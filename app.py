@@ -2,7 +2,7 @@ import os
 import click
 from calendar import monthrange
 from datetime import date
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -54,12 +54,16 @@ def home(path):
 
 @app.route('/api/fullSchedule')
 def apiFullDodgerSchedule():
+    if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json: return redirect(url_for('home'))
+
     allGames = DodgerGame.query.all()
     return jsonify([game.asDict for game in allGames])
 
 monthSwitch = { 'june': 6, 'july': 7, 'august': 8, 'september': 9, 'october': 10 }
 @app.route('/api/<string:month>')
 def apiSingleMonthDodgerSchedule(month):
+    if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json: return redirect(url_for('home'))
+
     monthNum = 0
     try: 
         monthNum = monthSwitch[month]
@@ -75,14 +79,17 @@ def apiSingleMonthDodgerSchedule(month):
     
 @app.route('/api/<string:month>/<int:day>')
 def apiSingleDayDodgerSchedule(month, day):
+    if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json: return redirect(url_for('home'))
+
     monthNum = 0
     try: 
         monthNum = monthSwitch[month]
     except KeyError:
-        return { 'message': 'Invalid Month!' }
+        return {'message': 'Invalid Month!'}
 
     lastDayOfMonth = monthrange(year=2021, month=monthSwitch[month])[1] #? Returns tuple (firstDay, lastDay)
-    if (day <= 0 or day > lastDayOfMonth): return { 'message': 'Invalid Day of month'}
+    if (day <= 0 or day > lastDayOfMonth):
+        return {'message': 'Invalid Month!'}
 
     start = date(year=2021, month=monthNum, day=day)
     endMonth = monthNum if (day != lastDayOfMonth) else monthNum + 1
