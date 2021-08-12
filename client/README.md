@@ -32,6 +32,7 @@ For a production build, simply run the following commands and thanks to sirv, yo
 npm run build
 npm run start
 ```
+But in this particular case `npm run build` should be auto run by Heroku and that should be it!
 
 ## Single-page app mode
 

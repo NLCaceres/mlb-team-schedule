@@ -38,6 +38,13 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
 - Flask should autoload .env files but if not include `load_dotenv=True` in the app.run command
   - Also important to have python-dotenv or flask won't have dotenv to load in the .env files
 
+## Heroku
+- Heroku will autodetect the package.json and install needed packages then run the detected build command as part of build phase (making a heroku-postbuild 
+command unnecessary except for more complicated setups). In this case, Svelte will build and ROLLUP the necessary files, allowing flask to serve it
+  - For this reason, package-lock.json is necessary, Heroku will install the dependency tree once it sees it [Extra Notes](https://devcenter.heroku.com/articles/nodejs-support)
+- Once the release phase begins (meaning build was successful), Heroku will check the Procfile for processes to run. Here, flask will 
+run the migrations committed to git by using the release process (flask db upgrade), and finally run web process (gunicorn app:app)
+
 ## Created CLI Commands 
 - Since Flask uses Click to make its own commands, it also exposes it for you to use, making it very to create your own CLI commands for all kinds of things!
 - In the case of this app, the few commands are related to updating the database
