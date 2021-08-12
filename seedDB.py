@@ -3,7 +3,7 @@ import requests
 from app import db
 from models import * #DodgerGame, BaseballTeam, Promo 
 
-#? Changing teamId in following url can change homeTeam to desired one
+#? Changing teamId in following url can change homeTeam to desired one - https://bit.ly/2XbrNVn for MLB-stats python wrapper github
 upcomingSchedule = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team' #? Concatenated at compile time
                     ',game(promotions)&season={seasonYear}&startDate={startDate}&endDate={endDate}' 
                     '&teamId=119&gameType=R,F,D,L,W&scheduleTypes=games') #* See below for formatting
@@ -13,6 +13,7 @@ latestGameUrl = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&team
 #https://statsapi.mlb.com/api/v1/teams?lang=en&sportId=1 #? Grabs all teams
 #https://statsapi.mlb.com/api/v1/standings?leagueId=104 #? Grabs all national league -> 203 - 205 NL West,East,Central
 #https://statsapi.mlb.com/api/v1/standings?leagueId=103 #? Grabs all american league -> 200 - 202 AL West,East,Central
+#https://statsapi.mlb.com/api/v1/gameTypes #? Useful for grabbing info on certain meta/key/urlParam types - https://bit.ly/3CLOyjl known types
 
 def createScheduleEndpoint(startDate = None, endDate = None, seasonYear = None):
     #* StartDate & endDate Format: YYYY-MM-DD -> e.g. 2021-06-01 #* SeasonYear Format: YYYY -> e.g. 2021

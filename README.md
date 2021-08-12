@@ -59,3 +59,15 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
 
   Bonus Tip - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the venv location 
   and what packages require that package! Super helpful if VSCode doesn't recognize imports
+
+### Notes on Seeding & the MLB-Stats API
+- Main Concern at the moment: How are double headers handled?
+  - Typically it seems rain delays get rescheduled next day turning single games into double headers which would make
+  the max number of games on a single day, for sure, two. 
+    - Mostly remains the same EXCEPT
+      - doubleHeader value goes from 'N' to 'S'
+      - scheduledInnings value goes from 9 to 7
+      - New rescheduledFrom key appears! with original UTC time
+    - Important to note that gamesInSeries & seriesGameNumber MAY change but likely will remain the same
+      - So if the first game in the series got rained out, the next day will have two games, with the first being the replacement
+      for the original first game, making gamesInSeries remain the same AND the seriesGameNumber the same while only the dates changed!
