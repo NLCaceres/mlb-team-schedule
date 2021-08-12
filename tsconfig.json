@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "strictPropertyInitialization": true,
+    "strictNullChecks": true
+  },
+
+  "include": ["client/**/*"],
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+}
