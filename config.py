@@ -12,7 +12,7 @@ class Config(object):
     SECRET_KEY = os.environ['SECRET_KEY']
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("://", "ql://", 1) #? Deals with small SQLAlchemy/Heroku incompatibility
     #? Usually would have some sort of prodConfig differentiations/overriden vars BUT heroku handles most of it
 
 class DevelopmentConfig(Config):
