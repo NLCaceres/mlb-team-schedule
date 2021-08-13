@@ -12,9 +12,8 @@ class Config(object):
     SECRET_KEY = os.environ['SECRET_KEY']
 
 class ProductionConfig(Config):
-    pass
-    #? Usually would have some sort of prodConfig differentiations/overriden vars BUT heroku will handle it
-    # SQLALCHEMY_DATABASE_URI = os.environ['PROD_DATABASE_URL'] #? For example
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    #? Usually would have some sort of prodConfig differentiations/overriden vars BUT heroku handles most of it
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
