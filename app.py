@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 app = Flask(__name__, static_folder='dist')
 
 #? APP_SETTINGS should = 'config.ProductionConfig', else following defaults to devConfig
-env_config = os.getenv('APP_SETTINGS', 'config.DevelopmentConfig')
+env_config = os.getenv('APP_SETTINGS', 'DodgersPromo.config.DevelopmentConfig') #? Python 3 expects explicit relative imports
 app.config.from_object(env_config) #? To get configs vars from config.py, use `os.config.get('envVariableName')`
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #? Disabled by default soon. ONLY useful if modding DB OFTEN
 
@@ -19,8 +19,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 #? Seems best to put next 2 lines here to avoid a circular dependency since 'models' file needs 'app' & 'db' ready
-from seedDB import seedDB, updateAllTeamRecords, updateAllPromotions #? Similarly, this imports 'models' so plan/place imports wisely!
-from models import DodgerGame
+from .commands.database_seed import seedDB #? Similarly, this imports 'models' so plan/place imports wisely!
+from .commands.database_update import updateAllTeamRecords, updateAllPromotions
+from .models import DodgerGame
 
 #* Flask Custom Commands
 

@@ -1,6 +1,6 @@
 from datetime import timedelta
 from sqlalchemy.ext.hybrid import hybrid_property
-from app import db
+from .app import db
 
 #? With particularly small projects, this can be kept in the main app file
 #? BUT when separating models into own file, you'd end up with a circular import and crash!
