@@ -62,7 +62,7 @@ def apiFullDodgerSchedule():
     allGames = DodgerGame.query.all()
     return jsonify([game.asDict for game in allGames])
 
-monthSwitch = { 'june': 6, 'july': 7, 'august': 8, 'september': 9, 'october': 10 }
+monthSwitch = { 'march': 3, 'april': 4, 'may': 5, 'june': 6, 'july': 7, 'august': 8, 'september': 9, 'october': 10 }
 @app.route('/api/<string:month>')
 def apiSingleMonthDodgerSchedule(month):
     if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json: 
@@ -74,8 +74,9 @@ def apiSingleMonthDodgerSchedule(month):
     except KeyError:
         return { 'message': 'Invalid Month!' }
 
-    start = date(year=2021, month=monthNum, day=1)
-    end = date(year=2021, month=monthNum+1, day=1)
+    year = date.today().year
+    start = date(year=year, month=monthNum, day=1)
+    end = date(year=year, month=monthNum+1, day=1)
 
     #* Was unable to get games on last day of month, so simplest solution = set end to 1st day of next month with '<'
     dodgerGames = DodgerGame.query.filter(DodgerGame.readableDateTime < end).filter(DodgerGame.readableDateTime >= start)
@@ -92,14 +93,15 @@ def apiSingleDayDodgerSchedule(month, day):
     except KeyError:
         return { 'message': 'Invalid Month!' }
 
-    lastDayOfMonth = monthrange(year=2021, month=monthSwitch[month])[1] #? Returns tuple (firstDay, lastDay)
+    year = date.today().year
+    lastDayOfMonth = monthrange(year=year, month=monthSwitch[month])[1] #? Returns tuple (firstDay, lastDay)
     if (day <= 0 or day > lastDayOfMonth):
         return { 'message': 'Invalid Month!' }
 
-    start = date(year=2021, month=monthNum, day=day)
+    start = date(year=year, month=monthNum, day=day)
     endMonth = monthNum if (day != lastDayOfMonth) else monthNum + 1
     endDay = day + 1 if (day != lastDayOfMonth) else 1
-    end = date(year=2021, month=endMonth, day=endDay)
+    end = date(year=year, month=endMonth, day=endDay)
 
     dodgerGames = DodgerGame.query.filter(DodgerGame.readableDateTime < end).filter(DodgerGame.readableDateTime >= start)
     return jsonify([game.asDict for game in dodgerGames])
