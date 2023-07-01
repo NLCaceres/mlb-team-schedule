@@ -27,4 +27,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from . import api
+    app.register_blueprint(api.bp)
+
+    from .commands import bp as command_blueprint
+    app.register_blueprint(command_blueprint, cli_group=None) #? No CLI group means no need to use blueprint name in command
+
     return app
