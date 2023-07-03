@@ -4,4 +4,4 @@ from . import create_app
 
 if __name__ == '__main__':
     app = create_app() #? Configure and construct the app
-    app.run(debug=app.config.get('DEBUG'), load_dotenv=True) #? And run it with a few extra param options
+    app.run(debug=app.config.get('DEBUG')) #? And run it with a few extra param options

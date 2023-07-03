@@ -7,14 +7,11 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 
-def create_app():
+def create_app(test_config = None):
     #? Adding export FLASK_ENV=development and FLASK_DEBUG=True can improve debugging
     app = Flask(__name__, static_folder='dist')
 
-    #? APP_SETTINGS should = 'config.ProductionConfig' BUT Python 3 wants explicit relative imports so prepend `DodgersPromo`
-    #? In prod, it might be helpful to use `print(os.getcwd().split('/')[-1])` to get the root directory name to prepend
-    env_config = os.getenv('APP_SETTINGS', 'DodgersPromo.config.DevelopmentConfig') #? Use dev version as a default
-    app.config.from_object(env_config) #? To get configs vars from config.py, use `os.config.get('envVariableName')`
+    configure_app(app, test_config)
 
     @app.route('/', defaults={'path': ''}) #* Path for the root Svelte page
     @app.route('/<path:path>') #? '<path' sets the var name. ':path>' type checks for URLs like 'dir/subDir/subSubDir'
@@ -34,3 +31,16 @@ def create_app():
     app.register_blueprint(command_blueprint, cli_group=None) #? No CLI group means no need to use blueprint name in command
 
     return app
+
+BASE_CONFIG_NAME = 'DodgersPromo.config'
+DEV_CONFIG = f"{BASE_CONFIG_NAME}.DevelopmentConfig"
+TESTING_CONFIG = f"{BASE_CONFIG_NAME}.TestingConfig"
+
+def configure_app(app, test_config):
+    #? APP_SETTINGS should = 'config.ProductionConfig' BUT Python 3 wants explicit relative imports so prepend `DodgersPromo`
+    #? In prod, it might be helpful to use `print(os.getcwd().split('/')[-1])` to get the root directory name to prepend
+    default_config = DEV_CONFIG if test_config is None else TESTING_CONFIG
+    env_config = os.getenv('APP_SETTINGS', default_config) #? Use dev version as a default
+    app.config.from_object(env_config) #? To get configs vars from config.py, use `os.config.get('envVariableName')`
+    if test_config is not None:
+        app.config.update(test_config)
