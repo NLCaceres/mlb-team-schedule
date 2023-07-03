@@ -21,6 +21,56 @@ files that can be swapped in as a particular team's theme without a single thoug
 
 For anyone who finds it, hopefully it helps you as much as it's helped me, and let me know what you think I should add, thanks! 
 
+## Recent Changes
+### Flask
+- Split `app.py` into a `create_app()` oriented `__init__.py` file, allowing `app.py` to do the final configuration before launching Flask in the
+`if __name__ == '__main__'` condition
+- API routes and custom CLI Commands split into their own files via the Flask Blueprint pattern
+- Database Seed file split into two command method files as well as three helper method files
+  - The Seeder, itself, adjusts for year and now accounts for longer season and adjusted schedules, and heavily depends on all three helper files
+    - Contains endpoint generation methods, the main CLI command, and model parse/creation methods
+  - The Update file contains 2 CLI commands, BUT depends on all three helper files as well as a few methods from the Seeder
+    - Update the promotions, depends on datetimeHelpers and the Seeder's endpoint generation methods as well as Promotion creation method 
+    - Update Team records, depends on a specific URL from the endpointHelpers, and its own mapping/parsing method
+- Add pyproject.toml + `pip-tools` generated `requirements.txt` via `requirements.in` for better dependency management
+- Configured `tests` directory with `Pytest` by adding a fixture to load the `.env` file as well as a set of `create_app()` oriented fixtures
+  - Added tests for utility methods, i.e. Database, datetime class, and endpoint URL helpers
+### Svelte
+- Prep for Svelte 4 by updating package.json completely, in particular to Typescript 5.1 and Node 18
+
+## Future Changes
+### Flask
+- Migrate from Heroku to Railway
+  - Since Railway deployments are always online, cron jobs are much easier! The APScheduler package's BackgroundScheduler() should do the trick, so the Flask app can 
+  update the database if there are changes to the schedule week to week.
+- Provide an Env var that can change the selected team
+  - Likely best to map the name to the MLB stats API's team ID
+  - Provide a simple deploy button? Railway template?
+- Use fixtures to test the database seed + update commands
+  - These fixtures can likely be defined within each test file so they can be specific and only provide necessary info
+- Drop `requirements.in` in favor of simply embracing `pyproject.toml`
+  - Unfortunately, there seems to be some issue with `setuptools`, `wheels`, and `pip-tools` that will hopefully be solved fairly soon!
+### Svelte
+- Svelte 4 is now an option! BUT Svelte-Navigator is currently the main issue as it lags behind in development
+- If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
+  - Is it possible to dynamically update the favicon?
+  - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
+  - Use current year to set the schedule year dynamically
+- Provide a view that shows the box score of a game in progress AND completed games
+  - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
+    - Update in real time? setInterval API call? websocket?
+- Double header calendar view
+  - Diagonally or horizontally split box?
+
+### Railway
+- Similar to Heroku, it should autodetect both the requirements.txt as well as the package.json, and run the needed buildpacks to setup dependencies
+  - If Railway only detects one of the buildpacks (Python or NodeJS), then adding the `providers` config option to your `nixpacks.toml` file should add
+  any needed buildpacks for monorepos like this one
+    - As a bonus, `nixpacks.toml` can define every step (called phases) of the build process if needed! Which can help replicate Heroku's release phase by
+    running `flask db upgrade` and seeding the database
+- Unlike Heroku, it'll only use the Procfile's web process, reading it as a start command, so it's probably best to drop `Procfile` in favor of a `railway.toml` file
+that contains a start command
+
 ## Workflow
 - To start
   - Enter the directory on the terminal and use `python3 -m venv venv` if an existing venv directory does not exist
@@ -48,46 +98,16 @@ simple API server.
   - Why though? `Flask`, nor `Vite` seem to like to be run in the background, so using Foreman makes separating the processes easy
   - BUT since `Vite` does not produce a build in dev mode, Vite must use a proxy to send Axios requests to the `Flask` API in dev
     - See `vite.config.js` for an example
-    - Alternatively, running `vite build -w` may work since it'll produce a build to a `dist` folder that `Flask` can serve by changing line 11 in `app.py`
-    from `Flask(__name__, static_folder="public")` to `Flask(__name__, static_folder="dist")`
-      - This method SHOULD eliminate the need for `foreman` since `Flask` could just serve Svelte index.html from the `templates` directory as long as 
-      all of the url_for('static') calls are updated properly in `templates/index.html`
+    - Alternatively, running `vite build -w` MOSTLY works since it produces a build in a `dist` folder that `Flask` can serve
+      - This method SHOULD eliminate the need for `foreman` since `Flask` could just serve Svelte's index.html from the `templates` directory as long as 
+      all of the `url_for('static')` calls are updated properly in `templates/index.html`
+      - The problem `url_for('static')` call that needs adjusting/updating is `build/bundle` files since Vite prefers to use `assets/index` files which can
+      include a hash extension that may change every re-build
+      - The solution (seemingly) is to add a `build` key to your `vite.config.ts` with a `rollupOptions.output` key inside it. Inside this `output` key, 
+      a simple adjustment to the `assetFileNames` and `entryFileNames` options can be made that should ensure consistent `assets/index` files across builds
 - Bonus Pip Tip - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the venv location 
 and what packages require that package! Super helpful if VSCode doesn't recognize imports
   - For even more tips, see [Pip PyPA](https://pip.pypa.io/en/latest/user_guide/)
-
-## Future Changes
-### Flask
-- Migrate from Heroku to Railway
-  - Since Railway deployments are always online, cron jobs are much easier! The APScheduler package's BackgroundScheduler() should do the trick, so the Flask app can 
-  update the database if there are changes to the schedule week to week.
-- Provide an Env var that can change the selected team
-  - Likely best to map the name to the MLB stats API's team ID
-  - Provide a simple deploy button? Railway template?
-- Make DB seed commands a bit more flexible, in particular so the date adjusts yearly and accounts for fluctuations in each season's schedule (i.e. shortened seasons
-and longer playoffs that may take the schedule from early March to early November!)
-- Separate API routes into an API Blueprint that the main Flask app accepts in `app.py`, enabling the API routes to be split into their own file
-  - Similarly, split seedDB based on usage, since some functions are helpers/utility, while others are main functions that are directly run by CLI commands
-### Svelte
-- Svelte 4 is now an option! BUT it has quite a few breaking changes, notably Node 16+ and Typescript 5 required
-  - Overall, a full upgrade to the latest versions of npm packages is needed
-- If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
-  - Is it possible to dynamically update the favicon? Can a favicon be downloaded during DB seeding?
-  - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
-- Provide a view that shows the box score of a game in progress AND completed games
-  - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
-    - Update in real time? setInterval API call?
-- Double header calendar view
-  - Diagonally or horizontally split box?
-
-### Railway
-- Similar to Heroku, it should autodetect both the requirements.txt as well as the package.json, and run the needed buildpacks to setup dependencies
-  - If Railway only detects one of the buildpacks (Python or NodeJS), then adding the `providers` config option to your `nixpacks.toml` file should add
-  any needed buildpacks for monorepos like this one
-    - As a bonus, `nixpacks.toml` can define every step (called phases) of the build process if needed! Which can help replicate Heroku's release phase by
-    running `flask db upgrade` and seeding the database
-- Unlike Heroku, it'll only use the Procfile's web process, reading it as a start command, so it's probably best to drop `Procfile` in favor of a `railway.toml` file
-that contains a start command
 
 ## Created CLI Commands 
 - Since `Flask` uses Click to make its own commands, it also exposes it for you to use, making it very to create your own CLI commands for all kinds of things!
@@ -119,3 +139,12 @@ that contains a start command
     - Important to note that gamesInSeries & seriesGameNumber MAY change but likely will remain the same
       - So if the first game in the series got rained out, the next day will have two games, with the first being the replacement
       for the original first game, making gamesInSeries remain the same AND the seriesGameNumber the same while only the dates changed!
+
+### Pytest
+- To run tests, run `pytest` from the root directory!
+  - It also helps to include `-W ignore::DeprecationWarning` to silence warnings commonly out of your control!
+    - A `pytest.ini` file can also be used to configure a filter for a number of different warnings by setting the `filterwarnings` key with a list of
+    `ignore::someWarning` strings
+  - Pytest DOESN'T load env files by default, so it's important to include a fixture that will run before all other fixtures to provide the env
+    - Most likely placed in a `conftest.py` file so all tests have your env loaded/included by default
+  
