@@ -2,7 +2,7 @@
   import { getSingleGame } from '../api';
   import Image from "../Utility/Components/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
-  import dateFormatter from "../Utility/Functions/DateFormatter";
+  import getReadableDate from "../Utility/Functions/DateFormatter";
 
   export let day: number;
   export let monthName: string;
@@ -25,7 +25,7 @@
     <h1>Loading up today's matchup!</h1>
   {:then currentGame} 
     {#if currentGame}
-      <h1 class="text-decoration-underline">{dateFormatter(currentGame.date)}'s Matchup:</h1>
+      <h1 class="text-decoration-underline">{getReadableDate(currentGame.date)}'s Matchup:</h1>
       <h3 class='text-center'>
         The <Image source="{currentGame.awayTeam.teamLogo}" altText="{currentGame.awayTeam.abbreviation} Logo"/>
         {currentGame.awayTeam.cityName} {currentGame.awayTeam.teamName} <sup>({currentGame.awayTeam.wins} - {currentGame.awayTeam.losses})</sup> 

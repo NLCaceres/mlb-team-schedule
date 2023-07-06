@@ -5,12 +5,13 @@
 
   //* Normal props
   export let month: Month;
+  export let currentYear: string;
 
 	//todo Optimize following since it gets called 3 times in a row
 	$: loadingGames = getMonthsGames(month);
 </script>
 
-<h3 class='subtitle text-center mb-2'>Below you'll find all the promos for the month of {month.monthName} 2021 </h3>
+<h3 class='subtitle text-center mb-2'>Below you'll find all the promos for the month of {month.monthName} {currentYear} </h3>
 
 <p class='subtitle text-center mb-0'>* indicates promo days at Dodger Stadium</p>
 

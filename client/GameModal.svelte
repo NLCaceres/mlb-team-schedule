@@ -2,7 +2,7 @@
   import type BaseballGame from "./Models/DataClasses";
   import Modal from "./Utility/Components/Modal.svelte";
   import Image from "./Utility/Components/Image.svelte";
-  import dateFormatter from './Utility/Functions/DateFormatter';
+  import getReadableDate from './Utility/Functions/DateFormatter';
 
   export let modalID: string;
   export let game: BaseballGame | null;
@@ -20,7 +20,7 @@
 <Modal modalID="{modalID}" modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border"> 
   <span slot="title" class="main-title w-100">
     <div class='d-flex justify-content-between'>
-      <h2 class="game-day text-decoration-underline">{dateFormatter(game?.date ?? '')}'s Matchup: </h2>
+      <h2 class="game-day text-decoration-underline">{getReadableDate(game?.date ?? '')}'s Matchup: </h2>
       <p class='game-day text-end'>{gameNumStr(game)}</p>
     </div>
     <h4>

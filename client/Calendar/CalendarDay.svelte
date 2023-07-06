@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type BaseballGame from '../Models/DataClasses';
-  import { timeFormatter } from '../Utility/Functions/DateFormatter';
+  import { getTimeFromDateStr } from '../Utility/Functions/DateFormatter';
   import { link } from 'svelte-navigator';
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
@@ -28,7 +28,7 @@
     const dimensions = (smallScreen || mini) ? '15' : (bigScreen) ? '45' : '30' //* Since img is square, can set to both height/width
     //* BUT svelte CAN react to the above dimensions init, and we can pass 'dimensions' to our DRY fn, making non reactive props reactive!
     awayLogoSvg = createSvgElem(awayLogo, dimensions); 
-  } */  
+  } */
 </script>
 
 <svelte:window bind:innerWidth />
@@ -43,7 +43,7 @@
           </p>
           {#if game}
             <p class="game-time link-shadow {(bigScreenSingleCalendar) ? 'fs-5 text-end lh-1 mt-1' : ''}">
-              {timeFormatter(game.date)}
+              {getTimeFromDateStr(game.date)}
             </p>
           {/if}
         </div>

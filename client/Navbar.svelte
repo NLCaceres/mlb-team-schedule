@@ -2,13 +2,14 @@
   import { link as linkNav, navigate, useLocation } from "svelte-navigator";
 
   export let links: string[] = [];
+  export let currentYear: string;
   const location = useLocation(); //? Exposes $location which acts as a basic reactive location obj
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark custom-nav">
   <div class="container-fluid">
 
-    <a class="navbar-brand fs-2" href="/">Dodgers 2021</a>
+    <a class="navbar-brand fs-2" href="/">Dodgers {currentYear}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

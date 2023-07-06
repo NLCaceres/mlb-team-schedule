@@ -9,6 +9,7 @@
 
   //* Normal props
   export let months: Month[];
+  export let currentYear: string;
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
@@ -63,7 +64,7 @@
 <svelte:window bind:innerWidth bind:innerHeight />
 
 <h3 class='subtitle text-center mb-2'>
-  Below you'll find a full list of the Dodgers Promo schedule 2021. 
+  Below you'll find a full list of the Dodgers Promo schedule {currentYear}.
   {tabletScreen ? 'Tapping' : 'Clicking'} the date will show you the details!
 </h3>
 

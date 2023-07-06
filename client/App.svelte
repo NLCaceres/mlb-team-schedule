@@ -15,17 +15,22 @@
 	import type RouteParams from 'svelte-navigator/types/RouteParam';
 	import type BaseballGame from './Models/DataClasses';
 	import Alert from './Utility/Components/Alert.svelte';
+  import { currentYear } from './Utility/Functions/DateFormatter';
 
-	let monthsDict = {
-		'june': {monthName: 'June', startDay: Day.Tuesday, numDays: 30},
-		'july': {monthName: 'July', startDay: Day.Thursday, numDays: 31},
-		'august': {monthName: 'August', startDay: Day.Sunday, numDays: 31}, 
-		'september': {monthName: 'September', startDay: Day.Wednesday, numDays: 30}, 
-		'october': {monthName: 'October', startDay: Day.Friday, numDays: 31}
+	let monthsDict = { //todo Try using API to set startDays
+		'march': { monthName: 'March', startDay: Day.Wednesday, numDays: 31 },
+		'april': { monthName: 'April', startDay: Day.Saturday, numDays: 30 },
+		'may': { monthName: 'May', startDay: Day.Monday, numDays: 31 },
+		'june': { monthName: 'June', startDay: Day.Tuesday, numDays: 30 },
+		'july': { monthName: 'July', startDay: Day.Thursday, numDays: 31 },
+		'august': { monthName: 'August', startDay: Day.Sunday, numDays: 31 }, 
+		'september': { monthName: 'September', startDay: Day.Wednesday, numDays: 30 }, 
+		'october': { monthName: 'October', startDay: Day.Friday, numDays: 31 }
 	};
 
 	//? Using a function introduces a bit of reactivity! Instead of a simple var or even just writing the main find() fn 
 	const dodgerMonths = Object.values(monthsDict);
+	const thisYear = currentYear();
 
 	let ballGameModal;
 	let invisibleAlert = true; //* Alert starts invisible
@@ -38,12 +43,7 @@
 		const foundMonth: Month = monthsDict[nextUrlParam];
 		if (!foundMonth) { navigate('/fullSchedule'); return; } //* Basic programmatic redirect with svelte
 	})
-	/* //? Worth considering as an alternative to svelte-navigator's useLocation hook (since as a whole the pkg may be overkill)
-	import {getContext} from 'svelte'; //? See: Svelte-routing issue #41
-	import {ROUTER} from 'svelte-routing/src/contexts';
-	const { activeRoute } = getContext(ROUTER); 
-	//? This would be used from inside a component placed in a Router - like the navbar component below
-	$: { console.log($activeRoute) } */
+	//todo Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
 
 	let modalBallGame: BaseballGame | null = null;
 	function displayBaseballGameModal(event: CustomEvent<BaseballGame | null>) { 
@@ -64,19 +64,19 @@
 <!-- Svelte-Navigator unlike svelte-routing includes 'a11y' which, while helpful, manages focus! 
 	and can lead to somewhat odd behavior like unexpected outlined headers -->
 <Router primary={false}> <!-- Setting primary to false prevents the odd focus a11y behavior -->
-	<Navbar links={dodgerMonths.map(month => month.monthName)}/>
+	<Navbar links={dodgerMonths.map(month => month.monthName)} currentYear={thisYear} />
 	
 	<main>
-		<h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule 2021!</h1>
+		<h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule {thisYear}!</h1>
 
 		<Route path="/:monthName/:dayNum" let:params>
 			<SingleDayView monthName={params.monthName} day={parseInt(params.dayNum)} />
 		</Route>
 		<Route path="/:monthName" let:params>
-			<SingleMonthView month={monthsDict[params.monthName]} on:openModal={displayBaseballGameModal} />
+			<SingleMonthView currentYear={thisYear} month={monthsDict[params.monthName]} on:openModal={displayBaseballGameModal} />
 		</Route>
 		<Route path="/fullSchedule">
-			<MiniCalendarView months={dodgerMonths} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
+			<MiniCalendarView currentYear={thisYear} months={dodgerMonths} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
 		</Route>
 
 		<Route path="/*">
