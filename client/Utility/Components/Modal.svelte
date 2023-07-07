@@ -1,29 +1,29 @@
-<script lang="ts">
-export let modalID: string;
-export let modalTitle: string | null = null;
+<script lang="ts"> //todo May ultimately be replaceable with the new <dialog> elem, fixing the slot testing issue
+export let modalID: string = "";
+export let modalTitle: string = "";
 
 //* Style CSS
 export let closeable = false;
-export let modalContentClasses = '';
-export let modalHeaderClasses = '';
+export let modalContentClasses = "";
+export let modalHeaderClasses = "";
 </script>
 
-<div class="modal fade" id="{modalID}" tabindex="-1" aria-labelledby="{modalID}" aria-hidden="true">
+<div class="modal fade" id="{modalID}" tabindex="-1" aria-labelledby="{modalID}" aria-hidden="true" data-testid="modal">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content {modalContentClasses}">
       <div class="modal-header {modalHeaderClasses}">
-        {#if $$slots.title}
-          <!-- Expected to always be changed but in case it's not!-->
+        {#if modalTitle !== "" || $$slots.title}
           <slot name="title"> <!-- Span works well as a slot parent component here -->
-            <h5 class="modal-title" id="{modalID}Label">{modalTitle} ?? {modalID} Label</h5>
+            <h5 class="modal-title" id="{modalID}Label">{modalTitle}</h5>
           </slot>
         {/if}
+
         {#if closeable}
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         {/if}
       </div>
       <div class="modal-body">
-        <slot name='body'></slot>
+        <slot name="body"></slot>
       </div>
     </div>
   </div>
