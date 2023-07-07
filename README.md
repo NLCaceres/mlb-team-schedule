@@ -37,6 +37,9 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
   - Added tests for utility methods, i.e. Database, datetime class, and endpoint URL helpers
 ### Svelte
 - Prep for Svelte 4 by updating package.json completely, in particular to Typescript 5.1 and Node 18
+- Add Vitest for unit testing + `testing-library/Svelte` for Component testing
+  - `Client/Utility` directory nearly completely finished BUT likely needs reorganizing before finishing last few unit tests
+- Use current year to set the schedule year dynamically
 
 ## Future Changes
 ### Flask
@@ -51,16 +54,37 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
 - Drop `requirements.in` in favor of simply embracing `pyproject.toml`
   - Unfortunately, there seems to be some issue with `setuptools`, `wheels`, and `pip-tools` that will hopefully be solved fairly soon!
 ### Svelte
+- Consider moving any Svelte notes into the Svelte Readme in the `client` directory
 - Svelte 4 is now an option! BUT Svelte-Navigator is currently the main issue as it lags behind in development
+  - Svelte-Routing is an option since it, now, includes the useLocation hook
 - If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
   - Is it possible to dynamically update the favicon?
   - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
-  - Use current year to set the schedule year dynamically
+  - Use DayJS or Date-Fns to help draw the calendars, in particular grabbing the day of the week each month starts
 - Provide a view that shows the box score of a game in progress AND completed games
   - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
     - Update in real time? setInterval API call? websocket?
-- Double header calendar view
-  - Diagonally or horizontally split box?
+- Update calendar view
+  - Double header -> Diagonally or horizontally split box?
+  - Update Image Component to not only provide a placeholder but lazy load only when on-screen
+- If dropping Bootstrap, one of the first components that can be improved is the Modal via the new `<dialog>` elem
+  - Partially because testing Svelte Slots currently requires making test components because there is no simple internal Svelte createSlot API
+- `Utility` directory could use a reorganization since the directories inside aren't particularly related
+  - After reorganizing, it might be easier to group tests with their components as well as group related components into small-ish folders
+  - Also after reorganizing, the `Utility/Functions` directory could use a bit of re-examining
+    - `CreateCalendar` might fit best in the `Calendar` component directory and definitely needs testing
+    - `CreateSvgElement` mostly relies on DomPurifier so testing might be unnecessary
+      - Since `Lodash.ts` is a dependency of `CreateSvgElement`, this seems to be the part to test
+        - Also, thanks to this simple helper func, the `lodash` npm package can probably be dropped
+        - Also it would be helpful to rename this file for better descriptiveness
+    - `DynamicEventBinding` is an incredibly powerful option for Components BUT completely unused at the moment so it may be a case of
+    optimizing too early, and better to drop rather than work out the testing
+    - A `StringHelper` file would probably be super helpful to process a number of strings across the app, in particular:
+      - Trim concatenated `string` props as well as CSS & Style strings
+      - Identify empty strings (i.e. "") since Svelte Props can't be set to Optional via the `?` marker
+        - An alternative around this limitation is either:
+          - `export let someProp: someClass | undefined = undefined`
+          - `export let someProp: Optional<someClass> = undefined` via a type alias like `type Optional<T> = T | undefined;`
 
 ### Railway
 - Similar to Heroku, it should autodetect both the requirements.txt as well as the package.json, and run the needed buildpacks to setup dependencies
