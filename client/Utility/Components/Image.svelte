@@ -1,31 +1,28 @@
 <script lang="ts">
-export let source: string | null; //* Src string
-export let altText: string; //* Text to display if not able to load img;
-export let height: number = 0;; //* Overrides
-export let width: number = 0;
+export let source: string = ""; //* Src string
+export let altText: string = ""; //* Text to display if not able to load img
+let hasError = false;
 
-$: heightStyle = (height !== 0) ? `height:${height}px !important;` : '';
-$: widthStyle = (width !== 0) ? `width:${width}px !important;` : '';
+export let height: number = 0; //* Overrides the dimensions
+$: heightStyle = (height !== 0) ? `height:${height}px !important;` : "";
+export let width: number = 0;
+$: widthStyle = (width !== 0) ? `width:${width}px !important;` : "";
 
 //* Css Props
 export let miniView = false;
-export let placeholderStyleString = '';
-let isLoaded = true;
-
+export let placeholderStyleString = "";
 </script>
 
-{#if isLoaded || source && source !== 'undefined'}
-  <!-- Loading src with 'error' will cause error on img tag and result in displaying else div as backup-->
-  <img src="{source ?? 'error'}" alt="{altText}" on:error={event => isLoaded = false} class:miniView 
-    style="{heightStyle}{widthStyle}">
-{:else}
+{#if hasError || source === ""}
   <div class="placeholder-img" style="{placeholderStyleString}">
     Missing {altText}
   </div>
+{:else}
+  <img src="{source}" alt="{altText}" on:error={event => hasError = true} class:miniView style="{heightStyle} {widthStyle}">
 {/if}
 
 <style lang="less">
-  @import '../Less/variables';
+  @import "../Less/variables";
   img {
     &.miniView {
       @media @max575 {

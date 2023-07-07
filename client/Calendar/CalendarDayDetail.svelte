@@ -16,9 +16,9 @@
 
 <div class:even class:odd={!even} class="{(mini) ? 'd-flex' : ''}">
   <div class='d-flex justify-content-evenly align-items-center link-shadow mt-2 mb-4 {(smallScreen || mini) ? 'flex-column' : ''} {(!mini) ? 'me-1':''}'>
-      <Image source="{game?.awayTeam.teamLogo ?? null}" altText="{game?.awayTeam.abbreviation} Logo" miniView="{mini}"/>
+      <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo" miniView="{mini}"/>
       vs 
-      <Image source="{game?.homeTeam.teamLogo ?? null}" altText="{game?.homeTeam.abbreviation} Logo" miniView="{mini}"/>
+      <Image source="{game?.homeTeam.teamLogo ?? ""}" altText="{game?.homeTeam.abbreviation} Logo" miniView="{mini}"/>
   </div>
   <div class='link-shadow {(!mini) ? 'mt-3': ''}'>
     {#if !mini && game?.promos && game?.promos.length > 0}

@@ -24,12 +24,12 @@
       <p class='game-day text-end'>{gameNumStr(game)}</p>
     </div>
     <h4>
-      The <Image source="{game?.awayTeam.teamLogo ?? null}" altText="{game?.awayTeam.abbreviation} Logo"/>
+      The <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo"/>
       {game?.awayTeam.cityName} {game?.awayTeam.teamName} <sup>({game?.awayTeam.wins} - {game?.awayTeam.losses})</sup>
     </h4>
     <h6>vs</h6>
     <h4>
-      The <Image source="{game?.homeTeam.teamLogo ?? null}" altText="{game?.homeTeam.abbreviation} Logo"/>
+      The <Image source="{game?.homeTeam.teamLogo ?? ""}" altText="{game?.homeTeam.abbreviation} Logo"/>
       {game?.homeTeam.cityName} {game?.homeTeam.teamName} <sup>({game?.homeTeam.wins} - {game?.homeTeam.losses})</sup>
     </h4>
   </span>
