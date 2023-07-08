@@ -15,7 +15,7 @@
 	import type RouteParams from 'svelte-navigator/types/RouteParam';
 	import type BaseballGame from './Models/DataClasses';
 	import Alert from './Utility/Components/Alert.svelte';
-  import { currentYear } from './Utility/Functions/DateFormatter';
+  import { currentYear } from './HelperFuncs/DateExtension';
 
 	let monthsDict = { //todo Try using API to set startDays
 		'march': { monthName: 'March', startDay: Day.Wednesday, numDays: 31 },

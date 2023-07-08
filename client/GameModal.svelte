@@ -2,7 +2,7 @@
   import type BaseballGame from "./Models/DataClasses";
   import Modal from "./Utility/Components/Modal.svelte";
   import Image from "./Utility/Components/Image.svelte";
-  import getReadableDate from './Utility/Functions/DateFormatter';
+  import getReadableDate from './HelperFuncs/DateExtension';
 
   export let modalID: string;
   export let game: BaseballGame | null;

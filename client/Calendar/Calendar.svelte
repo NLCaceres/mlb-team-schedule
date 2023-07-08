@@ -4,7 +4,7 @@ import { beforeUpdate, onMount } from 'svelte';
   import type BaseballGame from '../Models/DataClasses';
 
   import type { Month } from '../Models/Month'; //? As of TS 3.8, this syntax is used to import ONLY the type (rather than the whole file)
-  import { CreateRemainingMonth, CreateStartingWeek } from '../Utility/Functions/CreateCalendar';
+  import { CreateRemainingMonth, CreateStartingWeek } from './CreateCalendar';
   import CalendarDay from "./CalendarDay.svelte";
   
   //* Normal Props

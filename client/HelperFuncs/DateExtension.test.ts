@@ -1,4 +1,4 @@
-import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero, utcDate, currentYear } from "./DateFormatter"
+import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero, utcDate, currentYear } from "./DateExtension"
 
 describe("Utility functions relating to JS Date types", () => {
   //! Date

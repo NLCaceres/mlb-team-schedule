@@ -2,7 +2,7 @@
   import { getSingleGame } from '../api';
   import Image from "../Utility/Components/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
-  import getReadableDate from "../Utility/Functions/DateFormatter";
+  import getReadableDate from "../HelperFuncs/DateExtension";
 
   export let day: number;
   export let monthName: string;

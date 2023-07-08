@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type BaseballGame from '../Models/DataClasses';
-  import { getTimeFromDateStr } from '../Utility/Functions/DateFormatter';
+  import { getTimeFromDateStr } from '../HelperFuncs/DateExtension';
   import { link } from 'svelte-navigator';
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();

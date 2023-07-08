@@ -1,4 +1,4 @@
-import type { Month } from '../../Models/Month'; //? As of TS 3.8, this syntax is used to import ONLY the type (rather than the whole file)
+import type { Month } from '../Models/Month'; //? As of TS 3.8, this syntax is used to import ONLY the type (rather than the whole file)
 
 export function CreateStartingWeek(calendarMonth: Month): string[] {
   return Array.from({length: 7}, (_, i) => (i < calendarMonth.startDay) ? '' : `${i - calendarMonth.startDay + 1}`)
