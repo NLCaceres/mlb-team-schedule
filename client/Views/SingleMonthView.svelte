@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Month } from "../Models/Month";
   import Calendar from '../Calendar/Calendar.svelte';
-	import { getMonthsGames } from "../api";
+	import { getMonthsGames } from "../API";
 
   //* Normal props
   export let month: Month;

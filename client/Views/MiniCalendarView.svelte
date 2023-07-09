@@ -2,7 +2,7 @@
   import type { Month } from "../Models/Month";
   import { link } from 'svelte-navigator';
   import Calendar from '../Calendar/Calendar.svelte';
-  import { getFullSchedule } from "../api";
+  import { getFullSchedule } from "../API";
   import type BaseballGame from "../Models/DataClasses";
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();

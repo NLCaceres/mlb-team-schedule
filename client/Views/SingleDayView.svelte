@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getSingleGame } from '../api';
+  import { getSingleGame } from '../API';
   import Image from "../Common/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
   import getReadableDate from "../HelperFuncs/DateExtension";
