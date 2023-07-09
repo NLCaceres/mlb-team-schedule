@@ -93,7 +93,7 @@
 {/await}
 
 <style lang="less">
-  @import '../Utility/Less/variables';
+  @import '../CSS/variables';
 
   .subtitle {
     color: #004680;

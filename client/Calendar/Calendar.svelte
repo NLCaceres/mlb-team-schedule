@@ -62,7 +62,7 @@ import { beforeUpdate, onMount } from 'svelte';
 </table>
 
 <style lang='less'>
-  @import '../Utility/Less/variables';
+  @import '../CSS/variables';
 
   table {
     font-family: 'Rambla', sans-serif !important;

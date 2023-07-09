@@ -22,7 +22,7 @@ export let placeholderStyleString = "";
 {/if}
 
 <style lang="less">
-  @import "../Less/variables";
+  @import "../CSS/variables";
   img {
     &.miniView {
       @media @max575 {

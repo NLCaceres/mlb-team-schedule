@@ -1,6 +1,6 @@
 <script lang="ts">
   import type BaseballGame from "../Models/DataClasses";
-  import Image from "../Utility/Components/Image.svelte";
+  import Image from "../Common/Image.svelte";
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
@@ -47,7 +47,7 @@
 </div>
 
 <style lang="less">
-  @import '../Utility/Less/variables';
+  @import '../CSS/variables';
 
   .even > .link-shadow {
     color: @dodgerBlue;

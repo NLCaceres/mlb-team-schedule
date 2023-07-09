@@ -1,7 +1,7 @@
 <script lang="ts">
   import type BaseballGame from "./Models/DataClasses";
-  import Modal from "./Utility/Components/Modal.svelte";
-  import Image from "./Utility/Components/Image.svelte";
+  import Modal from "./Common/Modal.svelte";
+  import Image from "./Common/Image.svelte";
   import getReadableDate from './HelperFuncs/DateExtension';
 
   export let modalID: string;
@@ -54,7 +54,7 @@
 </Modal>  
 
 <style lang="less">
-  @import './Utility/Less/variables';
+  @import './CSS/variables';
 
   //* Using :global tells svelte to unscope and expand what this component's CSS can affect
   :global(.modal-content.custom-content) { //* Bootstrap will normally override so the !important is necessary

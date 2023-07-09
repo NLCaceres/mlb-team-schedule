@@ -5,7 +5,7 @@
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-  import Image from '../Utility/Components/Image.svelte';
+  import Image from '../Common/Image.svelte';
   import CalendarDayDetail from './CalendarDayDetail.svelte';
 
   //* Normal Props
@@ -72,7 +72,7 @@
 </td>
 
 <style lang="less">
-  @import '../Utility/Less/variables';
+  @import '../CSS/variables';
 
   .standard-detail {
     @media @max575 {

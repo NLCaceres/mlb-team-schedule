@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getSingleGame } from '../api';
-  import Image from "../Utility/Components/Image.svelte";
+  import Image from "../Common/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
   import getReadableDate from "../HelperFuncs/DateExtension";
 

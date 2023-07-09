@@ -34,7 +34,7 @@
 </nav>
 
 <style lang="less">
-  @import './Utility/Less/variables';
+  @import './CSS/variables';
 
   .custom-nav {
     background-color: darken(@dodgerBlue, 30%);

@@ -5,7 +5,7 @@
 	import Navbar from './Navbar.svelte';
 	import { Modal as BsModal, Alert as BsAlert } from "bootstrap";
 	import GameModal from './GameModal.svelte';
-	import Redirect from "./Utility/Components/Redirect.svelte";
+	import Redirect from "./Common/Redirect.svelte";
 	import SingleDayView from "./Views/SingleDayView.svelte";
 	import SingleMonthView from "./Views/SingleMonthView.svelte";
 	import MiniCalendarView from './Views/MiniCalendarView.svelte'
@@ -14,7 +14,7 @@
 	import { Day } from "./Models/Month";
 	import type RouteParams from 'svelte-navigator/types/RouteParam';
 	import type BaseballGame from './Models/DataClasses';
-	import Alert from './Utility/Components/Alert.svelte';
+	import Alert from './Common/Alert.svelte';
   import { currentYear } from './HelperFuncs/DateExtension';
 
 	let monthsDict = { //todo Try using API to set startDays
@@ -96,7 +96,7 @@
 
 
 <style lang='less'>
-	@import './Utility/Less/variables';
+	@import './CSS/variables';
 
 	.main-title {
 		color: #004680;

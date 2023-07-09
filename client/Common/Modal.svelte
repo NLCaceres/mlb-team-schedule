@@ -30,7 +30,7 @@ export let modalHeaderClasses = "";
 </div>
 
 <style lang="less">
-  @import '../Less/variables';
+  @import '../CSS/variables';
 
   .modal-dialog { //* Imitates modal-lg from bootstrap (needed due to Svelte scoping overriding modal-lg)
     @media @min576 {

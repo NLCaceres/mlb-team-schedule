@@ -24,7 +24,7 @@
 {/if}
 
 <style lang="less">
-  @import "../Less/variables";
+  @import "../CSS/variables";
   div.alert {
     position: fixed;
     color: white;
