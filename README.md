@@ -22,7 +22,6 @@ files that can be swapped in as a particular team's theme without a single thoug
 For anyone who finds it, hopefully it helps you as much as it's helped me, and let me know what you think I should add, thanks! 
 
 ## Recent Changes
-### Flask
 - Split `app.py` into a `create_app()` oriented `__init__.py` file, allowing `app.py` to do the final configuration before launching Flask in the
 `if __name__ == '__main__'` condition
 - API routes and custom CLI Commands split into their own files via the Flask Blueprint pattern
@@ -35,14 +34,9 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
 - Add pyproject.toml + `pip-tools` generated `requirements.txt` via `requirements.in` for better dependency management
 - Configured `tests` directory with `Pytest` by adding a fixture to load the `.env` file as well as a set of `create_app()` oriented fixtures
   - Added tests for utility methods, i.e. Database, datetime class, and endpoint URL helpers
-### Svelte
-- Prep for Svelte 4 by updating package.json completely, in particular to Typescript 5.1 and Node 18
-- Add Vitest for unit testing + `testing-library/Svelte` for Component testing
-  - `Client/Utility` directory nearly completely finished BUT likely needs reorganizing before finishing last few unit tests
-- Use current year to set the schedule year dynamically
+
 
 ## Future Changes
-### Flask
 - Migrate from Heroku to Railway
   - Since Railway deployments are always online, cron jobs are much easier! The APScheduler package's BackgroundScheduler() should do the trick, so the Flask app can 
   update the database if there are changes to the schedule week to week.
@@ -53,38 +47,7 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
   - These fixtures can likely be defined within each test file so they can be specific and only provide necessary info
 - Drop `requirements.in` in favor of simply embracing `pyproject.toml`
   - Unfortunately, there seems to be some issue with `setuptools`, `wheels`, and `pip-tools` that will hopefully be solved fairly soon!
-### Svelte
-- Consider moving any Svelte notes into the Svelte Readme in the `client` directory
-- Svelte 4 is now an option! BUT Svelte-Navigator is currently the main issue as it lags behind in development
-  - Svelte-Routing is an option since it, now, includes the useLocation hook
-- If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
-  - Is it possible to dynamically update the favicon?
-  - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
-  - Use DayJS or Date-Fns to help draw the calendars, in particular grabbing the day of the week each month starts
-- Provide a view that shows the box score of a game in progress AND completed games
-  - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
-    - Update in real time? setInterval API call? websocket?
-- Update calendar view
-  - Double header -> Diagonally or horizontally split box?
-  - Update Image Component to not only provide a placeholder but lazy load only when on-screen
-- If dropping Bootstrap, one of the first components that can be improved is the Modal via the new `<dialog>` elem
-  - Partially because testing Svelte Slots currently requires making test components because there is no simple internal Svelte createSlot API
-- `Utility` directory could use a reorganization since the directories inside aren't particularly related
-  - After reorganizing, it might be easier to group tests with their components as well as group related components into small-ish folders
-  - Also after reorganizing, the `Utility/Functions` directory could use a bit of re-examining
-    - `CreateCalendar` might fit best in the `Calendar` component directory and definitely needs testing
-    - `CreateSvgElement` mostly relies on DomPurifier so testing might be unnecessary
-      - Since `Lodash.ts` is a dependency of `CreateSvgElement`, this seems to be the part to test
-        - Also, thanks to this simple helper func, the `lodash` npm package can probably be dropped
-        - Also it would be helpful to rename this file for better descriptiveness
-    - `DynamicEventBinding` is an incredibly powerful option for Components BUT completely unused at the moment so it may be a case of
-    optimizing too early, and better to drop rather than work out the testing
-    - A `StringHelper` file would probably be super helpful to process a number of strings across the app, in particular:
-      - Trim concatenated `string` props as well as CSS & Style strings
-      - Identify empty strings (i.e. "") since Svelte Props can't be set to Optional via the `?` marker
-        - An alternative around this limitation is either:
-          - `export let someProp: someClass | undefined = undefined`
-          - `export let someProp: Optional<someClass> = undefined` via a type alias like `type Optional<T> = T | undefined;`
+
 
 ### Railway
 - Similar to Heroku, it should autodetect both the requirements.txt as well as the package.json, and run the needed buildpacks to setup dependencies
@@ -114,21 +77,14 @@ that contains a start command
   - It is also possible to run `Flask` like a typical python program via `python app.py` which will run the code in the `if __name__ == "__main__"` block
   - This along with `python-dotenv` should load any `.env` files 
     - If it doesn't, then adding `load_dotenv=True` to the app.run command fixes this issue
-- With the addition of `Vite`, it is useful to have [`foreman`](https://github.com/ddollar/foreman), so it can run `Vite` in dev mode while `Flask` acts as a 
-simple API server.
-  - The start command would be `foreman local -f Procfile.dev`
-    - HOWEVER, due to issues with Mac's system version of Ruby, I found it simplest to use the Go Port of `Foreman`, i.e. `ForeGo`
-  - In `Forego`, the command is `forego start -f Procfile.dev`
-  - Why though? `Flask`, nor `Vite` seem to like to be run in the background, so using Foreman makes separating the processes easy
-  - BUT since `Vite` does not produce a build in dev mode, Vite must use a proxy to send Axios requests to the `Flask` API in dev
-    - See `vite.config.js` for an example
-    - Alternatively, running `vite build -w` MOSTLY works since it produces a build in a `dist` folder that `Flask` can serve
-      - This method SHOULD eliminate the need for `foreman` since `Flask` could just serve Svelte's index.html from the `templates` directory as long as 
-      all of the `url_for('static')` calls are updated properly in `templates/index.html`
-      - The problem `url_for('static')` call that needs adjusting/updating is `build/bundle` files since Vite prefers to use `assets/index` files which can
-      include a hash extension that may change every re-build
-      - The solution (seemingly) is to add a `build` key to your `vite.config.ts` with a `rollupOptions.output` key inside it. Inside this `output` key, 
-      a simple adjustment to the `assetFileNames` and `entryFileNames` options can be made that should ensure consistent `assets/index` files across builds
+- To run both `Flask` and the `Svelte` app, run `forego start -f Procfile.dev`
+  - Alternatively, to see Flask serve a production build run `forego start -f Procfile.devBuild`
+  - In order to run Procfiles and the commands inside them, [`forego`](https://github.com/ddollar/forego) is necessary
+    - This is the Golang version of the handy-dandy [`foreman`](https://github.com/ddollar/foreman)
+      - Why not use `foreman`? `forego` just seems to play along with Mac's system version of Ruby
+    - As a bonus, `forego` will grab any `.env` files for you!
+  - Why not just use `flask run & npm run dev`? It seems neither Flask, nor Vite like to run in the background, so one command kills the other unless you open two
+  separate terminals. At that point, `forego` is a convenient addition for Mac users that use `homebrew` to install packages like `forego`
 - Bonus Pip Tip - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the venv location 
 and what packages require that package! Super helpful if VSCode doesn't recognize imports
   - For even more tips, see [Pip PyPA](https://pip.pypa.io/en/latest/user_guide/)
