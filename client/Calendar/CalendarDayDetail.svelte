@@ -1,47 +1,50 @@
 <script lang="ts">
-  import type BaseballGame from "../Models/DataClasses";
   import Image from "../Common/Image.svelte";
+  import type BaseballGame from "../Models/DataClasses";
 
-  $: innerWidth = window.innerWidth;
-  $: smallScreen = innerWidth < 576;
-  $: tabletScreen = innerWidth <= 768;
-
-  export let game: BaseballGame | null;
+  export let game: BaseballGame;
+  export let even: boolean = true; //* Helps create contrast in colors
   export let mini: boolean = false;
-  export let even: boolean = true;
-
+  
+  $: innerWidth = window.innerWidth;
+  $: tabletScreen = innerWidth <= 768; //todo <Image> accepts CSS classes, so use instead of a style string
 </script>
 
 <svelte:window bind:innerWidth />
 
 <div class:even class:odd={!even} class="{(mini) ? 'd-flex' : ''}">
-  <div class='d-flex justify-content-evenly align-items-center link-shadow mt-2 mb-4 {(smallScreen || mini) ? 'flex-column' : ''} {(!mini) ? 'me-1':''}'>
-      <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo" miniView="{mini}"/>
+  <div class='d-flex justify-content-evenly align-items-center link-shadow mt-2 mb-4 {(mini) ? 'flex-column' : 'me-1'}'>
+      <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo" miniView="{mini}" />
       vs 
-      <Image source="{game?.homeTeam.teamLogo ?? ""}" altText="{game?.homeTeam.abbreviation} Logo" miniView="{mini}"/>
+      <Image source="{game?.homeTeam.teamLogo ?? ""}" altText="{game?.homeTeam.abbreviation} Logo" miniView="{mini}" />
   </div>
   <div class='link-shadow {(!mini) ? 'mt-3': ''}'>
-    {#if !mini && game?.promos && game?.promos.length > 0}
-      <h6>* Promos</h6>
-      <ul class="promo-list">
-        {#each game?.promos as promo (promo.id)}
-          <li>
-            <Image source="{promo.thumbnailUrl}" altText="{promo.name} Thumbnail" miniView={mini}
-              placeholderStyleString="margin-bottom:7px;{(!even)? 'color:#fff;background-color:#000;' :''}
-              {(tabletScreen) ? 'font-size:10px;' : 'font-size:14px'}"/>
-              <!--Using font-size since Bootstrap 'fs' utility class is still too big! -->
-          </li>
-        {/each}
-      </ul>
-    {:else if mini && game?.promos && game?.promos.length > 0}
-      <sup>{(game && game?.promos.length > 0) ? '*' : ''}</sup>
+    {#if game.promos.length > 0}
+      {#if mini}
+        <sup>*</sup>
 
-    {:else if !mini && game?.promos && game?.promos.length === 0}
-      {#if game?.homeTeam.teamName === 'Dodgers'}
+      {:else}
+        <h6>* Promos</h6>
+        <ul class="promo-list">
+          {#each game.promos as promo (promo.id)}
+            <li>
+              <Image source="{promo.thumbnailUrl}" altText="{promo.name} Thumbnail" miniView={mini}
+                placeholderStyleString="margin-bottom:7px;{(!even) ? 'color:#fff;background-color:#000;' : ''}
+                {(tabletScreen) ? 'font-size:10px;' : 'font-size:14px'}"/>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+
+    {:else if !mini}
+      {#if game.homeTeam.teamName === 'Dodgers'}
         <h6>Sorry! No Dodgers promos today!</h6>
       {:else}
         <h6>Sorry! The Dodgers away, No promos today!</h6>
       {/if}
+
+    {:else}
+      <!--* Just a colored-in empty space -->
     {/if}
   </div>
 </div>

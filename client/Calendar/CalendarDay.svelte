@@ -1,27 +1,24 @@
 <script lang='ts'>
+  import Image from '../Common/Image.svelte';
+  import CalendarDayDetail from './CalendarDayDetail.svelte';
   import type BaseballGame from '../Models/DataClasses';
   import { getTimeFromDateStr } from '../HelperFuncs/DateExtension';
   import { link } from 'svelte-navigator';
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-  import Image from '../Common/Image.svelte';
-  import CalendarDayDetail from './CalendarDayDetail.svelte';
-
   //* Normal Props
-  export let mini: boolean = false;
   export let currentMonth: string;
-  export let dayOfWeek: string = '';
+  export let dayNum: string; //* Day N of this month, i.e. 1 to 31 
   export let game: BaseballGame | null;
-
   //* Css Related Props
-  export let even: boolean; //* 
+  export let even: boolean = true; //* Helps create contrast in colors
+  export let mini: boolean = false;
   export let cssClasses: string = '';
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
-  
-  $: bigScreenSingleCalendar = !smallScreen && !mini; //* When in a tablet or greater view + not in the multicalendar month page == true
+  $: largeCalendarView = !smallScreen && !mini; //* When in a tablet or greater view + not in the multicalendar month page == true
 
   /* Good Example of Svelte Reactivity - common pattern: handle complex computed props with a reactive block
   $: { //* When DRYing code, note Svelte can't react to vars in or changed by an external func, of course!
@@ -34,41 +31,53 @@
 <svelte:window bind:innerWidth />
 
 <!-- Bootstrap 5 does expose events to listen on modal opening/closing BUT -->
-<td class={`standard-detail ${cssClasses}`} class:different-month={dayOfWeek === ''} class:even class:odd={!even} >
-    <div class="fs-6 justify-content-between {(bigScreenSingleCalendar || !game) ? 'flex-column' : 'd-flex'}" on:click={e => dispatch('openModal', game)}>
-      {#if dayOfWeek}
-        <div class="{(bigScreenSingleCalendar) ? 'd-flex justify-content-between' : ''}">
-          <p class="calendar-text text-decoration-underline {even ? 'text-dodger-blue' : 'text-white'} me-2" class:mini>
-            {dayOfWeek}
+<td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ''} class:even class:odd={!even}>
+  <!--todo Divs aren't clickable so the following causes an a11y issue, so need to convert this div into a button -->
+  <div class="fs-6 justify-content-between d-flex {(largeCalendarView || !game) ? 'flex-column' : ''}" on:click={e => dispatch('openModal', game)}>
+    {#if dayNum.length > 0}
+      <!--* Calendar Days always need the numbered day of the week (1-31) -->
+      <div class="{(largeCalendarView) ? 'd-flex justify-content-between' : ''}">
+        <p class="calendar-text text-decoration-underline {even ? 'text-dodger-blue' : 'text-white'} me-2" class:mini>
+          {dayNum}
+        </p>
+        <!--* If game happening, give the time -->
+        {#if game}
+          <p class="game-time link-shadow {(largeCalendarView) ? 'fs-5 text-end lh-1 mt-1' : ''}">
+            {getTimeFromDateStr(game.date)}
           </p>
-          {#if game}
-            <p class="game-time link-shadow {(bigScreenSingleCalendar) ? 'fs-5 text-end lh-1 mt-1' : ''}">
-              {getTimeFromDateStr(game.date)}
-            </p>
-          {/if}
-        </div>
-        {#if game && !smallScreen}
-          <CalendarDayDetail game={game} mini={mini} even={even}/>
-
-        {:else if game}
-          <a use:link href="/{currentMonth}/{dayOfWeek}" class='d-flex justify-content-evenly 
-            align-items-center link-shadow mt-2 {(smallScreen || mini) ? 'flex-column' : ''}'>
-              <Image source="{game.awayTeam.teamLogo}" altText="{game.awayTeam.abbreviation} Logo" miniView="{mini}"/>
-              vs 
-              <Image source="{game.homeTeam.teamLogo}" altText="{game.homeTeam.abbreviation} Logo" miniView="{mini}"/>
-          </a>
-          <div class='link-shadow me-1'><sup>{game.promos.length > 0 ? '*' : ''}</sup></div>
-
-        {:else if currentMonth === 'october' && parseInt(dayOfWeek) > 30}
-          <p class:mini class='calendar-text text-center lh-1'>Season Over!</p>
-
-        {:else if currentMonth === 'october'}
-          <p class:mini class='calendar-text text-center lh-1'>Post Season!</p>
-        {:else}
-          <p class:mini class="calendar-text text-center lh-1">Off Day!</p>
         {/if}
+      </div>
+
+      <!--* Main Game + Promo Section -->
+      {#if game && !smallScreen}
+        <CalendarDayDetail game={game} mini={mini} even={even} />
+
+      {:else if game}
+        <a use:link href="/{currentMonth}/{dayNum}" class='d-flex justify-content-evenly 
+          align-items-center link-shadow mt-2 {(mini) ? 'flex-column': ''}'>
+            <Image source="{game.awayTeam.teamLogo}" altText="{game.awayTeam.abbreviation} Logo" miniView="{mini}" />
+            vs 
+            <Image source="{game.homeTeam.teamLogo}" altText="{game.homeTeam.abbreviation} Logo" miniView="{mini}" />
+        </a>
+        <div class='link-shadow me-1'><sup>{game.promos.length > 0 ? '*' : ''}</sup></div>
+
+      {:else if currentMonth === 'march' && parseInt(dayNum) < 20 }
+        <p class:mini class='calendar-text text-center lh-1'>Spring Training!</p>
+
+      {:else if currentMonth === 'october' && parseInt(dayNum) > 30}
+        <p class:mini class='calendar-text text-center lh-1'>Season Over!</p>
+
+      {:else if currentMonth === 'october'}
+        <p class:mini class='calendar-text text-center lh-1'>Post Season!</p>
+
+      {:else}
+        <p class:mini class="calendar-text text-center lh-1">Off Day!</p>
       {/if}
-    </div>
+    
+    {:else}
+      <!--* Just a colored-in empty space -->
+    {/if}
+  </div>
 </td>
 
 <style lang="less">
