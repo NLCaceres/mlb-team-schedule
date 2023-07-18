@@ -1,47 +1,40 @@
 <script lang='ts'>
-import { beforeUpdate, onMount } from 'svelte';
-
-  import type BaseballGame from '../Models/DataClasses';
-
-  import type { Month } from '../Models/Month'; //? As of TS 3.8, this syntax is used to import ONLY the type (rather than the whole file)
-  import { CreateRemainingMonth, CreateStartingWeek } from './CreateCalendar';
+  import { beforeUpdate } from 'svelte';
   import CalendarDay from "./CalendarDay.svelte";
+  import type BaseballGame from '../Models/DataClasses';
+  import { CreateMonth } from './CreateCalendar';
+  import { getDayFromDateStr } from '../HelperFuncs/DateExtension';
   
   //* Normal Props
-  export let calendarMonth: Month;
-  export let mini: boolean = false;
-  
+  export let monthName: string;
   export let gamesList: BaseballGame[];
   let offDays: number = 0; //* Tracks days without a game to calc game assignment
+  //* Css Props
+  export let mini: boolean = false;
+  export let tableClass: string = ''; //* Allow default prop
+
+  $: month = CreateMonth(gamesList);
+  
   beforeUpdate(() => {
     offDays = 0; //* Useful to prevent accessing negative indices
   })
   function grabGame(day: string): BaseballGame | null {
-    if (day) {
-      if (!gamesList || gamesList.length === 0) return null;
-      const properCalendarDayNum = parseInt(day); //* Converts '01' -> 1 properly
-      const nextIndex = properCalendarDayNum - (1 + offDays); //* Goal: Assign every game in list to a day!
-      // console.log(`Next Index is ${nextIndex}`);
-      const expectedGame = (nextIndex < gamesList.length) ? gamesList[nextIndex] : null;
-      // console.log(expectedGame);
-      if (expectedGame) {
-        const gameDayNum = expectedGame.date.split(' ')[2]; //* Format: 'Weekday Month DayNum...'
-        if (parseInt(gameDayNum) === properCalendarDayNum) { return expectedGame } 
-        else { offDays++; return null; } //* No Games today so do best to keep gameList at same index
-      }
-    }
-    // console.log("Not a day of this month");
+    if (day.length === 0 || gamesList.length === 0) { return null }
+
+    const calendarDayNum = parseInt(day); //* Proper way of turning '1' -> 1 (rather than +day via "+" unary operator)
+    const nextIndex = calendarDayNum - (1 + offDays); //* Goal: Assign every game in list to a day!
+    if (nextIndex >= gamesList.length) { return null } //* At end of the month, so no more off-days/games. Rest of calendar is empty
+    const expectedGame = gamesList[nextIndex]
+
+    const gameDayNum = parseInt(getDayFromDateStr(expectedGame.date)); //* Take the day # of the month in int form, not string form
+    if (gameDayNum === calendarDayNum) { return expectedGame }
+    offDays++; //* No game on this day, so this keeps the gameList index in the same spot
     return null;
   }
-
-  //* Css Props
-  export let tableClass: string = ''; //* Allow default prop
-
-  $: month = [CreateStartingWeek(calendarMonth), ...CreateRemainingMonth(calendarMonth) ];
 </script>
 
 <table class={`table table-bordered table-sm ${tableClass}`} class:mini-calendar={mini}>
-  <caption>{calendarMonth.monthName}</caption>
+  <caption>{monthName}</caption>
   <thead>
     <tr>
       {#each ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'] as day (day+'-head')}
@@ -53,8 +46,7 @@ import { beforeUpdate, onMount } from 'svelte';
     {#each month as week, i ("week-"+i)} <!-- Can actually loop thru ANYTHING with length prop so {length: 6} would work too -->
       <tr> <!-- Following key seems to rerender multiple times but uncertain why -->
         {#each week as day, j ("date-box-"+i*7+j) } <!--"date-box-" + WeekNum*7 DateBoxNum e.g. 'date-box-6'-->
-          <CalendarDay game={grabGame(day)} currentMonth={calendarMonth.monthName.toLowerCase()} dayOfWeek={day} 
-            mini={mini} even={i % 2 === 0} on:openModal/>
+          <CalendarDay game={grabGame(day)} currentMonth={monthName.toLowerCase()} dayNum={day} mini={mini} even={i % 2 === 0} on:openModal/>
         {/each}
       </tr>
     {/each}
