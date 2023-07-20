@@ -151,33 +151,33 @@ describe("Utility functions relating to JS Date types", () => {
     const [date, time] = utcString.split('T');
 
     const [year, month, day] = date.split('-'); //? [YYYY, MM, DD]
-    expect(year.length).toBe(4); 
-    expect(month.length).toBe(2); 
-    expect(day.length).toBe(2);
+    expect(year).toHaveLength(4); 
+    expect(month).toHaveLength(2); 
+    expect(day).toHaveLength(2);
 
     const [hour, minute, second] = time.slice(0, time.length - 1).split(':'); //? [HH, MM, SS.SSS]
-    expect(hour.length).toBe(2); 
-    expect(minute.length).toBe(2);
-    expect(second.length).toBe(6);
+    expect(hour).toHaveLength(2); 
+    expect(minute).toHaveLength(2);
+    expect(second).toHaveLength(6);
   })
   test("grabs the year, month and day as an array from a UTC string", () => {
     const dateElements = todaysSplitDate();
-    expect(dateElements.length).toBe(3); //* Should always be [YYYY, MM, DD]
+    expect(dateElements).toHaveLength(3); //* Should always be [YYYY, MM, DD]
 
     const [year, month, day] = dateElements; //* Easily destructured for use
     //* Because, there's no consistent method of matching the date to a specific set of numbers
     //* Instead, identify the consistent properties of these dates to gauge that we receive the correct data
-    expect(year.length).toBe(4);
+    expect(year).toHaveLength(4);
     expect(year.slice(0, 2)).toBe("20"); //* It'll be a while before this test fails
-    expect(month.length).toBe(2);
+    expect(month).toHaveLength(2);
     expect(parseInt(month)).toBeLessThanOrEqual(12); //* Should never be higher than 12, i.e. December
-    expect(day.length).toBe(2);
+    expect(day).toHaveLength(2);
     expect(parseInt(day)).toBeLessThanOrEqual(31); //* Should never be higher than 31 since no month has more days
     //todo Keep thinking of consistent properties to further assert that the correct date info is being returned
   })
   test("grabs the year from a UTC string", () => {
     const thisYear = currentYear();
-    expect(thisYear.length).toBe(4); //* Should always be 4 digits
+    expect(thisYear).toHaveLength(4); //* Should always be 4 digits
     expect(thisYear.slice(0, 2)).toBe("20"); //* It'll be a while before this test fails
   })
 })
