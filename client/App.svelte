@@ -1,35 +1,20 @@
 <script lang="ts">
 	import { beforeUpdate, onMount } from 'svelte';
 	import { Router, Route, navigate } from "svelte-navigator";
-	
-	import Navbar from './Navbar.svelte';
-	import { Modal as BsModal, Alert as BsAlert } from "bootstrap";
+	import Alert from './Common/Alert.svelte';
 	import GameModal from './GameModal.svelte';
+	import Navbar from './Navbar.svelte';
 	import Redirect from "./Common/Redirect.svelte";
+	import MiniCalendarView from './Views/MiniCalendarView.svelte'
 	import SingleDayView from "./Views/SingleDayView.svelte";
 	import SingleMonthView from "./Views/SingleMonthView.svelte";
-	import MiniCalendarView from './Views/MiniCalendarView.svelte'
-
-	import type { Month } from "./Models/Month";
-	import { Day } from "./Models/Month";
-	import type RouteParams from 'svelte-navigator/types/RouteParam';
+	import { Modal as BsModal, Alert as BsAlert } from "bootstrap";
+	import { MONTH_MAP } from "./Models/Month";
 	import type BaseballGame from './Models/DataClasses';
-	import Alert from './Common/Alert.svelte';
   import { currentYear } from './HelperFuncs/DateExtension';
 
-	let monthsDict = { //todo Try using API to set startDays
-		'march': { monthName: 'March', startDay: Day.Wednesday, numDays: 31 },
-		'april': { monthName: 'April', startDay: Day.Saturday, numDays: 30 },
-		'may': { monthName: 'May', startDay: Day.Monday, numDays: 31 },
-		'june': { monthName: 'June', startDay: Day.Tuesday, numDays: 30 },
-		'july': { monthName: 'July', startDay: Day.Thursday, numDays: 31 },
-		'august': { monthName: 'August', startDay: Day.Sunday, numDays: 31 }, 
-		'september': { monthName: 'September', startDay: Day.Wednesday, numDays: 30 }, 
-		'october': { monthName: 'October', startDay: Day.Friday, numDays: 31 }
-	};
-
 	//? Using a function introduces a bit of reactivity! Instead of a simple var or even just writing the main find() fn 
-	const dodgerMonths = Object.values(monthsDict);
+	const monthsInSeason = Object.keys(MONTH_MAP).slice(2, -2);
 	const thisYear = currentYear();
 
 	let ballGameModal;
@@ -40,7 +25,7 @@
 	})
 	beforeUpdate(() => {
 		const nextUrlParam = window.location.pathname.slice(1); //* Don't need '/foo' with slash, need 'foo'
-		const foundMonth: Month = monthsDict[nextUrlParam];
+		const foundMonth = MONTH_MAP[nextUrlParam.slice(0,1).toUpperCase() + nextUrlParam.slice(1)];
 		if (!foundMonth) { navigate('/fullSchedule'); return; } //* Basic programmatic redirect with svelte
 	})
 	//todo Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
@@ -48,7 +33,7 @@
 	let modalBallGame: BaseballGame | null = null;
 	function displayBaseballGameModal(event: CustomEvent<BaseballGame | null>) { 
 		if (event.detail) {
-			ballGameModal.show(); 
+			ballGameModal.show();
 			modalBallGame = event.detail;
 		}
   }
@@ -64,7 +49,7 @@
 <!-- Svelte-Navigator unlike svelte-routing includes 'a11y' which, while helpful, manages focus! 
 	and can lead to somewhat odd behavior like unexpected outlined headers -->
 <Router primary={false}> <!-- Setting primary to false prevents the odd focus a11y behavior -->
-	<Navbar links={dodgerMonths.map(month => month.monthName)} currentYear={thisYear} />
+	<Navbar links={monthsInSeason} currentYear={thisYear} />
 	
 	<main>
 		<h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule {thisYear}!</h1>
@@ -72,11 +57,11 @@
 		<Route path="/:monthName/:dayNum" let:params>
 			<SingleDayView monthName={params.monthName} day={parseInt(params.dayNum)} />
 		</Route>
-		<Route path="/:monthName" let:params>
-			<SingleMonthView currentYear={thisYear} month={monthsDict[params.monthName]} on:openModal={displayBaseballGameModal} />
+		<Route path="/:monthName">
+			<SingleMonthView currentYear={thisYear} on:openModal={displayBaseballGameModal} />
 		</Route>
 		<Route path="/fullSchedule">
-			<MiniCalendarView currentYear={thisYear} months={dodgerMonths} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
+			<MiniCalendarView currentYear={thisYear} months={monthsInSeason} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
 		</Route>
 
 		<Route path="/*">
