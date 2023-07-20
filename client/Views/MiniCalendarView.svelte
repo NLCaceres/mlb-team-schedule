@@ -1,62 +1,52 @@
 <script lang='ts'>
-  import type { Month } from "../Models/Month";
-  import { link } from 'svelte-navigator';
   import Calendar from '../Calendar/Calendar.svelte';
-  import { getFullSchedule } from "../API";
+  import { link } from 'svelte-navigator';
   import type BaseballGame from "../Models/DataClasses";
+  import { MONTH_NUM_MAP } from '../Models/Month';
+  import { getFullSchedule } from "../API";
+  import { getDayFromDateStr, getMonthFromDateStr, todaysSplitDate } from '../HelperFuncs/DateExtension';
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
   //* Normal props
-  export let months: Month[];
+  export let months: string[]; //* Expected months of the season
   export let currentYear: string;
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
   $: innerHeight = window.innerHeight;
-  //* Following should handle most tablets since they're usually taller than wide, unlike laptops
-  $: tabletScreen = innerWidth <= 1024 && innerHeight > innerWidth + 100; 
+  $: tabletScreen = innerWidth <= 1024 && innerHeight > innerWidth + 100; //* Since tablets are tall, but not wide, this excludes laptops
 
   async function splitGames() {
     let loadedGames = await getFullSchedule();
-    if (loadedGames) {
-      const gamesSplitByMonth: BaseballGame[][] = [[],[],[],[],[]];
-      let gamesIndex = 0;
-      for (let i = 0; i < gamesSplitByMonth.length; i++) {
-        let currentMonthName = months[i].monthName;
-        // console.log(`Beginning Following Month: ${currentMonthName}`);
-        for (let j = gamesIndex; j < loadedGames.length; j++) {
-          const loadedGame = loadedGames[j];
-          const monthName = loadedGame.date.split(' ')[1]; //* Format: 'Weekday Month...'
-          // console.log(`LoadedGameMonthName: ${monthName} vs MonthSelectingFor: ${currentMonthName}`)
-          if (monthName === currentMonthName) {
-            // console.log("Matched months! Adding game");
-            gamesSplitByMonth[i].push(loadedGame);
-          } else {
-            // console.log(`Done Processing ${currentMonthName}`);
-            gamesIndex = j; //* So next for loop in next iteration of i, starts at this index
-            break;
-          }
+    if (loadedGames === undefined) { return undefined }
+    //? Can't use Array(length).fill([]) since it fills each spot with the same array ref, so each change affects the other
+    const gamesSplitByMonth: BaseballGame[][] = Array.from({ length: months.length }, _ => []);
+    let gamesIndex = 0;
+    for (let i = 0; i < gamesSplitByMonth.length; i++) { //todo May be able to condense these loops into single "while" loop
+      for (let j = gamesIndex; j < loadedGames.length; j++) {
+        const monthName = getMonthFromDateStr(loadedGames[j].date);
+        if (monthName !== months[i]) {
+          gamesIndex = j; //* In next iteration of the "i" for-loop start the j-loop at gamesIndex of loadedGames
+          break;
         }
+        gamesSplitByMonth[i].push(loadedGames[j]);
       }
-      return gamesSplitByMonth;
     }
-    return undefined;
+    return gamesSplitByMonth;
   }
   const dividedGamesList = splitGames();
 
-  const currentDate = new Date();
-  const currentMonth = currentDate.toLocaleString('default', { month: 'long'}).toLowerCase();
-  const currentDay = currentDate.toLocaleString('default', { day: 'numeric'});
+  const [_, currentMonth, currentDay] = todaysSplitDate();
 
   async function propagateModalOpening(event: Event) { 
     const dividedGames = await splitGames();
     if (dividedGames) {
-      const monthIndex = currentDate.getMonth() - 5 //* Since starting at June, offset is 5 (6th month of year zero-indexed)
+      const monthIndex = parseInt(currentMonth) - 3; //* Since starting season starts in March, offset is 3
       const foundMonth = dividedGames[monthIndex];
-      const foundGame = foundMonth.find(game => parseInt(game.date.split(' ')[2]) === parseInt(currentDay));
-      if (!foundGame) dispatch('openAlert', true); //* If offday, open alert to say so!
-      else dispatch('openModal', foundGame);
+      const foundGame = foundMonth.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
+      if (!foundGame) { dispatch('openAlert', true) } //* If offday, open alert to say so!
+      else { dispatch('openModal', foundGame) }
     }
   }
 </script>
@@ -76,15 +66,15 @@
   {#if gamesByMonth}
     <div class="container mt-2">
         {#if smallScreen}
-          <a use:link href="{currentMonth}/{currentDay}" class="btn">Today's Game is:</a>
+          <a use:link href="{MONTH_NUM_MAP[parseInt(currentMonth)]}/{currentDay}" class="btn">Today's Game is:</a>
         {:else}
           <button type='button' class="btn ms-lg-5" on:click={propagateModalOpening}>Today's Game is:</button>
         {/if}
     </div>
 
     <div class="d-flex flex-wrap w-100 justify-content-center">
-      {#each months as month, i (month.monthName)}
-        <Calendar tableClass={`mx-2`} calendarMonth={month} mini gamesList={gamesByMonth[i]} on:openModal/>
+      {#each months as month, i (month)}
+        <Calendar mini tableClass={`mx-2`} monthName={month} gamesList={gamesByMonth[i]} on:openModal />
       {/each}
     </div>
   {:else}

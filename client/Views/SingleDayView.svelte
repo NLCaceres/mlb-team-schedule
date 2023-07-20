@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { getSingleGame } from '../API';
   import Image from "../Common/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
+  import { getSingleGame } from '../API';
   import getReadableDate from "../HelperFuncs/DateExtension";
 
   export let day: number;
@@ -51,7 +51,7 @@
             {/each}
           </ul>
         {:else if currentGame.homeTeam.teamName === "Dodgers"}
-          <h3>Sorry no Dodgers Promos today!</h3>
+          <h3>Sorry! No Dodgers Promos today!</h3>
         {:else}
           <h3>Sorry! The Dodgers are away, so no promos today!</h3>
         {/if}

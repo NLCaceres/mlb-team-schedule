@@ -1,25 +1,29 @@
 <script lang="ts">
-  import type { Month } from "../Models/Month";
   import Calendar from '../Calendar/Calendar.svelte';
 	import { getMonthsGames } from "../API";
+  import { useLocation } from "svelte-navigator";
 
-  //* Normal props
-  export let month: Month;
+  //? As a bonus the following location is completely compatible with svelte-routing
+  const location = useLocation(); //? Ex: Grab "/april" and ONLY take "april"
+  $: month = $location.pathname.slice(1, 2).toUpperCase() + $location.pathname.slice(2);
   export let currentYear: string;
 
 	//todo Optimize following since it gets called 3 times in a row
 	$: loadingGames = getMonthsGames(month);
+  $: innerWidth = window.innerWidth;
 </script>
 
-<h3 class='subtitle text-center mb-2'>Below you'll find all the promos for the month of {month.monthName} {currentYear} </h3>
+<svelte:window bind:innerWidth />
+
+<h3 class='subtitle text-center mb-2'>Below you'll find all the promos for the month of {month} {currentYear} </h3>
 
 <p class='subtitle text-center mb-0'>* indicates promo days at Dodger Stadium</p>
 
 {#await loadingGames}
   <h1>Loading up this month's games!</h1>
-{:then fullGames} 
+{:then fullGames}
   {#if fullGames}
-		<Calendar calendarMonth={month} gamesList={fullGames} on:openModal/>
+		<Calendar monthName={month} mini={innerWidth < 576} gamesList={fullGames} on:openModal/>
   {:else}
     <h1>Sorry! Seems we hit a snag!</h1>
   {/if}
