@@ -46,20 +46,18 @@ describe("render a single day in a typical wall-calendar style", () => {
     expect(screen.getByText("foo").nextElementSibling).toBeNull(); //* Time should non-existent
     //? use "nextElementSibling" because "nextSibling" may treat the text inside a <p> tag as a sibling
   })
-  test("switching the game/promo section depending on the screen width and if a game is happening", () => {    
-    const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", game: game });
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
-    
-    //* On small screens, each calendar day is a link to a Detail page, using the currentMonth and dayNum
+  test("altering the game/promo section depending on the screen width and if a game is happening", () => { 
+    //todo Since small screens, use a simplified/smaller version of the CalendarDayDetail
+    //todo Seems best to find a way to merge the simpler stylings into CalendarDayDetail, simplifying this entire conditional block
+    //* On small screens, each calendar day gets a smaller version of the CalendarDayDetail component
     global.innerWidth = 575;
-    rerender({ currentMonth: "foo", dayNum: "bar", game: game });
-    expect(screen.getByRole("link")).toBeInTheDocument();
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/foo/bar");
-    expect(screen.getByRole("link").nextElementSibling?.firstElementChild).toHaveTextContent("");
+    const { rerender } = render(CalendarDay, { currentMonth: "foo", dayNum: "bar", game: game });
+    expect(screen.getByText("vs")).toBeInTheDocument();
+    expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("");
     //* The link gets an asterisk if it has promotions 
     rerender({ currentMonth: "foo", dayNum: "bar", game: { ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }]} });
-    expect(screen.getByRole("link")).toBeInTheDocument();
-    expect(screen.getByRole("link").nextElementSibling?.firstElementChild).toHaveTextContent("*");
+    expect(screen.getByText("vs")).toBeInTheDocument();
+    expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("*");
 
     //! If no game, then one of the following messages is displayed in the Calendar Day depending on time of the season
     rerender({ currentMonth: "march", dayNum: "15", game: null });
@@ -82,14 +80,14 @@ describe("render a single day in a typical wall-calendar style", () => {
       rerender({ currentMonth: "", dayNum: "foo", game: game, mini: true });
       expect(screen.getByText("foo")).toHaveClass("mini");
 
-      global.innerWidth = 575; //* Need to change viewport size to render <a> tag instead of CalendarDayDetail
+      global.innerWidth = 575; //* Need to change viewport size to prevent rendering full CalendarDayDetail
       rerender({ currentMonth: "", dayNum: "foo", game: game, mini: true });
       expect(screen.getByText("foo")).toHaveClass("mini"); //* No change
-      expect(screen.getByRole("link")).toHaveClass("flex-column");
+      expect(screen.getByText("vs")).toHaveClass("flex-column"); //* Smaller non-component based CalendarDayDetail
 
       rerender({ currentMonth: "", dayNum: "foo", game: game, mini: false });
       expect(screen.getByText("foo")).not.toHaveClass("mini"); //* Mini now false, so remove class
-      expect(screen.getByRole("link")).not.toHaveClass("flex-column"); //* Small screen, so despite mini being false, keep this class
+      expect(screen.getByText("vs")).not.toHaveClass("flex-column"); //* Small screen, so despite mini being false, keep this class
 
       rerender({ currentMonth: "march", dayNum: "15", game: null, mini: true });
       expect(screen.getByText(/spring training/i)).toHaveClass("mini");

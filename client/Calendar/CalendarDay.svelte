@@ -3,7 +3,7 @@
   import CalendarDayDetail from './CalendarDayDetail.svelte';
   import type BaseballGame from '../Models/DataClasses';
   import { getTimeFromDateStr } from '../HelperFuncs/DateExtension';
-  import { link } from 'svelte-navigator';
+  import { link, navigate } from 'svelte-navigator';
   import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
@@ -20,6 +20,10 @@
   $: smallScreen = innerWidth < 576;
   $: largeCalendarView = !smallScreen && !mini; //* When in a tablet or greater view + not in the multicalendar month page == true
 
+  function handleClick(event: Event) { //* Nav to DetailView on mobile, Else open the app-wide modal
+    if (smallScreen) { navigate(`${currentMonth}/${dayNum}`) }
+    else { dispatch('openModal', game) }
+  }
   /* Good Example of Svelte Reactivity - common pattern: handle complex computed props with a reactive block
   $: { //* When DRYing code, note Svelte can't react to vars in or changed by an external func, of course!
     const dimensions = (smallScreen || mini) ? '15' : (bigScreen) ? '45' : '30' //* Since img is square, can set to both height/width
@@ -33,7 +37,7 @@
 <!-- Bootstrap 5 does expose events to listen on modal opening/closing BUT -->
 <td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ''} class:even class:odd={!even}>
   <!--todo Divs aren't clickable so the following causes an a11y issue, so need to convert this div into a button -->
-  <div class="fs-6 justify-content-between d-flex {(largeCalendarView || !game) ? 'flex-column' : ''}" on:click={e => dispatch('openModal', game)}>
+  <div class="fs-6 justify-content-between d-flex {(largeCalendarView || !game) ? 'flex-column' : ''}" on:click={handleClick}>
     {#if dayNum.length > 0}
       <!--* Calendar Days always need the numbered day of the week (1-31) -->
       <div class="{(largeCalendarView) ? 'd-flex justify-content-between' : ''}">
@@ -53,12 +57,11 @@
         <CalendarDayDetail game={game} mini={mini} even={even} />
 
       {:else if game}
-        <a use:link href="/{currentMonth}/{dayNum}" class='d-flex justify-content-evenly 
-          align-items-center link-shadow mt-2 {(mini) ? 'flex-column': ''}'>
+        <div class='d-flex justify-content-evenly align-items-center link-shadow mt-2 text-decoration-underline {(mini) ? 'flex-column': ''}'>
             <Image source="{game.awayTeam.teamLogo}" altText="{game.awayTeam.abbreviation} Logo" miniView="{mini}" />
             vs 
             <Image source="{game.homeTeam.teamLogo}" altText="{game.homeTeam.abbreviation} Logo" miniView="{mini}" />
-        </a>
+        </div>
         <div class='link-shadow me-1'><sup>{game.promos.length > 0 ? '*' : ''}</sup></div>
 
       {:else if currentMonth === 'march' && parseInt(dayNum) < 20 }
