@@ -85,18 +85,12 @@
 
   .standard-detail {
     @media @max575 {
-      max-width: 25px;
-      min-width: 25px;
-      width: 25px;
-      min-height: 55px;
-      height: 55px;
+      max-width: 25px; //* Prevents overly wide td elems
+      height: 80px; //* Keeps equal table rows/tds in mobile view 
     }
     @media @min576 {
-      max-width: 40px;
-      min-width: 40px;
-      width: 40px;
-      min-height: 100px;
-      height: 100px;
+      max-width: 40px; //* Only width setting needed to limit table at lower widths
+      height: 190px; //* Only setting needed to create equal rows/td elements, while allowing some to stretch bigger to fit content
     }
     font-size: 1rem;
     font-weight: bolder;
@@ -107,6 +101,15 @@
     }
     &:hover.odd:not(.different-month) {
       background-color: lighten(#0290f5, 20%);
+    }
+
+    &.mini { //* Following keeps table rows/tds equal in mini calendar
+      @media @min576 {
+        height: 100px; 
+      }
+      @media @min992 {
+        height: 131px; //* Oddly works
+      }
     }
   }
 

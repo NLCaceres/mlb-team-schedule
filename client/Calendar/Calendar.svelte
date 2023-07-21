@@ -88,12 +88,14 @@
       @media @min576 { //* Only way to use 'and' as expected in an @media query
         @media @max991 {
           max-width: 380px;
+          width: 380px; //* Solves an odd safari issue for wider screens
           max-height: 325px;
         }
       }
       @media @min992 {
         max-width: 440px;
-        max-height: 400px;
+        width: 440px; //* Solves an odd safari issue for wider screens
+        height: 800px;
       }
     }
   }
