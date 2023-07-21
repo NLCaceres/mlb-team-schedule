@@ -24,11 +24,15 @@
 ## Recent Changes
 - Prep for Svelte 4 by updating package.json completely, in particular to Typescript 5.1 and Node 18
 - Add Vitest for unit testing + `testing-library/Svelte` for Component testing
+- Update Calendar props to adapt to a normal/generalized Baseball season each year
+  - Speed up rendering with less prop-drilling, simpler algorithm, quick dependencies like date-fns, and more edge-cases considered
+  - Get rid of TS enums + unnecessary Month interface
 - Use current year to set the schedule year dynamically
 - `Client/Utility` directory reorganized across the `Client` folder into `Common` components, `CSS` style files, and `HelperFuncs` directories
   - Several files moved entirely, specifically `CreateCalendar.ts` moved into `Calendar` and `CreateSvgElement` now contains its necessary `unescape()` function
   - Lodash dropped entirely
 - `API` folder added to organize common HTTP Request functionality, the main set of API endpoints, and, in the future, a set of MLB endpoints
+
 
 ## Future Changes
 - Svelte 4 is now an option! BUT Svelte-Navigator is currently the main issue as it lags behind in development
@@ -36,13 +40,17 @@
 - If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
   - Is it possible to dynamically update the favicon?
   - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
-  - Use DayJS or Date-Fns to help draw the calendars, in particular grabbing the day of the week each month starts
 - Provide a view that shows the box score of a game in progress AND completed games
   - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
     - Update in real time? setInterval API call? websocket?
 - Update calendar view
   - Double header -> Diagonally or horizontally split box?
   - Update Image Component to not only provide a placeholder but lazy load only when on-screen
+  - CalendarDay currently is difficult to access for screen readers since a `<div>` will only have its text read aloud without any interactivity.
+  Consequently, the `<div>` inside `<td>` should be swapped for a `<button>` that calls the new onClick handler
+    - Alternatively, the tap target can be made larger by placing the onClick handler on the `<td>` itself, which is already easily accessible.
+    - Additionally, to simplify the conditional rendering of its Game/Promo section, CalendarDayDetail should be styled so that the first
+    `{:else if game}` condition is not needed. Instead, CalendarDayDetail should render something similar to the `else if` condition's simple layout
 - If dropping Bootstrap, one of the first components that can be improved is the Modal via the new `<dialog>` elem
   - Partially because testing Svelte Slots currently requires making test components because there is no simple internal Svelte createSlot API
 - `DynamicEventBinding` is an incredibly powerful option for Components BUT completely unused at the moment so it may be a case of
