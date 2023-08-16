@@ -1,4 +1,5 @@
 Flask ~=2.3
+Flask-APScheduler ~= 1.12
 Flask-Migrate ~=4.0
 Flask-SQLAlchemy ~=3.0
 gunicorn ~=20.1
