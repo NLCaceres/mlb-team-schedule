@@ -77,17 +77,24 @@ that contains a start command
   - It is also possible to run `Flask` like a typical python program via `python app.py` which will run the code in the `if __name__ == "__main__"` block
   - This along with `python-dotenv` should load any `.env` files 
     - If it doesn't, then adding `load_dotenv=True` to the app.run command fixes this issue
-- To run both `Flask` and the `Svelte` app, run `forego start -f Procfile.dev`
-  - Alternatively, to see Flask serve a production build run `forego start -f Procfile.devBuild`
-  - In order to run Procfiles and the commands inside them, [`forego`](https://github.com/ddollar/forego) is necessary
-    - This is the Golang version of the handy-dandy [`foreman`](https://github.com/ddollar/foreman)
-      - Why not use `foreman`? `forego` just seems to play along with Mac's system version of Ruby
-    - As a bonus, `forego` will grab any `.env` files for you!
+- To run both `Flask` and the `Svelte` app, run `hivemind Procfile.dev`
+  - Alternatively, to see Flask serve a production build run `hivemind Procfile.devBuild`
+  - In order to run Procfiles and the commands inside them, [`hivemind`](https://github.com/DarthSim/hivemind) is necessary
+    - This is a modern and even simpler alternative to [`foreman`](https://github.com/ddollar/foreman)
+      - Why not use `foreman`? `hivemind` works even better with `.env` files and accepts additional `.env` vars inline with the command, i.e. `PORT=3000 flask run`
   - Why not just use `flask run & npm run dev`? It seems neither Flask, nor Vite like to run in the background, so one command kills the other unless you open two
-  separate terminals. At that point, `forego` is a convenient addition for Mac users that use `homebrew` to install packages like `forego`
-- Bonus Pip Tip - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the venv location 
-and what packages require that package! Super helpful if VSCode doesn't recognize imports
+  separate terminals. At that point, `hivemind` is a convenient addition for Mac users that use `homebrew` to install packages like `hivemind`
+- Bonus `pip` Tips
+  - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the venv location and what packages require that package! 
+  Super helpful if VSCode doesn't recognize imports
   - For even more tips, see [Pip PyPA](https://pip.pypa.io/en/latest/user_guide/)
+  - `pip-tools` is a super helpful set of command line tools to simplify Python dependency management by providing the `pip-compile` and `pip-sync` commands
+    - `pip-compile` takes a list of dependencies and their semantic versioning from a `pyproject.toml` or `requirements.in` file and generates a very clean
+    and well-organized `requirements.txt` file
+      - `pip-compile --upgrade` checks for the latest version number for all dependencies and sub-dependencies and rewrites the `requirements.txt` file
+    - `pip-sync`, on the other hand, actually runs the dependency installations and updates to match the newly created `requirements.txt`
+    - To handle dev requirements, `pip-compile` appends `requirements-dev.in` while `pip-sync` appends `requirements-dev.txt` to the end of each respective command
+    so that the proper dependencies are grabbed, written, and installed
 
 ## Created CLI Commands 
 - Since `Flask` uses Click to make its own commands, it also exposes it for you to use, making it very to create your own CLI commands for all kinds of things!
