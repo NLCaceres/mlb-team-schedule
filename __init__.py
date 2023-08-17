@@ -1,17 +1,20 @@
 import os
 from flask import Flask, render_template
+from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 #? Setting db and migrate here makes exporting them into other pkgs/dirs & modules/files easier
 db = SQLAlchemy()
 migrate = Migrate()
+scheduler = APScheduler()
 
 def create_app(test_config = None):
     #? Adding export FLASK_ENV=development and FLASK_DEBUG=True can improve debugging
     app = Flask(__name__, static_folder='dist')
 
     configure_app(app, test_config)
+    scheduler.init_app(app)
 
     @app.route('/', defaults={'path': ''}) #* Path for the root Svelte page
     @app.route('/<path:path>') #? '<path' sets the var name. ':path>' type checks for URLs like 'dir/subDir/subSubDir'
@@ -23,6 +26,9 @@ def create_app(test_config = None):
 
     db.init_app(app)
     migrate.init_app(app, db)
+
+    from . import scheduled_jobs # noqa: F401
+    scheduler.start() #? `import scheduled_jobs` ensures its tasks run after BOTH scheduler.start() and app.run() were called
 
     from . import api
     app.register_blueprint(api.bp)
