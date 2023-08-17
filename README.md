@@ -31,22 +31,23 @@ For anyone who finds it, hopefully it helps you as much as it's helped me, and l
   - The Update file contains 2 CLI commands, BUT depends on all three helper files as well as a few methods from the Seeder
     - Update the promotions, depends on datetimeHelpers and the Seeder's endpoint generation methods as well as Promotion creation method 
     - Update Team records, depends on a specific URL from the endpointHelpers, and its own mapping/parsing method
-- Add pyproject.toml + `pip-tools` generated `requirements.txt` via `requirements.in` for better dependency management
+    - The Promos and TeamRecord update commands both placed on a weekly schedule via Flask-APScheduler
+      - However, Railway does offer Cron Jobs as a service now if eventually needed for some reason
+- `pyproject.toml` + `pip-tools` added to generate `requirements.txt` via `requirements.in` for better dependency management
 - Configured `tests` directory with `Pytest` by adding a fixture to load the `.env` file as well as a set of `create_app()` oriented fixtures
   - Added tests for utility methods, i.e. Database, datetime class, and endpoint URL helpers
 
 
 ## Future Changes
-- Migrate from Heroku to Railway
-  - Since Railway deployments are always online, cron jobs are much easier! The APScheduler package's BackgroundScheduler() should do the trick, so the Flask app can 
-  update the database if there are changes to the schedule week to week.
 - Provide an Env var that can change the selected team
   - Likely best to map the name to the MLB stats API's team ID
   - Provide a simple deploy button? Railway template?
 - Use fixtures to test the database seed + update commands
   - These fixtures can likely be defined within each test file so they can be specific and only provide necessary info
 - Drop `requirements.in` in favor of simply embracing `pyproject.toml`
-  - Unfortunately, there seems to be some issue with `setuptools`, `wheels`, and `pip-tools` that will hopefully be solved fairly soon!
+  - Unfortunately, there seems to be some issue with `setuptools`, `wheels`, and `pip-tools` that will hopefully be solved once `pip-tools` switches to
+  the `wheels` standard output logger, which should unveil any issues with the `pyproject.toml` file
+- Deploy to Railway
 
 
 ### Railway
@@ -113,19 +114,19 @@ that contains a start command
   - `flask db migrate` -> Create a migration file inside `migrations/versions` that's based on your models
     - Since Alembic isn't perfect, ALWAYS double check the DB changes it generates
   - `flask db upgrade` -> Run any new migrations on your DB
+    - `flask db downgrade` -> To rollback the last migration you've run
   - WORKFLOW NOTE: `db init` is only run once! `db migrate` + `db upgrade` is generally run every time you need to make migration changes
 
 ### Notes on Seeding & the MLB-Stats API
-- Main Concern at the moment: How are double headers handled?
-  - Typically it seems rain delays get rescheduled next day turning single games into double headers which would make
+- Main Concern at the moment: How are double headers handled in the API's JSON?
+  - Rain delays generally get rescheduled next day turning single games into double headers which would make
   the max number of games on a single day, for sure, two. 
-    - Mostly remains the same EXCEPT
-      - doubleHeader value goes from 'N' to 'S'
-      - scheduledInnings value goes from 9 to 7
-      - New rescheduledFrom key appears! with original UTC time
+    - Mostly remains the same EXCEPT the date JSON item updates its `'totalGames': 2`, the 2nd game item gets marked as `'gameNumber': 2`,
+    and doubleHeader value goes from 'N' to 'S', but these likely won't have any effect on the DB's record of each Game
     - Important to note that gamesInSeries & seriesGameNumber MAY change but likely will remain the same
-      - So if the first game in the series got rained out, the next day will have two games, with the first being the replacement
-      for the original first game, making gamesInSeries remain the same AND the seriesGameNumber the same while only the dates changed!
+      - Ex: If the first game in the series got rained out, the next day will have two games, with the first being the replacement
+      for the original first game, making gamesInSeries remain the same AND the seriesGameNumber the same
+        - MAIN FIX LIKELY NEEDED: Therefore ONLY the date will change for the rescheduled game
 
 ### Pytest
 - To run tests, run `pytest` from the root directory!
