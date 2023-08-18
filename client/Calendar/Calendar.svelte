@@ -18,18 +18,22 @@
   beforeUpdate(() => {
     offDays = 0; //* Useful to prevent accessing negative indices
   })
-  function grabGame(day: string): BaseballGame | null {
-    if (day.length === 0 || gamesList.length === 0) { return null }
+  function getTodaysGames(day: string): BaseballGame[] {
+    if (day.length === 0 || gamesList.length === 0) { return [] }
 
     const calendarDayNum = parseInt(day); //* Proper way of turning '1' -> 1 (rather than +day via "+" unary operator)
     const nextIndex = calendarDayNum - (1 + offDays); //* Goal: Assign every game in list to a day!
-    if (nextIndex >= gamesList.length) { return null } //* At end of the month, so no more off-days/games. Rest of calendar is empty
+    if (nextIndex >= gamesList.length) { return [] } //* At end of the month, so no more off-days/games. Rest of calendar is empty
     const expectedGame = gamesList[nextIndex]
+    const todaysGames = [expectedGame]
+    if (nextIndex < gamesList.length - 1) {
+      todaysGames.push(gamesList[nextIndex + 1]); //* Add next game just in case a doubleheader is happening
+    }
 
-    const gameDayNum = parseInt(getDayFromDateStr(expectedGame.date)); //* Take the day # of the month in int form, not string form
-    if (gameDayNum === calendarDayNum) { return expectedGame }
-    offDays++; //* No game on this day, so this keeps the gameList index in the same spot
-    return null;
+    //* Each iteration takes the day # of the month in int form, not string form
+    const finalGamesList = todaysGames.filter(game => parseInt(getDayFromDateStr(game.date)) === calendarDayNum);
+    if (finalGamesList.length === 0) { offDays++; return [] } //* No game on this day, so this keeps the gameList index in the same spot
+    return finalGamesList;
   }
 </script>
 
@@ -46,7 +50,7 @@
     {#each month as week, i ("week-"+i)} <!-- Can actually loop thru ANYTHING with length prop so {length: 6} would work too -->
       <tr> <!-- Following key seems to rerender multiple times but uncertain why -->
         {#each week as day, j ("date-box-"+i*7+j) } <!--"date-box-" + WeekNum*7 DateBoxNum e.g. 'date-box-6'-->
-          <CalendarDay game={grabGame(day)} currentMonth={monthName.toLowerCase()} dayNum={day} mini={mini} even={i % 2 === 0} on:openModal/>
+          <CalendarDay games={getTodaysGames(day)} currentMonth={monthName.toLowerCase()} dayNum={day} mini={mini} even={i % 2 === 0} on:openModal/>
         {/each}
       </tr>
     {/each}

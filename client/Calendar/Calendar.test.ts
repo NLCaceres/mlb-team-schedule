@@ -1,6 +1,5 @@
 import Calendar from "./Calendar.svelte"
 import { render, screen } from "@testing-library/svelte";
-import type BaseballGame from "../Models/DataClasses";
 
 describe("renders a simple Calendar", () => {
   test("setting the name of the Calendar month via 'monthName' prop", () => {
@@ -43,7 +42,7 @@ describe("renders a simple Calendar", () => {
       rerender({ monthName: "July", gamesList: [{ ...game, date: "Mon July 18 2023 at 06:15 PM" }, { ...game, date: "Tues July 19 2023 at 10:40 AM" }] });
       const julyDaysRendered = screen.getAllByRole("cell");
       expect(julyDaysRendered.length % 7).toBe(0);
-      expect(screen.getByText("5")).toBeInTheDocument(); //* Previous days, even if offdays, get their day num
+      expect(screen.getByText("5")).toBeInTheDocument(); //* Previous days, even if off-days, get their day num
       expect(screen.getByText("18")).toBeInTheDocument(); //* Actual game days do as well
       expect(screen.getByText("19")).toBeInTheDocument();
       expect(screen.getAllByText(/missing logo/i)).toHaveLength(4); //* Two games this time, so 4 total logos rendered
