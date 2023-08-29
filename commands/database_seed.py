@@ -1,7 +1,7 @@
 import requests
-from ..utility.database_helpers import saveToDb, finalizeDbUpdate
-from ..utility.datetime_helpers import (dateToday, dateToStr, strToDatetime, utcStrToPacificTime, 
-                             utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT)
+from ..utility.database_helpers import saveToDb, deleteFromDb
+from datetime import timedelta
+from ..utility.datetime_helpers import (dateToday, dateToStr, strToDatetime, utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT)
 from ..utility.endpoint_helpers import BASE_MLB_LOGO_URL, SCHEDULE_ENDPOINT
 from ..models import DodgerGame, BaseballTeam, Promo
 
@@ -51,46 +51,45 @@ def seedDB(updateMode = False):
     (totalGames, teamGameDates) = gamesTuple #* Tuples can unpack just like Javascript destructures!
 
     #? Query for all games in DB after the startDate (which if in updateMode is today's date)
-    startDateTime = strToDatetime(startDate, YMD_FORMAT)
+    startDateTime = strToDatetime(startDate, YMD_FORMAT) #todo Might be able to convert to PST HERE since it's EARLIER than UTC
     gamesInDb = DodgerGame.query.filter(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date).all()
-    #* gamesInDb used to check if a save, update, or skip + print done in createTodaysGames
+    #* gamesInDb used to check if a save, update, or skip + print done in createGamesOfTheDay
 
     startingDateStr = utcDateTimeToPacificTimeStr(startDateTime, YMD_FORMAT) #? StartDate with PST accounted for!
     print('Beginning to add Dodger Games to Schedule\n')
     seriesTotal, currentSeriesGame, seasonGameNum = 0, 0, 0 #* SeasonGameNum tracks total num of games read so far
     for dayNum, gameDate in enumerate(teamGameDates):
-        gameList = gameDate.get('games', 0)
-        if not gameList or len(gameList) == 0:
+        gameList = gameDate.get('games', [])
+        if len(gameList) == 0:
+            print('Date without any games found, skipping!')
             continue #? In case a date without any games is returned for some reason, skip it! (Not sure if possible)
         print(f"Day #{dayNum+1} that Dodgers have played since {startingDateStr}")
 
-        currentSeriesGame = gameList[0]['seriesGameNumber']
+        firstGameOfDay = gameList[0]
+        currentSeriesGame = gameList[1]['seriesGameNumber'] if len(gameList) > 1 else firstGameOfDay['seriesGameNumber']
         #* Next line checks for double headers BUT the above line just grabs the 1st of the 2 games (See next todo)
-        gameStr = "Today's a double header! " if len(gameList) > 1  \
-            else f"On {gameDate['date']} is game #{currentSeriesGame} in a series "
+        gameStr = f"On {gameDate['date']} is "
+        gameStr += "a double header " if len(gameList) > 1 else f"game #{currentSeriesGame} "
+        gameStr += 'in a series '
 
-        (seasonGameNum, gameStr) = createTodaysGames(gameList, gamesInDb, seasonGameNum, gameStr)
+        (seasonGameNum, gameStr) = createGamesOfTheDay(gameList, gamesInDb, seasonGameNum, gameStr)
 
-        seriesTotal = gameList[0]['gamesInSeries'] #todo Using the 1st game MIGHT cause next line to fail
+        seriesTotal = firstGameOfDay['gamesInSeries']
         if currentSeriesGame == seriesTotal: #* This condition will group games by series
-            gameStr += '\n'
-            gameStr += ('=' * 60)
-            gameStr += ' SERIES END '
-            gameStr += ('=' * 80)
-            gameStr += '\n\n'
+            gameStr += f"\n{('=' * 60)} SERIES END {('=' * 80)}\n\n"
             currentSeriesGame = 0
         else:
             gameStr += '\n'
 
         print(gameStr)
 
-    from . import updateAllTeamRecords #? Avoid createPromotions circular ref
+    from . import updateAllTeamRecords #? Avoid initPromotions circular ref
     updateAllTeamRecords()
 
     print('Finishing seeding process. \n')
 
 #! Model Creation Methods - GameDay, Team, and GameDayPromotions
-def createTodaysGames(todaysGames, gamesInDb, seasonGameNum, gameStr): #* Make games for particular date
+def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
     #* Perform this string manipulation ONCE, not twice if a double header
     awayTeam = createOrGrabTeam(todaysGames[0], 'away') #* Always needed so promos can check for updates later
     gameStr += f"where the visiting, {awayTeam.city_name} {awayTeam.team_name}, "
@@ -98,37 +97,98 @@ def createTodaysGames(todaysGames, gamesInDb, seasonGameNum, gameStr): #* Make g
     gameStr += f"will take on the {homeTeam.team_name} at home in {homeTeam.city_name}"
 
     for game in todaysGames: #* In case of double headers
-        gameDate, gameSeriesNumber, gamesInSeries = game['gameDate'], game['seriesGameNumber'], game['gamesInSeries']
+        gamePk, gameDate = game['gamePk'], game['gameDate']
+        gameSeriesNumber, gamesInSeries = game['seriesGameNumber'], game['gamesInSeries']
 
-        currentGameInDb = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
-        gameNotInDB = currentGameInDb is None
+        #* Should be able to grab any game in the DB from a oldest to most recent date sorted list 
+        #* based on what # game of the full season it is, i.e.
+        #* The tenth game of the year should be at index 9 with the expected time, promotions, etc
+        gameExpectedFromDb: DodgerGame = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
 
-        if gameNotInDB: #* If no record found, let's make one and set it!
-            print('No game previously on this date so adding it to the DB')
-            #* Create Game Model so promos can be associated
-            currentGameInDb = DodgerGame(date=strToDatetime(gameDate, ISO_FORMAT),
-                                         gameNumInSeries=gameSeriesNumber, gamesInSeries=gamesInSeries,
-                                         home_team_id=homeTeam.id, away_team_id=awayTeam.id)
-            saveToDb(currentGameInDb)
+        #* Create Game Model so promos can be associated later
+        newGame = DodgerGame(date=strToDatetime(gameDate, ISO_FORMAT),
+                             gameNumInSeries=gameSeriesNumber, gamesInSeries=gamesInSeries,
+                             home_team_id=homeTeam.id, away_team_id=awayTeam.id)
 
-        #* Add promos ONLY if it's a home game
-        if homeTeam.city_name == 'Los Angeles':
-            createPromotionsForGame(game['promotions'] if ('promotions' in game) else [], currentGameInDb)
-        seasonGameNum += 1 #* Keep incrementing regardless of conditional case above
-
-        if gameNotInDB or currentGameInDb.gameNumInSeries != gameSeriesNumber or currentGameInDb.gamesInSeries != gamesInSeries:
+        #* If resumedFrom key found, then found a Suspended game, which is most likely a copy of the previous game
+        originalDate = game.get('resumedFrom', '') #* Use default '' to falsy check ternary to avoid datetime format errors
+        originalPstDate = (strToDatetime(originalDate, ISO_FORMAT) - timedelta(hours=7)) if originalDate else None
+        #? Games aren't really added anymore, since 163rd tiebreaker games no longer happen due to extended playoffs
+        if seasonGameNum > 0 and originalPstDate and originalPstDate.day + 1 == newGame.readableDateTime.day:
+            print('Found a suspended game so skipping!\n') #* So that way, no 2nd copy is made
             continue
 
-        print(f"Game #{seasonGameNum + 1} currently in db is at {currentGameInDb}")
-        print(f"Game #{seasonGameNum + 1} in endpoint is at {utcStrToPacificTime(gameDate)}")
-        if currentGameInDb.readableDate != utcStrToPacificTime(gameDate):
-            print('No match! Update the game!')
-            currentGameInDb.date = gameDate #* Date might not be the only prop that needs updating!
-            finalizeDbUpdate() #todo BUT need to look for other changes that might happen
-        else:
-            print('Game time matches! All fine, move on!')
+        #* Using abbreviation to mark homeTeams handles edge case where a city has multiple teams, i.e. LA & NY
+        newPromos = initPromotionsForGame(game.get('promotions', [])) if homeTeam.abbreviation == 'LAD' else []
+        if gameExpectedFromDb is None: #* Likely running initial seed so just save everything as normal
+            print("No game from the DB found so save the game and its promos!")
+            createNewGame(newGame, newPromos)
+            seasonGameNum += 1 #* Increment to make sure to keep up with future checks
+            continue
+
+        #* Comparing datetime objs to get correct date ordering, not the strings which would get lexicographic sorting
+        if newGame.date < gameExpectedFromDb.date:
+            print('Seems a game moved up')
+            if gameExpectedFromDb.gameNumInSeries == gameExpectedFromDb.gamesInSeries:
+                print("Seems the game just made their start time earlier")
+            #* Away games track changes by comparing the API game to the current DB game
+            #* Home games can use promos to track game identity (which would be different than __eq__)
+            #todo In the future, gamePk is all-around better option since it holds across major changes
+            if homeTeam.abbreviation == 'LAD':
+                findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, replaceOldGame)
+        elif newGame.date > gameExpectedFromDb.date:
+            print('Seems a game was postponed OR suspended')
+            if gameExpectedFromDb.gameNumInSeries == gameExpectedFromDb.gamesInSeries:
+                print("Seems the game just made its start time later")
+            if gameExpectedFromDb.gamesInSeries > newGame.gamesInSeries:
+                print("Seems the game just rescheduled entirely since the total games in the series was reduced")
+            #* replaceOldGame seems the best way all-around to keep the DB list ordered correctly
+            if homeTeam.abbreviation == 'LAD':
+                findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, replaceOldGame)
+
+        print(f"Game from DB List = {gameExpectedFromDb} which is game " \
+              f"#{gameExpectedFromDb.gameNumInSeries} in a series of {gameExpectedFromDb.gamesInSeries}")
+        print(f"Game from API = {newGame} which is game #{newGame.gameNumInSeries} in a series of {newGame.gamesInSeries}")
+        print(f"Game from the DB List after changes = {gamesInDb[seasonGameNum]} which is game " \
+              f"#{gamesInDb[seasonGameNum].gameNumInSeries} in a series of {gamesInDb[seasonGameNum].gamesInSeries}")
+
+        if gameExpectedFromDb == gamesInDb[seasonGameNum]:
+            print(f"Game from DB list still matches original DB game = {gameExpectedFromDb == gamesInDb[seasonGameNum]}")
+            if newGame == gameExpectedFromDb:
+                if not comparePromoLists(gameExpectedFromDb.promos, newPromos): #* Compare now since likely didn't run check earlier
+                    print("Promo lists don't match, replacing old ones with new ones!")
+                    replaceOldPromos(gameExpectedFromDb, newPromos)
+            else:
+                replaceOldGame(gamesInDb, seasonGameNum, newGame)
+                print(f"API Game had an unnoticed minor change, so using {gamesInDb[seasonGameNum]}, and deleting {gameExpectedFromDb}")
+                createNewGame(newGame, newPromos)
+            print('')
+        elif newGame == gamesInDb[seasonGameNum]: #* The new game was likely swapped into the DB list so save it now
+            print(f"Game from DB list now matches API game = {newGame == gamesInDb[seasonGameNum]}\n")
+            createNewGame(newGame, newPromos)
+
+        seasonGameNum += 1 #* Increment to keep up with future checks
 
     return (seasonGameNum, gameStr) #* May one day get rid of gameStr or find way to consolidate string
+
+def findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, matchCallback):
+    searchIndex = seasonGameNum + 1
+    while searchIndex < len(gamesInDb) and gamesInDb[searchIndex].gameNumInSeries != 1:
+        potentialGame: DodgerGame = gamesInDb[searchIndex]
+        print(f"Potential game = {potentialGame} is #{potentialGame.gameNumInSeries}")
+        matchingPromos = comparePromoLists(potentialGame.promos, newPromos)
+        if matchingPromos:
+            matchCallback(gamesInDb, seasonGameNum, newGame, searchIndex)
+            break
+        searchIndex += 1
+
+def replaceOldGame(gamesInDb, seasonGameNum, newGame, searchIndex=None):
+    deleteIndex = searchIndex or seasonGameNum
+    print(f"Deleting a matching outdated game at index = {deleteIndex}")
+    originalGame = gamesInDb.pop(deleteIndex)
+    [deleteFromDb(promo) for promo in originalGame.promos]
+    deleteFromDb(originalGame)
+    gamesInDb.insert(seasonGameNum, newGame) #* Insert the newGame at expected date index. Save the changes to the DB later
 
 def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwise let's add it!
     team = game['teams'][teamKey]['team']
@@ -136,7 +196,7 @@ def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwi
     teamInDb = None
     #? Will always return model, so declare a var, check if in DB w/ walrus in conditional, or Create+Save, then return
     if (teamInDb := BaseballTeam.query.filter_by(team_name=team['clubName']).first()) is not None:
-        print(f"Found a matching team! {teamInDb}. No need to double save") #* Finalize team record later
+        print(f"Found a matching team! {teamInDb} -> No need to double save") #* Finalize team record later
     else:
         teamRecord = game['teams'][teamKey]['leagueRecord']
 
@@ -148,24 +208,64 @@ def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwi
 
     return teamInDb
 
-def createPromotionsForGame(promotions, thisGame):
-    print(f"Today's Game, {thisGame}, has {len(promotions)} promotions")
-    if thisGame is None:
-        return #? In case game doesn't exist (which would cause linking below to fail)
+def createNewGame(newGame, newPromos):
+    saveToDb(newGame)
+    linkPromosToGame(newGame, newPromos)
+
+def initPromotionsForGame(promotions):
+    newPromos = []
+    for promo in promotions:
+        promoName = promo['name']
+        thumbnailUrl = promo.get('imageUrl', 'undefined')
+        newPromo = Promo(name=promoName, thumbnail_url=thumbnailUrl)
+        newPromos.append(newPromo)
+    return newPromos #* Return the list of promos to save
+
+def linkPromosToGame(newGame, newPromos):
+    for newPromo in newPromos:
+        newPromo.dodger_game_id = newGame.id
+        saveToDb(newPromo)
+
+def replaceOldPromos(oldGame, newPromos):
+    [deleteFromDb(promo) for promo in oldGame.promos]
+    linkPromosToGame(oldGame, newPromos)
+
+#todo Likely no longer need this updatePromo func
+def updatePromotionsForGame(promotions, thisGame):
+    newPromos = []
     for promo in promotions:
         promoName = promo['name']
         print(f"\t********** {promoName} **********")
-        thumbnailUrl = promo['imageUrl'] if ('imageUrl' in promo) else 'undefined'
+        thumbnailUrl = promo.get('imageUrl', 'undefined')
 
         if len(thisGame.promos) > 0: #* THEN update the promotions list for this game
             matchingPromo = next((gamePromo for gamePromo in thisGame.promos if (gamePromo.name == promoName)), None)
             if matchingPromo is not None and matchingPromo.thumbnail_url != thumbnailUrl:
-                matchingPromo.thumbnail_url = thumbnailUrl
-                finalizeDbUpdate()
+                # matchingPromo.thumbnail_url = thumbnailUrl
+                # finalizeDbUpdate()
                 print('\tMatch found but image url changed, so updating!')
                 continue
             elif matchingPromo is not None:
                 print('\tMatch found but image url remained the same, so skip!')
                 continue
 
-        saveToDb(Promo(name=promoName, thumbnail_url=thumbnailUrl, dodger_game_id=thisGame.id))
+        newPromo = Promo(name=promoName, thumbnail_url=thumbnailUrl)
+        newPromos.append(newPromo)
+    return newPromos #* Return the list of promos to save
+
+#todo Could use also do (newPromoSet - dbPromoSet), and it should reliably leave ONLY the new/changed promos
+#todo from there, could iterate thru the new promos, save and link them
+def comparePromoLists(dbPromos, newPromos):
+    commonSet = { Promo(name='Fireworks Show'), Promo(name='Taco Tuesdays'), Promo(name='Kids Run the Bases') }
+    dbPromoSet = set(dbPromos) - commonSet #? Important that obj hashes match AND equals return True
+    #? so that dbPromoSet drops anything from the commonSet
+    newPromoSet = set(newPromos) - commonSet
+    if len(dbPromoSet) != len(newPromoSet): #* First prelim check if matching length
+        print("Promo length DOESN'T match")
+        return False
+    #* If SAME HOME game, then should be the same set of promo names despite date moving a day forward or back
+    if dbPromoSet != newPromoSet:
+        print("Promo sets DON'T match")
+        return False
+    print('Promo sets match!')
+    return True
