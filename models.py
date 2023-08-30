@@ -82,8 +82,8 @@ class BaseballTeam(db.Model):
     awayGames = db.relationship('DodgerGame', backref='away_team', lazy=True, foreign_keys='DodgerGame.away_team_id')
 
     @hybrid_property #? Hybrid props are SqlAlchemy's equivalent of computed properties (or virtuals from mongo!)
-    def fullName(self):
-        return f'{self.city_name} {self.team_name}'
+    def fullName(self): #? MUST concatenate here, since f-strings are misinterpreted by SQLAlchemy
+        return self.city_name + " " + self.team_name
 
     @hybrid_property
     def espnID(self): #* team_loglo starts as 'https://mlbstat.com/team-logos/123.svg'

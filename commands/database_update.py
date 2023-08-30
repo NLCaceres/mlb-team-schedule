@@ -1,8 +1,9 @@
 import requests
-from .database_seed import createEndpoint, scheduleDates, createPromotionsForGame
+from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame
+from .. import db
 from ..utility.database_helpers import finalizeDbUpdate
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
-from ..utility.endpoint_helpers import LATEST_GAME_URL
+from ..utility.endpoint_helpers import LEAGUE_STANDINGS_URL
 from ..models import BaseballTeam, DodgerGame
 
 def updateAllPromotions():
@@ -28,32 +29,65 @@ def updateAllPromotions():
             if (homeTeamName[0] + ' ' + homeTeamName[1] == 'Los Angeles'):
                 dateForGame = strToDatetime(game['gameDate'], ISO_FORMAT) #* Convert typical UTC string to datetime obj
                 gameInDb = DodgerGame.query.filter_by(date=dateForGame).first()
-                createPromotionsForGame(game['promotions'] if ('promotions' in game) else [], gameInDb)
+                initPromotionsForGame(game['promotions'] if ('promotions' in game) else [], gameInDb)
 
 
 def updateAllTeamRecords():
-    print("Updating each team's record in Db")
-    for team in BaseballTeam.query.all():
-        updateTeamRecord(team)
-
-def updateTeamRecord(team):
-    print(f"Looking for latest league record for the following team: {team.team_name}")
-    request = requests.get(LATEST_GAME_URL.format(espnID=team.espnID))
+    print("Updating all team records in Db")
+    request = requests.get(LEAGUE_STANDINGS_URL)
     if (request.status_code != 200):
+        print(f"Error Code: {request.status_code}")
         return #? In case of broken link
 
     #* Request should only receive single most recent game (or two in case of double header days)
-    datesWithGames = request.json().get('dates', 0) #? If key exists, get val, else set it to 0 so next line fails on issue
-    if (not datesWithGames or len(datesWithGames) == 0):
+    divisions = request.json().get('records', []) #? If key exists, get val, else provide an empty [] for early return
+    if len(divisions) == 0:
+        print("No team records found")
         return #? In case api ever changes
 
-    #* Extract the most recent game from the JSON
-    if (datesWithGames[0] and datesWithGames[0]['games'] and len(datesWithGames[0]['games']) > 0):
-        todaysGame = datesWithGames[0]['games'][0]
-        thisTeam = todaysGame['teams']['home'] if (todaysGame['teams']['home']['team']['name'] == team.fullName) \
-            else todaysGame['teams']['away'] #* Grab home or away team based on a matching name
-        team.wins, team.losses = thisTeam['leagueRecord']['wins'], thisTeam['leagueRecord']['losses']
-        #? The above '\' trick doesn't work with strings! Format issues occur
-        print(f"Json says wins: {thisTeam['leagueRecord']['wins']} & losses: {thisTeam['leagueRecord']['losses']}")
-        print(f"so saving team's record as {team.wins} - {team.losses}")
-        finalizeDbUpdate()
+    [updateByDivision(division) for division in divisions]
+
+MLB_DIVISIONS = {
+    200: 'American League West', 201: 'American League East', 202: 'American League Central',
+    203: 'National League West', 204: 'National League East', 205: 'National League Central',
+}
+def updateByDivision(division):
+    divisionInfo = division.get('division', None)
+    if divisionInfo is None:
+        print("No matching division found")
+        return
+
+    divisionID = divisionInfo.get('id', None)
+    if divisionID is None:
+        print("No division ID found. Not possible to update standings")
+        return
+
+    print(f"Updating the {MLB_DIVISIONS[divisionID]} division")
+    teamRecords = division.get('teamRecords', [])
+    [updateTeamRecord(team) for team in teamRecords]
+    print('DIVISION DONE\n\n')
+
+def updateTeamRecord(team):
+    teamInfo = team.get('team', None)
+    if teamInfo is None:
+        print('No team found. Unable to update standings')
+        return
+
+    teamName, teamID = teamInfo.get('name', ''), teamInfo.get('id', 0)
+    if not teamID:
+        print('No team ID found. Unable to update record in database')
+        return
+
+    print(f"Looking for latest league record for the following team: {teamName}")
+
+    teamWins, teamLosses = team.get('wins', 0), team.get('losses', 0)
+    if not teamWins or not teamLosses:
+        print('The API returned JSON missing the wins or losses. Will have to update later')
+        return
+
+    thisTeam = db.session.scalars(db.select(BaseballTeam).filter_by(fullName=teamName)).one()
+    print(f"Found the following team = {thisTeam} with a win-loss record of {thisTeam.wins}-{thisTeam.losses}")
+    print(f"Updating to a win-loss of {teamWins}-{teamLosses}\n")
+
+    thisTeam.wins, thisTeam.losses = teamWins, teamLosses
+    finalizeDbUpdate()
