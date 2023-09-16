@@ -55,7 +55,12 @@ describe("provides basic API functions", () => {
 
     fetchSpy.mockReturnValueOnce(Promise.resolve(undefined));
     const badResponse = await getFullSchedule();
-    expect(badResponse).toBe(undefined);
+    expect(badResponse).toStrictEqual([]); //* Empty array of games returned, so view can handle unexpectedly empty response
     expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    fetchSpy.mockReturnValueOnce(Promise.resolve([]));
+    const emptyResponse = await getFullSchedule();
+    expect(emptyResponse).toStrictEqual([]);
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
   })
 })

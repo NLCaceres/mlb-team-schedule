@@ -1,5 +1,4 @@
 import BaseballGame from "../Models/DataClasses";
-import type { Month } from "../Models/Month";
 import getRequest from "./utility";
 
 const BASE_URL = "/api";
@@ -28,9 +27,9 @@ export async function getMonthsGames(monthParam: string): Promise<BaseballGame[]
   return monthsGames;
 }
 
-export async function getFullSchedule(): Promise<BaseballGame[] | undefined> {
+export async function getFullSchedule(): Promise<BaseballGame[]> {
   const response = await getRequest(`${BASE_URL}/fullSchedule`);
-  if (response === undefined) { return undefined } //todo Might be best to just return an empty array and handle in view
+  if (response === undefined) { return [] }
   
   const monthsGames = response.map((game) => new BaseballGame(
     game.id, game.date, game.homeTeam, game.awayTeam, game.promos, game.gameNumInSeries, game.gamesInSeries

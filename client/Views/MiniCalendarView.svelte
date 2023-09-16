@@ -19,7 +19,10 @@
 
   async function splitGames() {
     let loadedGames = await getFullSchedule();
-    if (loadedGames === undefined) { return undefined }
+
+    //? Still returning undefined keeps render conditional as a super simple "if true, then calendar; else error msg"
+    if (loadedGames === undefined || loadedGames.length === 0) { return undefined }
+
     //? Can't use Array(length).fill([]) since it fills each spot with the same array ref, so each change affects the other
     const gamesSplitByMonth: BaseballGame[][] = Array.from({ length: months.length }, _ => []);
     let gamesIndex = 0;
