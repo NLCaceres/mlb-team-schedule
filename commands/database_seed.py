@@ -1,9 +1,11 @@
-import requests
-from ..utility.database_helpers import saveToDb, deleteFromDb
 from datetime import timedelta
+import requests
+from .. import db
+from ..models import DodgerGame, BaseballTeam, Promo
+from ..utility.database_helpers import saveToDb, deleteFromDb
 from ..utility.datetime_helpers import (dateToday, dateToStr, strToDatetime, utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT)
 from ..utility.endpoint_helpers import BASE_MLB_LOGO_URL, SCHEDULE_ENDPOINT
-from ..models import DodgerGame, BaseballTeam, Promo
+
 
 #! Endpoint generation methods
 #? Return an unpackable tuple useful to create the schedule endpoint
@@ -16,11 +18,12 @@ def scheduleDates(updateMode = False):
 
     return (startDate, endDate, thisYear) #* Most Python solution to quickly pack related data! Return a tuple!
 
-def createEndpoint(startDate = None, endDate = None, seasonYear = None):
+def createEndpoint(startDate = None, endDate = None, seasonYear = None, teamId = None):
     if startDate is None or endDate is None or seasonYear is None:
         return None
 
-    return SCHEDULE_ENDPOINT.format(startDate=startDate, endDate=endDate, seasonYear=seasonYear)
+    selectedTeamId = teamId or 119 #* The Dodgers ID acts as the default if None is found
+    return SCHEDULE_ENDPOINT.format(startDate=startDate, endDate=endDate, seasonYear=seasonYear, teamId=selectedTeamId)
 
 def fetchGames(endpointStr): #* Returns false OR a tuple.
     if endpointStr is None:

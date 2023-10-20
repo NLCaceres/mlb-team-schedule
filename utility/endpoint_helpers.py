@@ -1,10 +1,10 @@
 
 #! Constants
-#? https://github.com/toddrob99/MLB-StatsAPI/wiki
-#todo A variable 'teamId' in this URL can be used to change the homeTeam to a desired one
+#? https://github.com/toddrob99/MLB-StatsAPI/wiki - For more info on the underlying MLB-Stats API this Github comes in handy!
+#? This URL focuses on the regular season schedule for a given team based on the team_ID injected into the string
 SCHEDULE_ENDPOINT = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team' #? Concatenated on compile
                     ',game(promotions)&season={seasonYear}&startDate={startDate}&endDate={endDate}' 
-                    '&teamId=119&gameType=R,F,D,L,W&scheduleTypes=games')
+                    '&teamId={teamId}&gameType=R&scheduleTypes=games')
 #? This URL grabs the latest game so it can be useful for grabbing a Team's win-loss record
 LATEST_GAME_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&teamId={espnID}'
 #? Above URL grabs the most recent game up until 6-8AM PST the next day
