@@ -34,27 +34,26 @@ def updateAllPromotions():
 
 def updateAllTeamRecords():
     print("Updating all team records in Db")
-    request = requests.get(LEAGUE_STANDINGS_URL)
-    if (request.status_code != 200):
-        print(f"Error Code: {request.status_code}")
+    response = requests.get(LEAGUE_STANDINGS_URL)
+    if (response.status_code != 200):
+        print(f"Error Code: {response.status_code}")
         return #? In case of broken link
 
-    #* Request should only receive single most recent game (or two in case of double header days)
-    divisions = request.json().get('records', []) #? If key exists, get val, else provide an empty [] for early return
+    divisions = response.json().get('records', []) #? If key exists, get val, else provide an empty [] for early return
     if len(divisions) == 0:
         print("No team records found")
         return #? In case api ever changes
 
-    [updateByDivision(division) for division in divisions]
+    [updateEachDivision(division) for division in divisions]
 
 MLB_DIVISIONS = {
     200: 'American League West', 201: 'American League East', 202: 'American League Central',
     203: 'National League West', 204: 'National League East', 205: 'National League Central',
 }
-def updateByDivision(division):
+def updateEachDivision(division):
     divisionInfo = division.get('division', None)
     if divisionInfo is None:
-        print("No matching division found")
+        print("No division info found")
         return
 
     divisionID = divisionInfo.get('id', None)
@@ -62,9 +61,11 @@ def updateByDivision(division):
         print("No division ID found. Not possible to update standings")
         return
 
-    print(f"Updating the {MLB_DIVISIONS[divisionID]} division")
+    divisionName = MLB_DIVISIONS.get(divisionID, '')
+    print(f"Updating the {divisionName} division" if bool(divisionName) else "Unknown division being updated")
+
     teamRecords = division.get('teamRecords', [])
-    [updateTeamRecord(team) for team in teamRecords]
+    [updateTeamRecord(team) for team in teamRecords] #? If comprehension finds empty [], then nothing happens
     print('DIVISION DONE\n\n')
 
 def updateTeamRecord(team):
@@ -73,7 +74,7 @@ def updateTeamRecord(team):
         print('No team found. Unable to update standings')
         return
 
-    teamName, teamID = teamInfo.get('name', ''), teamInfo.get('id', 0)
+    teamID, teamName = teamInfo.get('id', 0), teamInfo.get('name', '')
     if not teamID:
         print('No team ID found. Unable to update record in database')
         return

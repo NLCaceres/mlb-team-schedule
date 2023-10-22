@@ -41,3 +41,8 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+#? The following fixture comes at the cost of failing ALL tests that try to run HTTP requests making it kinda useless
+# @pytest.fixture(autouse=True)
+# def no_requests(monkeypatch):
+#     monkeypatch.delattr("requests.sessions.Session.request")
