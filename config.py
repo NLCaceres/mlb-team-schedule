@@ -9,7 +9,8 @@ class Config(object):
     DEVELOPMENT = False
     TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = os.environ['SECRET_KEY']
+    SECRET_KEY = os.environ['SECRET_KEY'] #* This NEEDS to be set or else the app should't run, so best not to set a default
+    TEAM_FULL_NAME = os.getenv('VITE_TEAM_FULL_NAME', 'Los Angeles Dodgers') #* All other vars are likely OK to use defaults
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', '').replace("://", "ql://", 1) #todo the replace is probably not necessary for Railway

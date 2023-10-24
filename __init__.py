@@ -47,6 +47,7 @@ def configure_app(app, test_config):
     #? In prod, it might be helpful to use `print(os.getcwd().split('/')[-1])` to get the root directory name to prepend
     default_config = DEV_CONFIG if test_config is None else TESTING_CONFIG
     env_config = os.getenv('APP_SETTINGS', default_config) #? Use dev version as a default
-    app.config.from_object(env_config) #? To get configs vars from config.py, use `os.config.get('envVariableName')`
+    app.config.from_object(env_config)
+    #? To get the vars from config.py in-app, use `app.config.get('envVariableName')` or `app.config['envVariableName']`
     if test_config is not None:
         app.config.update(test_config)
