@@ -1,5 +1,6 @@
 import requests
-from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame
+from flask import current_app as app #? Main method of accessing App's Config.py env vars
+from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame, comparePromoLists, replaceOldPromos
 from .. import db
 from ..utility.database_helpers import finalizeDbUpdate
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
@@ -8,28 +9,35 @@ from ..models import BaseballTeam, DodgerGame
 
 def updateAllPromotions():
     print("Going to update all promotions")
-    dodgersSchedule = requests.get(createEndpoint(*scheduleDates(True)))
-    if (dodgersSchedule.status_code != 200):
+    #? '*' unpacks the tuple returned by scheduleDates() into the args of createEndpoint()
+    response = requests.get(createEndpoint(*scheduleDates(True)))
+    if (response.status_code != 200):
         return #? In case of broken link
-    scheduleJson = dodgersSchedule.json()
+    dodgersSchedule = response.json()
 
-    teamGameDates = scheduleJson.get('dates', 0)
-    if not teamGameDates or len(teamGameDates) == 0:
-        return #? In case json structure changes
+    gameDateList = dodgersSchedule.get('dates', [])
+    for gameDate in gameDateList:
+        gameList = gameDate.get('games', [])
+        #? If a date is found w/out any games, then this list comprehension ends immediately, moving on to next date
+        [updateEachGamesPromotions(game) for game in gameList]
 
-    for gameDate in teamGameDates:
-        gameList = gameDate.get('games', 0)
-        if not gameList or len(gameList) == 0:
-            continue #? In case a date without any games is returned for some reason, skip it!
-
-        for game in gameList: #* In case of double headers
-            homeTeamName = game['teams']['home']['team']['name'].split()
-            #? Example of expected split: ['Texas', 'Rangers', 'vs', 'Los', 'Angeles', 'Dodgers']
-            #* Add promos ONLY if it's a home game, i.e. the first two indices are 'Los' and 'Angeles'
-            if (homeTeamName[0] + ' ' + homeTeamName[1] == 'Los Angeles'):
-                dateForGame = strToDatetime(game['gameDate'], ISO_FORMAT) #* Convert typical UTC string to datetime obj
-                gameInDb = DodgerGame.query.filter_by(date=dateForGame).first()
-                initPromotionsForGame(game['promotions'] if ('promotions' in game) else [], gameInDb)
+def updateEachGamesPromotions(game):
+    #? Since the homeTeamName is deeply nested, it's easiest in Python to catch the KeyError if the name is missing, so the
+    #? comprehension keeps processing remaining games AND all remaining game dates by halting error propagation
+    try:
+        homeTeamName = game['teams']['home']['team'].get('name', '').lower() #* Ensure using lower() on a string via default
+        expectedTeamName = app.config.get('TEAM_FULL_NAME').lower()
+        if (homeTeamName == expectedTeamName): #* ONLY add promos if it's a home game
+            dateForGame = strToDatetime(game['gameDate'], ISO_FORMAT) #* Convert typical UTC string to datetime obj
+            #? first() returns None if no Game is found whereas one() raises an exception
+            gameInDb = db.session.scalars(db.select(DodgerGame).filter_by(date=dateForGame)).first()
+            if gameInDb is None:
+                return
+            newPromos = initPromotionsForGame(game.get('promotions', []))
+            if not comparePromoLists(gameInDb.promos, newPromos):
+                replaceOldPromos(gameInDb, newPromos)
+    except Exception:
+        print("Exception raised while trying to find home team or game's date in JSON")
 
 
 def updateAllTeamRecords():
