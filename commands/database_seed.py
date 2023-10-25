@@ -55,7 +55,9 @@ def seedDB(updateMode = False):
 
     #? Query for all games in DB after the startDate (which if in updateMode is today's date)
     startDateTime = strToDatetime(startDate, YMD_FORMAT) #todo Might be able to convert to PST HERE since it's EARLIER than UTC
-    gamesInDb = DodgerGame.query.filter(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date).all()
+    gamesInDb = db.session.scalars(
+        db.select(DodgerGame).where(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date)
+    ).all()
     #* gamesInDb used to check if a save, update, or skip + print done in createGamesOfTheDay
 
     startingDateStr = utcDateTimeToPacificTimeStr(startDateTime, YMD_FORMAT) #? StartDate with PST accounted for!
@@ -198,7 +200,7 @@ def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwi
 
     teamInDb = None
     #? Will always return model, so declare a var, check if in DB w/ walrus in conditional, or Create+Save, then return
-    if (teamInDb := BaseballTeam.query.filter_by(team_name=team['clubName']).first()) is not None:
+    if (teamInDb := queryTeamByName(team['clubName'])) is not None:
         print(f"Found a matching team! {teamInDb} -> No need to double save") #* Finalize team record later
     else:
         teamRecord = game['teams'][teamKey]['leagueRecord']
@@ -210,6 +212,9 @@ def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwi
         saveToDb(teamInDb)
 
     return teamInDb
+
+def queryTeamByName(name):
+    return db.session.scalars(db.select(BaseballTeam).filter_by(team_name=name)).one()
 
 def createNewGame(newGame, newPromos):
     saveToDb(newGame)

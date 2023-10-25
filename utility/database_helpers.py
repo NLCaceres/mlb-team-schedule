@@ -8,7 +8,9 @@ def saveToDb(new_model):
     finalizeDbUpdate()
     #? To update, query using a column like 'name', then using the returned model, set the prop, e.g. row.name = 'newName'
     #? Or, for a more concrete example, `row.wins = row.wins + 1`, and run commit on the db session
-    #? Could also use `Model.query.filter_by(name='oldName').update({ name='newName' })` which helps for mass updates
+    #? For mass updates, import update() from sqlalchemy,
+    #? THEN `db.session.execute(update(Model).where(Model.name == 'oldName').values(name = 'newName'))`
+    #? Alternatively, a dictionary can be used in .values({'name':'newName', 'age': 42}) for multiple prop/column updates
     print(f"Successfully saved {new_model}!")
 
 def deleteFromDb(model_to_delete):

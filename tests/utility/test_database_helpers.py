@@ -1,4 +1,5 @@
 from datetime import date
+from DodgersPromo import db
 from DodgersPromo.utility.database_helpers import saveToDb, finalizeDbUpdate
 from DodgersPromo.models import DodgerGame, BaseballTeam
 
@@ -11,8 +12,8 @@ def test_saveToDb(app):
         saveToDb(team1)
         saveToDb(team2)
         saveToDb(game)
-        allGames = DodgerGame.query.all()
-        allTeams = BaseballTeam.query.all()
+        allGames = db.session.scalars(db.select(DodgerGame)).all()
+        allTeams = db.session.scalars(db.select(BaseballTeam)).all()
         assert len(allGames) == 1
         assert len(allTeams) == 2
 
@@ -21,13 +22,14 @@ def test_finalizeDbUpdate(app):
 
     with app.app_context():
         saveToDb(team1)
-        teams = BaseballTeam.query.all()
+        teams = db.session.scalars(db.select(BaseballTeam)).all()
         assert len(teams) == 1
         assert teams[0].team_name == 'Foobar'
 
         teams[0].team_name = 'Fizz'
         finalizeDbUpdate()
 
-        teams_found = BaseballTeam.query.filter_by(team_name = 'Fizz').all()
+        #? Must use .all() here to complete conversion into BaseballTeam List, not simply the iterable ScalarResult
+        teams_found = db.session.scalars(db.select(BaseballTeam).filter_by(team_name = 'Fizz')).all()
         assert len(teams_found) == 1
         assert teams_found[0].team_name == 'Fizz'
