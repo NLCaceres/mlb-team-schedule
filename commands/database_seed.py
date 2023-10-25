@@ -214,7 +214,7 @@ def createOrGrabTeam(game, teamKey=''): #* If able to fetch team, great! Otherwi
     return teamInDb
 
 def queryTeamByName(name):
-    return db.session.scalars(db.select(BaseballTeam).filter_by(team_name=name)).one()
+    return db.session.scalars(db.select(BaseballTeam).filter_by(team_name=name)).first()
 
 def createNewGame(newGame, newPromos):
     saveToDb(newGame)

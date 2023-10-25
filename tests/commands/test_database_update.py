@@ -3,7 +3,6 @@ import requests
 #? An alt option w/ built-in collections like lists, dicts and sets is their constructor BUT they return shallow copies
 import copy #? So deep copy is super useful to avoid changes propagating in nested values across new copies
 from MockHttpResponse import MockHttpResponse
-from sqlalchemy import exc
 from DodgersPromo import db
 from DodgersPromo.commands.database_update import (updateTeamRecord, updateAllTeamRecords,
                                                    updateEachDivision, updateAllPromotions, updateEachGamesPromotions)
@@ -181,8 +180,7 @@ def test_updateTeamRecord(app, teamJSON):
         #* WHEN no team matching the name found in JSON found
         teamNotFoundByName = copy.deepcopy(teamJSON)
         teamNotFoundByName['team']['name'] = 'Foobar'
-        with pytest.raises(exc.NoResultFound): #* THEN NoResultFound exception raised preventing any updates
-            updateTeamRecord(teamNotFoundByName)
+        updateTeamRecord(teamNotFoundByName) #* THEN no changes to the DB, so upcoming checkTeamDefaultVals() works fine
 
         originalTeam, originalWins, originalLosses = checkTeamDefaultVals()
         #* WHEN team with matching name found AND the JSON contains a win-loss record

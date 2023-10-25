@@ -1,11 +1,12 @@
-import requests
 from flask import current_app as app #? Main method of accessing App's Config.py env vars
-from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame, comparePromoLists, replaceOldPromos
+import requests
+from sqlalchemy.exc import NoResultFound
 from .. import db
+from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame, comparePromoLists, replaceOldPromos
+from ..models import BaseballTeam, DodgerGame
 from ..utility.database_helpers import finalizeDbUpdate
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
 from ..utility.endpoint_helpers import LEAGUE_STANDINGS_URL
-from ..models import BaseballTeam, DodgerGame
 
 def updateAllPromotions():
     print("Going to update all promotions")
@@ -29,15 +30,16 @@ def updateEachGamesPromotions(game):
         expectedTeamName = app.config.get('TEAM_FULL_NAME').lower()
         if (homeTeamName == expectedTeamName): #* ONLY add promos if it's a home game
             dateForGame = strToDatetime(game['gameDate'], ISO_FORMAT) #* Convert typical UTC string to datetime obj
-            #? first() returns None if no Game is found whereas one() raises an exception
-            gameInDb = db.session.scalars(db.select(DodgerGame).filter_by(date=dateForGame)).first()
-            if gameInDb is None:
-                return
+            gameInDb = db.session.scalars(db.select(DodgerGame).filter_by(date=dateForGame)).one()
             newPromos = initPromotionsForGame(game.get('promotions', []))
             if not comparePromoLists(gameInDb.promos, newPromos):
                 replaceOldPromos(gameInDb, newPromos)
-    except Exception:
-        print("Exception raised while trying to find home team or game's date in JSON")
+    except KeyError:
+        print("While updating Game Promotions: Unable to find the game's home team or date in JSON")
+    except NoResultFound:
+        print(f"While updating Game Promotions: Unable to find Dodger game with the following UTC date: {game['gameDate']}")
+    except Exception as exception:
+        print(f"While updating Game Promotions: Unexpected exception of {type(exception)} encountered")
 
 
 def updateAllTeamRecords():
@@ -94,7 +96,11 @@ def updateTeamRecord(team):
         print('The API returned JSON missing the wins or losses. Will have to update later')
         return
 
-    thisTeam = db.session.scalars(db.select(BaseballTeam).filter_by(fullName=teamName)).one()
+    #? first() returns None if no Game is found whereas one() raises an exception
+    thisTeam = db.session.scalars(db.select(BaseballTeam).filter_by(fullName=teamName)).first()
+    if thisTeam is None:
+        print(f'No team found in the DB with the name: {teamName}')
+        return
     print(f"Found the following team = {thisTeam} with a win-loss record of {thisTeam.wins}-{thisTeam.losses}")
     print(f"Updating to a win-loss of {teamWins}-{teamLosses}\n")
 
