@@ -49,12 +49,11 @@ def updateAllTeamRecords():
         print(f"Error Code: {response.status_code}")
         return #? In case of broken link
 
-    divisions = response.json().get('records', []) #? If key exists, get val, else provide an empty [] for early return
-    if len(divisions) == 0:
+    standings = response.json().get('records', [])
+    if len(standings) == 0:
         print("No team records found")
-        return #? In case api ever changes
 
-    [updateEachDivision(division) for division in divisions]
+    [updateEachDivision(division) for division in standings]
 
 MLB_DIVISIONS = {
     200: 'American League West', 201: 'American League East', 202: 'American League Central',
