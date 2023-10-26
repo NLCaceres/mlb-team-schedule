@@ -1,9 +1,12 @@
 import pytest
 from dotenv import load_dotenv, find_dotenv
 from flask_migrate import upgrade, downgrade
+import requests
 from .. import create_app
+from .MockHttpResponse import MockHttpResponse
 
 #? `Conftest.py` is used by `Pytest` to create fixtures that can be easily reused across all tests
+#? Unfortunately, there isn't any other way to share fixtures across tests, so MUST be careful w/ 'autouse' 
 
 #? Using basic `python-dotenv` rather than `pytest-dotenv` requires the following
 #? 'session' scope ensures this test-wide fixture is the highest priority
@@ -46,3 +49,11 @@ def runner(app):
 # @pytest.fixture(autouse=True)
 # def no_requests(monkeypatch):
 #     monkeypatch.delattr("requests.sessions.Session.request")
+
+#? Example of a fixture that monkeypatches/mocks the `requests` library get() fetch func
+@pytest.fixture
+def mock_404_response(monkeypatch):
+    def mock_get(*args, **kwargs):
+        return MockHttpResponse(404)
+
+    monkeypatch.setattr(requests, "get", mock_get)
