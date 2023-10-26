@@ -157,8 +157,8 @@ def test_updateTeamRecord(app, teamJSON):
     with app.app_context():
         checkTeamDefaultVals() #* THEN no changes
 
-    teamMissingID = { 'team': { } } #* WHEN team info is missing the ID
-    updateTeamRecord(teamMissingID)
+    teamMissingName = { 'team': { } } #* WHEN team info is missing its name
+    updateTeamRecord(teamMissingName)
     with app.app_context():
         checkTeamDefaultVals() #* THEN no changes
 
@@ -187,6 +187,14 @@ def test_updateTeamRecord(app, teamJSON):
         updateTeamRecord(teamJSON)
         #* THEN team found will update its win-loss columns in DB
         checkUpdatedWinLossRecord(originalTeam, originalWins, originalLosses)
+
+        #* Interesting edge case where wins and losses are 0 (like in the beginning of a season)
+        teamJSON['wins'], teamJSON['losses'] = 0, 0
+        updateTeamRecord(teamJSON)
+        #* BEFORE: If no 'wins' or 'losses' key found, the default val of 0 would cause an early return
+        #* NOW: The default is None, so a team can begin their season with a win-loss record of 0-0 as one would expect!
+        assert originalTeam.wins == 0
+        assert originalTeam.losses == 0
 
 
 #! Update Promotions funcs

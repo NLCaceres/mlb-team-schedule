@@ -84,15 +84,15 @@ def updateTeamRecord(team):
         print('No team found. Unable to update standings')
         return
 
-    teamID, teamName = teamInfo.get('id', 0), teamInfo.get('name', '')
-    if not teamID:
-        print('No team ID found. Unable to update record in database')
+    teamName = teamInfo.get('name', '')
+    if not teamName: #? Perfectly cool w/ Pep 8 to treat empty strings, lists or tuples as falsy using `not someVar`
+        print('No team name found. Unable to update record in database')
         return
 
     print(f"Looking for latest league record for the following team: {teamName}")
 
-    teamWins, teamLosses = team.get('wins', 0), team.get('losses', 0)
-    if not teamWins or not teamLosses:
+    teamWins, teamLosses = team.get('wins', None), team.get('losses', None)
+    if teamWins is None or teamLosses is None:
         print('The API returned JSON missing the wins or losses. Will have to update later')
         return
 
