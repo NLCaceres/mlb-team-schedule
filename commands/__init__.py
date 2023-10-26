@@ -1,7 +1,8 @@
 from flask import Blueprint
 import click
 from .database_seed import seedDB
-from .database_update import updateAllTeamRecords, updateAllPromotions
+from .update_standings import updateAllTeamRecords
+from .update_promotions import updateAllPromotions
 
 bp = Blueprint('commands', __name__)
 

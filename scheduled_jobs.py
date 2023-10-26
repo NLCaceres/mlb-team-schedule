@@ -1,5 +1,6 @@
 from . import scheduler
-from .commands import database_update
+from .commands.update_standings import updateAllTeamRecords
+from .commands.update_promotions import updateAllPromotions
 from datetime import date
 from zoneinfo import ZoneInfo #? Concrete implementation of datetime.tzinfo which uses IANA timezone names
 
@@ -20,7 +21,7 @@ thisYear = date.today().year
 def updateTeamRecordTask():
     with scheduler.app.app_context():
         print("Running 'Update Team Record' Task")
-        database_update.updateAllTeamRecords()
+        updateAllTeamRecords()
         print("'Update Team Record' Task Complete")
 
 @scheduler.task(
@@ -37,5 +38,5 @@ def updateTeamRecordTask():
 def updateAllPromotionsTask():
     with scheduler.app.app_context():
         print("Running 'Update Promotion List' Task")
-        database_update.updateAllPromotions()
+        updateAllPromotions()
         print("'Update Promotion List' Task Complete")
