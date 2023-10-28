@@ -1,5 +1,5 @@
 import pytest
-from DodgersPromo.utility.endpoint_helpers import SCHEDULE_ENDPOINT, LATEST_GAME_URL, BASE_MLB_LOGO_URL
+from DodgersPromo.utility.endpoint_constants import SCHEDULE_ENDPOINT, LATEST_GAME_URL, BASE_MLB_LOGO_URL
 
 def test_format_schedule_endpoint():
     #? If the endpoint is used without a format() call, then the string KEEPS the placeholders
