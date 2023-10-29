@@ -1,60 +1,21 @@
 from datetime import timedelta
-import requests
 from .. import db
 from ..models import DodgerGame, BaseballTeam, Promo
 from ..utility.database_helpers import saveToDb, deleteFromDb
-from ..utility.datetime_helpers import (dateToday, dateToStr, strToDatetime, utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT)
-from ..utility.endpoint_helpers import BASE_MLB_LOGO_URL, SCHEDULE_ENDPOINT
+from ..utility.datetime_helpers import strToDatetime, utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT
+from ..utility.endpoint_constants import BASE_MLB_LOGO_URL
+from ..utility.mlb_api import fetchThisYearsSchedule, fetchRemainingSchedule
 
-
-#! Endpoint generation methods
-#? Return an unpackable tuple useful to create the schedule endpoint
-def scheduleDates(updateMode = False):
-    todaysDate = dateToday()
-    thisYear = todaysDate.year #* SeasonYear Format: YYYY -> e.g. 2021
-    #* StartDate & endDate Format: YYYY-MM-DD -> e.g. 2021-06-01
-    startDate = dateToStr(todaysDate, YMD_FORMAT) if updateMode else f"{thisYear}-03-01"
-    endDate = f"{thisYear}-11-30"
-
-    return (startDate, endDate, thisYear) #* Most Python solution to quickly pack related data! Return a tuple!
-
-def createEndpoint(startDate = None, endDate = None, seasonYear = None, teamId = None):
-    if startDate is None or endDate is None or seasonYear is None:
-        return None
-
-    selectedTeamId = teamId or 119 #* The Dodgers ID acts as the default if None is found
-    return SCHEDULE_ENDPOINT.format(startDate=startDate, endDate=endDate, seasonYear=seasonYear, teamId=selectedTeamId)
-
-def fetchGames(endpointStr): #* Returns false OR a tuple.
-    if endpointStr is None:
-        return None #* Ensure the endpoint string isn't None due to bad formatting
-    dodgersSchedule = requests.get(endpointStr)
-
-    if (dodgersSchedule.status_code != 200):
-        return None #? In case of broken link
-    scheduleJson = dodgersSchedule.json()
-    print('Beginning seeding process')
-
-    totalGames = scheduleJson.get('totalGames', 0)
-    print(f"Games expected: {totalGames}")
-    teamGameDates = scheduleJson.get('dates', 0)
-    print(f"Dates found: {len(teamGameDates)}\n")
-    if not teamGameDates or len(teamGameDates) == 0:
-        return False #? In case json structure changes
-
-    return (totalGames, teamGameDates)
 
 #! Main CLI Command
 def seedDB(updateMode = False):
     print('Running the Database Seeder')
-    (startDate, endDate, seasonYear) = scheduleDates(updateMode)
-    gamesTuple = fetchGames(createEndpoint(startDate, endDate, seasonYear))
-    if gamesTuple is None:
-        return #* Getting None means likely issue with stats endpoint
-    (totalGames, teamGameDates) = gamesTuple #* Tuples can unpack just like Javascript destructures!
+    (totalGames, teamGameDates, startDate) = fetchRemainingSchedule() if updateMode else fetchThisYearsSchedule()
+    if totalGames is None or teamGameDates is None:
+        return #* Getting None means likely issue with MLB-Stats endpoint
 
     #? Query for all games in DB after the startDate (which if in updateMode is today's date)
-    startDateTime = strToDatetime(startDate, YMD_FORMAT) #todo Might be able to convert to PST HERE since it's EARLIER than UTC
+    startDateTime = strToDatetime(startDate, YMD_FORMAT)
     gamesInDb = db.session.scalars(
         db.select(DodgerGame).where(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date)
     ).all()

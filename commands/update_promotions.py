@@ -2,9 +2,10 @@ from flask import current_app as app #? Main method of accessing App's Config.py
 import requests
 from sqlalchemy.exc import NoResultFound
 from .. import db
-from .database_seed import createEndpoint, scheduleDates, initPromotionsForGame, comparePromoLists, replaceOldPromos
+from .database_seed import initPromotionsForGame, comparePromoLists, replaceOldPromos
 from ..models import DodgerGame
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
+from ..utility.mlb_api import createEndpoint, scheduleDates
 
 
 def updateAllPromotions():

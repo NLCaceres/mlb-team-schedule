@@ -2,7 +2,7 @@ import requests
 from .. import db
 from ..models import BaseballTeam
 from ..utility.database_helpers import finalizeDbUpdate
-from ..utility.endpoint_helpers import LEAGUE_STANDINGS_URL
+from ..utility.endpoint_constants import LEAGUE_STANDINGS_URL
 
 
 #! DIVISION NAME CONSTANT
