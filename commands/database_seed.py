@@ -2,7 +2,8 @@ from datetime import timedelta
 from .. import db
 from ..models import DodgerGame, BaseballTeam, Promo
 from ..utility.database_helpers import saveToDb, deleteFromDb
-from ..utility.datetime_helpers import strToDatetime, utcDateTimeToPacificTimeStr, YMD_FORMAT, ISO_FORMAT
+from ..utility.datetime_helpers import dateToStr, strToDatetime, ISO_FORMAT, YMD_FORMAT
+from ..utility.utc_to_pt_converters import utcStrToPacificDatetime
 from ..utility.endpoint_constants import BASE_MLB_LOGO_URL
 from ..utility.mlb_api import fetchThisYearsSchedule, fetchRemainingSchedule
 
@@ -15,13 +16,12 @@ def seedDB(updateMode = False):
         return #* Getting None means likely issue with MLB-Stats endpoint
 
     #? Query for all games in DB after the startDate (which if in updateMode is today's date)
-    startDateTime = strToDatetime(startDate, YMD_FORMAT)
-    gamesInDb = db.session.scalars(
+    startDateTime = utcStrToPacificDatetime(startDate, YMD_FORMAT) #? Take it as PDT since it's 7 hours earlier than UTC
+    gamesInDb = db.session.scalars( #* gamesInDb used to check if a save, update, or skip + print done in createGamesOfTheDay
         db.select(DodgerGame).where(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date)
     ).all()
-    #* gamesInDb used to check if a save, update, or skip + print done in createGamesOfTheDay
 
-    startingDateStr = utcDateTimeToPacificTimeStr(startDateTime, YMD_FORMAT) #? StartDate with PST accounted for!
+    startingDateStr = dateToStr(startDateTime, YMD_FORMAT) #? StartDate with PDT accounted for!
     print('Beginning to add Dodger Games to Schedule\n')
     seriesTotal, currentSeriesGame, seasonGameNum = 0, 0, 0 #* SeasonGameNum tracks total num of games read so far
     for dayNum, gameDate in enumerate(teamGameDates):
