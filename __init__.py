@@ -3,9 +3,13 @@ from flask import Flask, render_template
 from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
 
 #? Setting db and migrate here makes exporting them into other pkgs/dirs & modules/files easier
-db = SQLAlchemy()
+db = SQLAlchemy(model_class = Base)
 migrate = Migrate()
 scheduler = APScheduler()
 
