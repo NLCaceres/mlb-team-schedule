@@ -9,29 +9,29 @@ class BaseballTeam(db.Model):
 
 
     #* MLB API Json Parent Key = dates.games.teams.home.
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     #* MLB API Json Key = team.id -> f"https://www.mlbstatic.com/team-logos/{espnID}.svg" -> DIFFERENT THAN above DB ID
-    team_logo: Mapped[str] = mapped_column(db.String(), unique=True, nullable=False)
+    team_logo: Mapped[str] = mapped_column(unique=True)
     #* MLB API Json Key = team.clubName -> Dodgers which grabs the official name, not nicknames like D-Backs
-    team_name: Mapped[str] = mapped_column(db.String(), unique=True, nullable=False)
+    team_name: Mapped[str] = mapped_column(unique=True)
     #* MLB API Json Key = team.franchiseName -> Los Angeles which grabs official location, not necessarily city or state
-    city_name: Mapped[str] = mapped_column(db.String(), nullable=False) #* i.e. Colorado Rockies vs Denver Rockies
+    city_name: Mapped[str] #* i.e. Colorado Rockies vs Denver Rockies
     #* MLB API Json Key = team.abbreviation -> LAD
-    abbreviation: Mapped[str] = mapped_column(db.String(), unique=True, nullable=False)
+    abbreviation: Mapped[str] = mapped_column(unique=True) #? Need mapped_column since unique must be set to true here
     #* MLB API Json Key = leagueRecord.wins
-    wins: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    wins: Mapped[int] #? Don't need mapped_column since nullable will be set to false based on the type!
     #* MLB API Json Key = leagueRecord.losses
-    losses: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    losses: Mapped[int] #? Alternatively, if nullable needed to be true, we could set the type to Mapped[Optional[int]]
 
 
     #? Being on the Many-side, BaseballGame uses foreign_keys to pair ITS OWN foreign keys' w/ their relationships
     #? BUT on the 1-side, BaseballTeam uses foreign_keys to help SQLAlchemy find those ForeignKeys in BASEBALL_GAMES table
-    baseball_game_mapping_name = 'DodgerGame'
-    homeGames: Mapped[List[baseball_game_mapping_name]] = relationship(back_populates='home_team',
-                                                                       foreign_keys='DodgerGame.home_team_id')
+    baseballGameMapName = 'DodgerGame'
+    homeGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='home_team',
+                                                                foreign_keys='DodgerGame.home_team_id')
     #? Put home+away games in 1 column THEN filter via hybrid_prop?.. FOR NOW, these 2 relationships provide easy table joins
-    awayGames: Mapped[List[baseball_game_mapping_name]] = relationship(back_populates='away_team',
-                                                                       foreign_keys='DodgerGame.away_team_id')
+    awayGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='away_team',
+                                                                foreign_keys='DodgerGame.away_team_id')
 
 
     @hybrid_property #? Hybrid props are SQLAlchemy's equivalent of computed properties (or virtuals from mongo!)

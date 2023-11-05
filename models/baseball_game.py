@@ -15,29 +15,29 @@ class DodgerGame(db.Model):
 
 
     #* MLB API Json Parent Key = dates.games.
-    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     #* MLB API Json Key = 'gamePk', seemingly the only consistent ID. Does 'Pk' = 'primary key'?
-    # gameKey = db.Column(db.Integer, nullable=False)
+    # gameKey: Mapped[int]
     #* MLB API Json Key = 'gameDate', format: 2021-07-05T22:40:00Z
-    date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
+    date: Mapped[datetime]
     #* MLB API Json Key = 'seriesGameNumber', e.g. Game # 2 of 3
-    gameNumInSeries: Mapped[int] = mapped_column(db.Integer, nullable=False) #todo Rename gameNumInSeries -> seriesGameNumber
+    gameNumInSeries: Mapped[int] #todo Rename gameNumInSeries -> seriesGameNumber
     #* MLB API Json Key = 'gamesInSeries', e.g. 3 games in series
-    gamesInSeries: Mapped[int] = mapped_column(db.Integer, nullable=False) #todo Rename gamesInSeries -> seriesGameCount
+    gamesInSeries: Mapped[int] #todo Rename gamesInSeries -> seriesGameCount
 
 
     #? Use a ForeignKey so the DB can setup the 1-Team to Many-Games relationship -> Usage: ForeignKey('tablename.columnkey')
-    home_team_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey('baseball_teams.id'), nullable=False)
+    home_team_id: Mapped[int] = mapped_column(db.ForeignKey('baseball_teams.id'))
     #? If there's 2+ paths between 2 tables, set foreign_keys in relationship() to set the specific key used in each path
-    baseball_team_mapping_name = 'BaseballTeam'
-    home_team: Mapped[baseball_team_mapping_name] = relationship(back_populates='homeGames', foreign_keys=[home_team_id])
-    away_team_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey('baseball_teams.id'), nullable=False)
-    away_team: Mapped[baseball_team_mapping_name] = relationship(back_populates='awayGames', foreign_keys=[away_team_id])
+    baseballTeamMapName = 'BaseballTeam'
+    home_team: Mapped[baseballTeamMapName] = relationship(back_populates='homeGames', foreign_keys=[home_team_id])
+    away_team_id: Mapped[int] = mapped_column(db.ForeignKey('baseball_teams.id'))
+    away_team: Mapped[baseballTeamMapName] = relationship(back_populates='awayGames', foreign_keys=[away_team_id])
 
 
     #? Relationships now default to Lazy='select' which waits until 1st use to load in the relation
-    promo_mapping_name = 'Promo'
-    promos: Mapped[List[promo_mapping_name]] = relationship(back_populates='game')
+    promoMapName = 'Promo'
+    promos: Mapped[List[promoMapName]] = relationship(back_populates='game')
 
 
     @hybrid_property
