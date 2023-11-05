@@ -1,6 +1,8 @@
 from datetime import timedelta
 from .. import db
-from ..models import DodgerGame, BaseballTeam, Promo
+from ..models.baseball_game import DodgerGame
+from ..models.baseball_team import BaseballTeam
+from ..models.promotion import Promo
 from ..utility.database_helpers import saveToDb, deleteFromDb
 from ..utility.datetime_helpers import dateToStr, strToDatetime, ISO_FORMAT, YMD_FORMAT
 from ..utility.utc_to_pt_converters import utcStrToPacificDatetime
@@ -66,7 +68,7 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
         gamePk, gameDate = game['gamePk'], game['gameDate']
         gameSeriesNumber, gamesInSeries = game['seriesGameNumber'], game['gamesInSeries']
 
-        #* Should be able to grab any game in the DB from a oldest to most recent date sorted list 
+        #* Should be able to grab any game in the DB from a oldest to most recent date sorted list
         #* based on what # game of the full season it is, i.e.
         #* The tenth game of the year should be at index 9 with the expected time, promotions, etc
         gameExpectedFromDb: DodgerGame = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
@@ -121,12 +123,13 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
         if gameExpectedFromDb == gamesInDb[seasonGameNum]:
             print(f"Game from DB list still matches original DB game = {gameExpectedFromDb == gamesInDb[seasonGameNum]}")
             if newGame == gameExpectedFromDb:
-                if not comparePromoLists(gameExpectedFromDb.promos, newPromos): #* Compare now since likely didn't run check earlier
-                    print("Promo lists don't match, replacing old ones with new ones!")
+                if not comparePromoLists(gameExpectedFromDb.promos, newPromos): #* Compare now since
+                    print("Promo lists don't match, replacing old ones with new ones!") #* likely didn't run check earlier
                     replaceOldPromos(gameExpectedFromDb, newPromos)
             else:
                 replaceOldGame(gamesInDb, seasonGameNum, newGame)
-                print(f"API Game had an unnoticed minor change, so using {gamesInDb[seasonGameNum]}, and deleting {gameExpectedFromDb}")
+                print((f"API Game had an unnoticed minor change, so using {gamesInDb[seasonGameNum]}," #? Multi-line f-string
+                       f"and deleting {gameExpectedFromDb}"))
                 createNewGame(newGame, newPromos)
             print('')
         elif newGame == gamesInDb[seasonGameNum]: #* The new game was likely swapped into the DB list so save it now

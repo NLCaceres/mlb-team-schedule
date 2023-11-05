@@ -1,6 +1,6 @@
 import requests
 from .. import db
-from ..models import BaseballTeam
+from ..models.baseball_team import BaseballTeam
 from ..utility.database_helpers import finalizeDbUpdate
 from ..utility.endpoint_constants import LEAGUE_STANDINGS_URL
 

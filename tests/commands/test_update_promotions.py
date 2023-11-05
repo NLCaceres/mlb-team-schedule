@@ -6,7 +6,8 @@ from ..common_assertions import assertIsEmpty, assertHasLengthOf
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
-from ...models import BaseballTeam, DodgerGame
+from ...models.baseball_game import DodgerGame
+from ...models.baseball_team import BaseballTeam
 from ...utility.database_helpers import saveToDb
 from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
@@ -14,8 +15,8 @@ from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 #! Fixtures
 @pytest.fixture(autouse=True)
 def gameDbSetup(app):
-    dodgers = BaseballTeam(team_name='Dodgers', city_name='Los Angeles', team_logo='Foo', abbreviation='LAD', wins=2, losses=1)
-    yankees = BaseballTeam(team_name='Yankees', city_name='New York', team_logo='Bar', abbreviation='NYY', wins=1, losses=2)
+    dodgers = BaseballTeam(team_name='Dodgers', city_name='Los Angeles', team_logo='A', abbreviation='LAD', wins=2, losses=1)
+    yankees = BaseballTeam(team_name='Yankees', city_name='New York', team_logo='B', abbreviation='NYY', wins=1, losses=2)
 
     with app.app_context():
         saveToDb(dodgers)
@@ -72,7 +73,7 @@ def test_updateAllPromotions(app, monkeypatch, gameDatesJSON):
 
     #* WHEN the gameDates contain no game info
     gamesDatesMissingGames = copy.deepcopy(gameDatesJSON)
-    gamesDatesMissingGames['dates'] = [{}]
+    gamesDatesMissingGames['dates'] = [{ }]
     mockResponse.jsonResponse = gamesDatesMissingGames
     updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB

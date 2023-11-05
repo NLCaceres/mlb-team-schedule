@@ -1,7 +1,9 @@
 from datetime import date
 from DodgersPromo import db
 from DodgersPromo.utility.database_helpers import saveToDb, finalizeDbUpdate
-from DodgersPromo.models import DodgerGame, BaseballTeam
+from DodgersPromo.models.baseball_game import DodgerGame
+from DodgersPromo.models.baseball_team import BaseballTeam
+
 
 def test_saveToDb(app):
     team1 = BaseballTeam(team_name='Foobar', city_name='Barfoo', team_logo='Foo', abbreviation='BF', wins=2, losses=1)

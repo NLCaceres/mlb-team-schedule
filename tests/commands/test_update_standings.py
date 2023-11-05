@@ -4,8 +4,9 @@ import requests
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
-from ...models import BaseballTeam
+from ...models.baseball_team import BaseballTeam
 from ...utility.database_helpers import saveToDb
+
 
 #! Fixtures
 @pytest.fixture(autouse=True)
