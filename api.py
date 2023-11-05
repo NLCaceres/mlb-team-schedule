@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, url_for, jsonify
 from calendar import monthrange
 from datetime import date
 from . import db
-from .models.baseball_game import DodgerGame
+from .models import DodgerGame
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')

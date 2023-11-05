@@ -3,7 +3,7 @@ import requests
 from sqlalchemy.exc import NoResultFound
 from .. import db
 from .database_seed import initPromotionsForGame, comparePromoLists, replaceOldPromos
-from ..models.baseball_game import DodgerGame
+from ..models import DodgerGame
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
 from ..utility.mlb_api import createEndpoint, scheduleDates
 

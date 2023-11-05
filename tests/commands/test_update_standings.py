@@ -4,7 +4,7 @@ import requests
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
-from ...models.baseball_team import BaseballTeam
+from ...models import BaseballTeam
 from ...utility.database_helpers import saveToDb
 
 

@@ -1,8 +1,6 @@
 from datetime import timedelta
 from .. import db
-from ..models.baseball_game import DodgerGame
-from ..models.baseball_team import BaseballTeam
-from ..models.promotion import Promo
+from ..models import DodgerGame, BaseballTeam, Promo
 from ..utility.database_helpers import saveToDb, deleteFromDb
 from ..utility.datetime_helpers import dateToStr, strToDatetime, ISO_FORMAT, YMD_FORMAT
 from ..utility.utc_to_pt_converters import utcStrToPacificDatetime

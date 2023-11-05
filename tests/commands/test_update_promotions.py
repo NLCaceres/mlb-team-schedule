@@ -6,8 +6,7 @@ from ..common_assertions import assertIsEmpty, assertHasLengthOf
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
-from ...models.baseball_game import DodgerGame
-from ...models.baseball_team import BaseballTeam
+from ...models import DodgerGame, BaseballTeam
 from ...utility.database_helpers import saveToDb
 from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 

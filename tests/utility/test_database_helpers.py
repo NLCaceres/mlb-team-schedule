@@ -1,8 +1,7 @@
 from datetime import date
 from DodgersPromo import db
 from DodgersPromo.utility.database_helpers import saveToDb, finalizeDbUpdate
-from DodgersPromo.models.baseball_game import DodgerGame
-from DodgersPromo.models.baseball_team import BaseballTeam
+from DodgersPromo.models import DodgerGame, BaseballTeam
 
 
 def test_saveToDb(app):
