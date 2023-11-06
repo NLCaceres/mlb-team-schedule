@@ -1,12 +1,12 @@
 import pytest
+import requests
 from dotenv import load_dotenv, find_dotenv
 from flask_migrate import upgrade, downgrade
-import requests
 from .. import create_app
 from .MockHttpResponse import MockHttpResponse
 
 #? `Conftest.py` is used by `Pytest` to create fixtures that can be easily reused across all tests
-#? Unfortunately, there isn't any other way to share fixtures across tests, so MUST be careful w/ 'autouse' 
+#? Unfortunately, there isn't any other way to share fixtures across tests, so MUST be careful w/ 'autouse'
 
 #? Using basic `python-dotenv` rather than `pytest-dotenv` requires the following
 #? 'session' scope ensures this test-wide fixture is the highest priority
@@ -20,10 +20,10 @@ def load_env():
 def app():
     # db_fd, db_path = tempfile.mkstemp() #? db_path links to temp db file
 
-    app = create_app({}) #* Passing an empty Dictionary ensures the TestConfig is used
+    app = create_app({ }) #* Passing an empty Dictionary ensures the TestConfig is used
 
     with app.app_context():
-        upgrade() #? Setup TestDB by creating the tables then running migrations on them
+        upgrade() #? Setup the test DB by running migrations so tables are created for tests to fill with mocks
 
     # with app.test_client() as client:
         # yield client
@@ -33,7 +33,7 @@ def app():
     # os.close(db_fd) #? Only purpose of db_fd is to close file/db
     # os.unlink(db_path)
     with app.app_context():
-        downgrade() #? Reset the TestDB by removing the migrations and deleting the tables
+        downgrade(revision='base') #? FULLY reset the DB by removing all migrations via 'base', so ALL tables are dropped
 
 
 @pytest.fixture
