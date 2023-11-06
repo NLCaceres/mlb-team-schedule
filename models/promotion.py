@@ -14,7 +14,7 @@ class Promo(db.Model):
     #* MLB API Json Key = imageURL
     thumbnail_url: Mapped[str]
     #* MLB API Json Key = offerType
-    # offer_type: Mapped[str] #? MOSTLY = 'Day of Game Highlights', 'Giveaway' OR 'Ticket Offer'
+    offer_type: Mapped[str] #? MOSTLY = 'Day of Game Highlights', 'Giveaway' OR 'Ticket Offer'
 
 
     #? If there's only 1 path between 2 tables (e.g. game to promos), SQLAlchemy easily finds the foreign key linking the 2
