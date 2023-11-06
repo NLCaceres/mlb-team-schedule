@@ -187,7 +187,8 @@ def initPromotionsForGame(promotions):
     for promo in promotions:
         promoName = promo['name']
         thumbnailUrl = promo.get('imageUrl', 'undefined')
-        newPromo = Promo(name=promoName, thumbnail_url=thumbnailUrl)
+        offerType = promo.get('offerType', '')
+        newPromo = Promo(name=promoName, thumbnail_url=thumbnailUrl, offer_type=offerType)
         newPromos.append(newPromo)
     return newPromos #* Return the list of promos to save
 
@@ -199,29 +200,6 @@ def linkPromosToGame(newGame, newPromos):
 def replaceOldPromos(oldGame, newPromos):
     [deleteFromDb(promo) for promo in oldGame.promos]
     linkPromosToGame(oldGame, newPromos)
-
-#todo Likely no longer need this updatePromo func
-def updatePromotionsForGame(promotions, thisGame):
-    newPromos = []
-    for promo in promotions:
-        promoName = promo['name']
-        print(f"\t********** {promoName} **********")
-        thumbnailUrl = promo.get('imageUrl', 'undefined')
-
-        if len(thisGame.promos) > 0: #* THEN update the promotions list for this game
-            matchingPromo = next((gamePromo for gamePromo in thisGame.promos if (gamePromo.name == promoName)), None)
-            if matchingPromo is not None and matchingPromo.thumbnail_url != thumbnailUrl:
-                # matchingPromo.thumbnail_url = thumbnailUrl
-                # finalizeDbUpdate()
-                print('\tMatch found but image url changed, so updating!')
-                continue
-            elif matchingPromo is not None:
-                print('\tMatch found but image url remained the same, so skip!')
-                continue
-
-        newPromo = Promo(name=promoName, thumbnail_url=thumbnailUrl)
-        newPromos.append(newPromo)
-    return newPromos #* Return the list of promos to save
 
 #todo Could use also do (newPromoSet - dbPromoSet), and it should reliably leave ONLY the new/changed promos
 #todo from there, could iterate thru the new promos, save and link them
