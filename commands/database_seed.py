@@ -73,7 +73,7 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
 
         #* Create Game Model so promos can be associated later
         newGame = DodgerGame(gameKey=gamePk, date=strToDatetime(gameDate, ISO_FORMAT),
-                             gameNumInSeries=gameSeriesNumber, gamesInSeries=gamesInSeries,
+                             seriesGameNumber=gameSeriesNumber, seriesGameCount=gamesInSeries,
                              home_team_id=homeTeam.id, away_team_id=awayTeam.id)
 
         #* If resumedFrom key found, then found a Suspended game, which is most likely a copy of the previous game
@@ -95,7 +95,7 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
         #* Comparing datetime objs to get correct date ordering, not the strings which would get lexicographic sorting
         if newGame.date < gameExpectedFromDb.date:
             print('Seems a game moved up')
-            if gameExpectedFromDb.gameNumInSeries == gameExpectedFromDb.gamesInSeries:
+            if gameExpectedFromDb.seriesGameNumber == gameExpectedFromDb.seriesGameCount:
                 print("Seems the game just made their start time earlier")
             #* Away games track changes by comparing the API game to the current DB game
             #* Home games can use promos to track game identity (which would be different than __eq__)
@@ -104,19 +104,19 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
                 findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, replaceOldGame)
         elif newGame.date > gameExpectedFromDb.date:
             print('Seems a game was postponed OR suspended')
-            if gameExpectedFromDb.gameNumInSeries == gameExpectedFromDb.gamesInSeries:
+            if gameExpectedFromDb.seriesGameNumber == gameExpectedFromDb.seriesGameCount:
                 print("Seems the game just made its start time later")
-            if gameExpectedFromDb.gamesInSeries > newGame.gamesInSeries:
+            if gameExpectedFromDb.seriesGameCount > newGame.seriesGameCount:
                 print("Seems the game just rescheduled entirely since the total games in the series was reduced")
             #* replaceOldGame seems the best way all-around to keep the DB list ordered correctly
             if homeTeam.abbreviation == 'LAD':
                 findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, replaceOldGame)
 
         print(f"Game from DB List = {gameExpectedFromDb} which is game " \
-              f"#{gameExpectedFromDb.gameNumInSeries} in a series of {gameExpectedFromDb.gamesInSeries}")
-        print(f"Game from API = {newGame} which is game #{newGame.gameNumInSeries} in a series of {newGame.gamesInSeries}")
+              f"#{gameExpectedFromDb.seriesGameNumber} in a series of {gameExpectedFromDb.seriesGameCount}")
+        print(f"Game from API = {newGame} which is game #{newGame.seriesGameNumber} in a series of {newGame.seriesGameCount}")
         print(f"Game from the DB List after changes = {gamesInDb[seasonGameNum]} which is game " \
-              f"#{gamesInDb[seasonGameNum].gameNumInSeries} in a series of {gamesInDb[seasonGameNum].gamesInSeries}")
+              f"#{gamesInDb[seasonGameNum].seriesGameNumber} in a series of {gamesInDb[seasonGameNum].seriesGameCount}")
 
         if gameExpectedFromDb == gamesInDb[seasonGameNum]:
             print(f"Game from DB list still matches original DB game = {gameExpectedFromDb == gamesInDb[seasonGameNum]}")
@@ -140,9 +140,9 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
 
 def findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, matchCallback):
     searchIndex = seasonGameNum + 1
-    while searchIndex < len(gamesInDb) and gamesInDb[searchIndex].gameNumInSeries != 1:
+    while searchIndex < len(gamesInDb) and gamesInDb[searchIndex].seriesGameNumber != 1:
         potentialGame: DodgerGame = gamesInDb[searchIndex]
-        print(f"Potential game = {potentialGame} is #{potentialGame.gameNumInSeries}")
+        print(f"Potential game = {potentialGame} is #{potentialGame.seriesGameNumber}")
         matchingPromos = comparePromoLists(potentialGame.promos, newPromos)
         if matchingPromos:
             matchCallback(gamesInDb, seasonGameNum, newGame, searchIndex)

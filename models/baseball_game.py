@@ -21,9 +21,9 @@ class DodgerGame(db.Model):
     #* MLB API Json Key = 'gameDate', format: 2021-07-05T22:40:00Z
     date: Mapped[datetime]
     #* MLB API Json Key = 'seriesGameNumber', e.g. Game # 2 of 3
-    gameNumInSeries: Mapped[int] #todo Rename gameNumInSeries -> seriesGameNumber
+    seriesGameNumber: Mapped[int]
     #* MLB API Json Key = 'gamesInSeries', e.g. 3 games in series
-    gamesInSeries: Mapped[int] #todo Rename gamesInSeries -> seriesGameCount
+    seriesGameCount: Mapped[int]
 
 
     #? Use a ForeignKey so the DB can setup the 1-Team to Many-Games relationship -> Usage: ForeignKey('tablename.columnkey')
@@ -54,7 +54,7 @@ class DodgerGame(db.Model):
     def asDict(self):
         return {
             'id': self.id, 'date': self.readableDate, 'promos': [promotion.asDict for promotion in self.promos],
-            'gameNumInSeries': self.gameNumInSeries, 'gamesInSeries': self.gamesInSeries,
+            'seriesGameNumber': self.seriesGameNumber, 'seriesGameCount': self.seriesGameCount,
             'homeTeam': self.home_team.asDict, 'awayTeam': self.away_team.asDict,
         }
 
@@ -69,8 +69,8 @@ class DodgerGame(db.Model):
     def __eq__(self, other): #? Could also override __hash__ but only needed if expected to use sets
         if isinstance(other, DodgerGame):
             idCheck = self.id == other.id
-            gameNumberCheck = self.gameNumInSeries == other.gameNumInSeries
-            gameCountCheck = self.gamesInSeries == other.gamesInSeries
+            gameNumberCheck = self.seriesGameNumber == other.seriesGameNumber
+            gameCountCheck = self.seriesGameCount == other.seriesGameCount
             dateCheck = (self.date == other.date and gameNumberCheck and gameCountCheck)
             teamsCheck = self.home_team_id == other.home_team_id and self.away_team_id == other.away_team_id
             return idCheck or (dateCheck and teamsCheck)
