@@ -3,7 +3,7 @@ import requests
 from sqlalchemy.exc import NoResultFound
 from .. import db
 from .database_seed import initPromotionsForGame, comparePromoLists, replaceOldPromos
-from ..models import DodgerGame
+from ..models import BaseballGame
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
 from ..utility.mlb_api import createEndpoint, scheduleDates
 
@@ -14,9 +14,9 @@ def updateAllPromotions():
     response = requests.get(createEndpoint(*scheduleDates(True)))
     if (response.status_code != 200):
         return #? In case of broken link
-    dodgersSchedule = response.json()
+    teamSchedule = response.json()
 
-    gameDateList = dodgersSchedule.get('dates', [])
+    gameDateList = teamSchedule.get('dates', [])
     for gameDate in gameDateList:
         gameList = gameDate.get('games', [])
         #? If a date is found w/out any games, then this list comprehension ends immediately, moving on to next date
@@ -31,13 +31,13 @@ def updateEachGamesPromotions(game):
         expectedTeamName = app.config.get('TEAM_FULL_NAME').lower()
         if (homeTeamName == expectedTeamName): #* ONLY add promos if it's a home game
             dateForGame = strToDatetime(game['gameDate'], ISO_FORMAT) #* Convert typical UTC string to datetime obj
-            gameInDb = db.session.scalars(db.select(DodgerGame).filter_by(date=dateForGame)).one()
+            gameInDb = db.session.scalars(db.select(BaseballGame).filter_by(date=dateForGame)).one()
             newPromos = initPromotionsForGame(game.get('promotions', []))
             if not comparePromoLists(gameInDb.promos, newPromos):
                 replaceOldPromos(gameInDb, newPromos)
     except KeyError:
         print("While updating Game Promotions: Unable to find the game's home team or date in JSON")
     except NoResultFound:
-        print(f"While updating Game Promotions: Unable to find Dodger game with the following UTC date: {game['gameDate']}")
+        print(f"While updating Game Promotions: Unable to find Baseball game with the following UTC date: {game['gameDate']}")
     except Exception as exception:
         print(f"While updating Game Promotions: Unexpected exception of {type(exception)} encountered")

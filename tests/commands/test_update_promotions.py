@@ -6,7 +6,7 @@ from ..common_assertions import assertIsEmpty, assertHasLengthOf
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
-from ...models import DodgerGame, BaseballTeam
+from ...models import BaseballGame, BaseballTeam
 from ...utility.database_helpers import saveToDb
 from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
@@ -24,14 +24,14 @@ def gameDbSetup(app):
 
         #* Game 1 = Dodgers facing Yankees at home while Game 2 = Dodgers facing Yankees at New York
         date1 = strToDatetime('2021-05-10T02:10:35Z', ISO_FORMAT) #* May 09 2021 7:10PM
-        game1 = DodgerGame(gameKey=1, date=date1, seriesGameNumber=1,
-                           seriesGameCount=3, home_team_id=dodgers.id, away_team_id=yankees.id)
+        game1 = BaseballGame(gameKey=1, date=date1, seriesGameNumber=1,
+                             seriesGameCount=3, home_team_id=dodgers.id, away_team_id=yankees.id)
         date2 = strToDatetime('2021-08-02T23:15:35Z', ISO_FORMAT) #* Aug 02 2021 4:15PM
-        game2 = DodgerGame(gameKey=2, date=date2, seriesGameNumber=1,
-                           seriesGameCount=3, home_team_id=yankees.id, away_team_id=dodgers.id)
+        game2 = BaseballGame(gameKey=2, date=date2, seriesGameNumber=1,
+                             seriesGameCount=3, home_team_id=yankees.id, away_team_id=dodgers.id)
         saveToDb(game1)
         saveToDb(game2)
-        assert len(db.session.scalars(db.select(DodgerGame)).all()) == 2
+        assert len(db.session.scalars(db.select(BaseballGame)).all()) == 2
 
 @pytest.fixture
 def gameDatesJSON(gameJSON):
@@ -154,11 +154,11 @@ def test_updateEachGamesPromotions(app, gameJSON):
 
 #! Assertion Methods
 def checkDefaultPromotions():
-    games = db.session.scalars(db.select(DodgerGame)).all()
+    games = db.session.scalars(db.select(BaseballGame)).all()
     [assertIsEmpty(game.promos) for game in games]
 
 def checkUpdatedPromotions():
-    games = db.session.scalars(db.select(DodgerGame)).all()
+    games = db.session.scalars(db.select(BaseballGame)).all()
     updatedGame = games[0] if games[0].home_team.fullName == 'Los Angeles Dodgers' else games[1]
     unchangedGame = games[1] if games[1].home_team.fullName == 'New York Yankees' else games[0]
     assertHasLengthOf(updatedGame.promos, 1)

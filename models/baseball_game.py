@@ -9,9 +9,8 @@ from .. import db
 #? BUT when separating models into own file, you'd end up with a circular import and crash!
 # db = SQLAlchemy()
 
-#* Rename BaseballGame
-class DodgerGame(db.Model):
-    __tablename__ = 'dodger_games' #? Without override, tablename = 'dodger_game' -> #todo Rename to baseball_games
+class BaseballGame(db.Model):
+    __tablename__ = 'baseball_games' #? Without override, tablename = 'baseball_game'
 
 
     #* MLB API Json Parent Key = dates.games.
@@ -63,11 +62,11 @@ class DodgerGame(db.Model):
 
 
     def __repr__(self): #? String representation on queries
-        return '<DodgerGame id {} on {}>'.format(self.id, self.readableDate) #? Python2.6 way to embed vars w/out f-strings
+        return '<BaseballGame id {} on {}>'.format(self.id, self.readableDate) #? Python2.6 way to embed vars w/out f-strings
 
 
     def __eq__(self, other): #? Could also override __hash__ but only needed if expected to use sets
-        if isinstance(other, DodgerGame):
+        if isinstance(other, BaseballGame):
             idCheck = self.id == other.id
             gameNumberCheck = self.seriesGameNumber == other.seriesGameNumber
             gameCountCheck = self.seriesGameCount == other.seriesGameCount

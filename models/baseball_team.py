@@ -26,12 +26,12 @@ class BaseballTeam(db.Model):
 
     #? Being on the Many-side, BaseballGame uses foreign_keys to pair ITS OWN foreign keys' w/ their relationships
     #? BUT on the 1-side, BaseballTeam uses foreign_keys to help SQLAlchemy find those ForeignKeys in BASEBALL_GAMES table
-    baseballGameMapName = 'DodgerGame'
+    baseballGameMapName = 'BaseballGame'
     homeGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='home_team',
-                                                                foreign_keys='DodgerGame.home_team_id')
+                                                                foreign_keys='BaseballGame.home_team_id')
     #? Put home+away games in 1 column THEN filter via hybrid_prop?.. FOR NOW, these 2 relationships provide easy table joins
     awayGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='away_team',
-                                                                foreign_keys='DodgerGame.away_team_id')
+                                                                foreign_keys='BaseballGame.away_team_id')
 
 
     @hybrid_property #? Hybrid props are SQLAlchemy's equivalent of computed properties (or virtuals from mongo!)

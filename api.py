@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, url_for, jsonify
 from calendar import monthrange
 from datetime import date
 from . import db
-from .models import DodgerGame
+from .models import BaseballGame
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -14,16 +14,16 @@ MONTH_SWITCH = { 'march': 3, 'april': 4, 'may': 5, 'june': 6, 'july': 7, 'august
 
 #? All routes prepended with '/api' thanks to prefix param in Blueprint constructor
 @bp.route('/fullSchedule')
-def apiFullDodgerSchedule():
+def apiFullSchedule():
     if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json:
         return redirect(url_for('home'))
 
-    allGames = db.session.scalars(db.select(DodgerGame))
+    allGames = db.session.scalars(db.select(BaseballGame))
     return jsonify([game.asDict for game in allGames])
 
 
 @bp.route('/<string:month>')
-def apiSingleMonthDodgerSchedule(month):
+def apiSingleMonthSchedule(month):
     if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json:
         return redirect(url_for('home'))
 
@@ -38,14 +38,14 @@ def apiSingleMonthDodgerSchedule(month):
     end = date(year=year, month=monthNum+1, day=1)
 
     #* Was unable to get games on last day of month, so simplest solution = set end to 1st day of next month with '<'
-    dodgerGames = db.session.scalars(
-        db.select(DodgerGame).where(DodgerGame.readableDateTime < end).where(DodgerGame.readableDateTime >= start)
+    baseballGames = db.session.scalars(
+        db.select(BaseballGame).where(BaseballGame.readableDateTime < end).where(BaseballGame.readableDateTime >= start)
     )
-    return jsonify([game.asDict for game in dodgerGames])
+    return jsonify([game.asDict for game in baseballGames])
 
 
 @bp.route('/<string:month>/<int:day>')
-def apiSingleDayDodgerSchedule(month, day):
+def apiSingleDaySchedule(month, day):
     if len(request.accept_mimetypes) > 1 or not request.accept_mimetypes.accept_json:
         return redirect(url_for('home'))
 
@@ -65,7 +65,7 @@ def apiSingleDayDodgerSchedule(month, day):
     endDay = day + 1 if (day != lastDayOfMonth) else 1
     end = date(year=year, month=endMonth, day=endDay)
 
-    dodgerGames = db.session.scalars(
-        db.select(DodgerGame).where(DodgerGame.readableDateTime < end).where(DodgerGame.readableDateTime >= start)
+    baseballGames = db.session.scalars(
+        db.select(BaseballGame).where(BaseballGame.readableDateTime < end).where(BaseballGame.readableDateTime >= start)
     ) #? Since scalars() returns an iterable ScalarResult, only need to suffix .all() if a basic List is explicitly needed
-    return jsonify([game.asDict for game in dodgerGames])
+    return jsonify([game.asDict for game in baseballGames])

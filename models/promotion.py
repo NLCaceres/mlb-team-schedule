@@ -18,9 +18,9 @@ class Promo(db.Model):
 
 
     #? If there's only 1 path between 2 tables (e.g. game to promos), SQLAlchemy easily finds the foreign key linking the 2
-    dodger_game_id: Mapped[int] = mapped_column(db.ForeignKey('dodger_games.id'))
+    baseball_game_id: Mapped[int] = mapped_column(db.ForeignKey('baseball_games.id'))
     #? No matter if it's a 1-to-Many or a 1-to-1 relationship, just need to save a ForeignKey on the Child/BelongsTo side
-    baseballGameMapName = 'DodgerGame'
+    baseballGameMapName = 'BaseballGame'
     game: Mapped[baseballGameMapName] = relationship(back_populates='promos') #? SO this Promo BELONGS TO only 1 Game
 
 

@@ -1,6 +1,7 @@
 from datetime import timedelta
+from flask import current_app as app
 from .. import db
-from ..models import DodgerGame, BaseballTeam, Promo
+from ..models import BaseballGame, BaseballTeam, Promo
 from ..utility.database_helpers import saveToDb, deleteFromDb
 from ..utility.datetime_helpers import dateToStr, strToDatetime, ISO_FORMAT, YMD_FORMAT
 from ..utility.utc_to_pt_converters import utcStrToPacificDatetime
@@ -18,18 +19,18 @@ def seedDB(updateMode = False):
     #? Query for all games in DB after the startDate (which if in updateMode is today's date)
     startDateTime = utcStrToPacificDatetime(startDate, YMD_FORMAT) #? Take it as PDT since it's 7 hours earlier than UTC
     gamesInDb = db.session.scalars( #* gamesInDb used to check if a save, update, or skip + print done in createGamesOfTheDay
-        db.select(DodgerGame).where(DodgerGame.readableDateTime >= startDateTime).order_by(DodgerGame.date)
+        db.select(BaseballGame).where(BaseballGame.readableDateTime >= startDateTime).order_by(BaseballGame.date)
     ).all()
 
     startingDateStr = dateToStr(startDateTime, YMD_FORMAT) #? StartDate with PDT accounted for!
-    print('Beginning to add Dodger Games to Schedule\n')
+    print('Beginning to add Baseball Games to Schedule\n')
     seriesTotal, currentSeriesGame, seasonGameNum = 0, 0, 0 #* SeasonGameNum tracks total num of games read so far
     for dayNum, gameDate in enumerate(teamGameDates):
         gameList = gameDate.get('games', [])
         if len(gameList) == 0:
             print('Date without any games found, skipping!')
             continue #? In case a date without any games is returned for some reason, skip it! (Not sure if possible)
-        print(f"Day #{dayNum+1} that Dodgers have played since {startingDateStr}")
+        print(f"Day #{dayNum+1} that {app.config.get('TEAM_FULL_NAME')} have played since {startingDateStr}")
 
         firstGameOfDay = gameList[0]
         currentSeriesGame = gameList[1]['seriesGameNumber'] if len(gameList) > 1 else firstGameOfDay['seriesGameNumber']
@@ -69,12 +70,12 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
         #* Should be able to grab any game in the DB from a oldest to most recent date sorted list
         #* based on what # game of the full season it is, i.e.
         #* The tenth game of the year should be at index 9 with the expected time, promotions, etc
-        gameExpectedFromDb: DodgerGame = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
+        gameExpectedFromDb: BaseballGame = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
 
         #* Create Game Model so promos can be associated later
-        newGame = DodgerGame(gameKey=gamePk, date=strToDatetime(gameDate, ISO_FORMAT),
-                             seriesGameNumber=gameSeriesNumber, seriesGameCount=gamesInSeries,
-                             home_team_id=homeTeam.id, away_team_id=awayTeam.id)
+        newGame = BaseballGame(gameKey=gamePk, date=strToDatetime(gameDate, ISO_FORMAT),
+                               seriesGameNumber=gameSeriesNumber, seriesGameCount=gamesInSeries,
+                               home_team_id=homeTeam.id, away_team_id=awayTeam.id)
 
         #* If resumedFrom key found, then found a Suspended game, which is most likely a copy of the previous game
         originalDate = game.get('resumedFrom', '') #* Use default '' to falsy check ternary to avoid datetime format errors
@@ -141,7 +142,7 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
 def findOriginalGameByPromos(gamesInDb, seasonGameNum, newGame, newPromos, matchCallback):
     searchIndex = seasonGameNum + 1
     while searchIndex < len(gamesInDb) and gamesInDb[searchIndex].seriesGameNumber != 1:
-        potentialGame: DodgerGame = gamesInDb[searchIndex]
+        potentialGame: BaseballGame = gamesInDb[searchIndex]
         print(f"Potential game = {potentialGame} is #{potentialGame.seriesGameNumber}")
         matchingPromos = comparePromoLists(potentialGame.promos, newPromos)
         if matchingPromos:
@@ -194,7 +195,7 @@ def initPromotionsForGame(promotions):
 
 def linkPromosToGame(newGame, newPromos):
     for newPromo in newPromos:
-        newPromo.dodger_game_id = newGame.id
+        newPromo.baseball_game_id = newGame.id
         saveToDb(newPromo)
 
 def replaceOldPromos(oldGame, newPromos):

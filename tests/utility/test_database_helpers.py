@@ -1,19 +1,19 @@
 from datetime import date
 from DodgersPromo import db
 from DodgersPromo.utility.database_helpers import saveToDb, finalizeDbUpdate
-from DodgersPromo.models import DodgerGame, BaseballTeam
+from DodgersPromo.models import BaseballGame, BaseballTeam
 
 
 def test_saveToDb(app):
     team1 = BaseballTeam(team_name='Foobar', city_name='Barfoo', team_logo='Foo', abbreviation='BF', wins=2, losses=1)
     team2 = BaseballTeam(team_name='Buzz', city_name='Fizz', team_logo='Bar', abbreviation='FB', wins=1, losses=2)
-    game = DodgerGame(gameKey=1, date=date.today(), seriesGameNumber=1, seriesGameCount=3, home_team_id=1, away_team_id=2)
+    game = BaseballGame(gameKey=1, date=date.today(), seriesGameNumber=1, seriesGameCount=3, home_team_id=1, away_team_id=2)
 
     with app.app_context(): #? App Context required to interact with the DB (session.commit() & queries)
         saveToDb(team1)
         saveToDb(team2)
         saveToDb(game)
-        allGames = db.session.scalars(db.select(DodgerGame)).all()
+        allGames = db.session.scalars(db.select(BaseballGame)).all()
         allTeams = db.session.scalars(db.select(BaseballTeam)).all()
         assert len(allGames) == 1
         assert len(allTeams) == 2
