@@ -24,9 +24,11 @@ def gameDbSetup(app):
 
         #* Game 1 = Dodgers facing Yankees at home while Game 2 = Dodgers facing Yankees at New York
         date1 = strToDatetime('2021-05-10T02:10:35Z', ISO_FORMAT) #* May 09 2021 7:10PM
-        game1 = DodgerGame(date=date1, gameNumInSeries=1, gamesInSeries=3, home_team_id=dodgers.id, away_team_id=yankees.id)
+        game1 = DodgerGame(gameKey=1, date=date1, gameNumInSeries=1,
+                           gamesInSeries=3, home_team_id=dodgers.id, away_team_id=yankees.id)
         date2 = strToDatetime('2021-08-02T23:15:35Z', ISO_FORMAT) #* Aug 02 2021 4:15PM
-        game2 = DodgerGame(date=date2, gameNumInSeries=1, gamesInSeries=3, home_team_id=yankees.id, away_team_id=dodgers.id)
+        game2 = DodgerGame(gameKey=2, date=date2, gameNumInSeries=1,
+                           gamesInSeries=3, home_team_id=yankees.id, away_team_id=dodgers.id)
         saveToDb(game1)
         saveToDb(game2)
         assert len(db.session.scalars(db.select(DodgerGame)).all()) == 2

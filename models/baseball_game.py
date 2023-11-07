@@ -17,7 +17,7 @@ class DodgerGame(db.Model):
     #* MLB API Json Parent Key = dates.games.
     id: Mapped[int] = mapped_column(primary_key=True)
     #* MLB API Json Key = 'gamePk', seemingly the only consistent ID. Does 'Pk' = 'primary key'?
-    # gameKey: Mapped[int]
+    gameKey: Mapped[int] = mapped_column(unique=True)
     #* MLB API Json Key = 'gameDate', format: 2021-07-05T22:40:00Z
     date: Mapped[datetime]
     #* MLB API Json Key = 'seriesGameNumber', e.g. Game # 2 of 3

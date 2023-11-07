@@ -72,7 +72,7 @@ def createGamesOfTheDay(todaysGames, gamesInDb, seasonGameNum, gameStr):
         gameExpectedFromDb: DodgerGame = gamesInDb[seasonGameNum] if seasonGameNum < len(gamesInDb) else None
 
         #* Create Game Model so promos can be associated later
-        newGame = DodgerGame(date=strToDatetime(gameDate, ISO_FORMAT),
+        newGame = DodgerGame(gameKey=gamePk, date=strToDatetime(gameDate, ISO_FORMAT),
                              gameNumInSeries=gameSeriesNumber, gamesInSeries=gamesInSeries,
                              home_team_id=homeTeam.id, away_team_id=awayTeam.id)
 
