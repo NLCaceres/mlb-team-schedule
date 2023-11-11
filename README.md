@@ -3,26 +3,26 @@ Even though MLB's site can be a great one stop shop for any and all questions ab
 it's pretty rare you check any other team but your favorite, in my case the Dodgers. Personally, though the MLB schedule pages are decent, I've found
 that the site can be pretty slow, will often stop mid-load, and generally, the list of promotions is not displayed in the prettiest or most logical fashion.
 After noticing that the site was actually calling out to an open stats API, I knew exactly what I'd like to do, make my own version of it! Thankfully,
-there's a python wrapper on github ([MLB-StatsAPI](https://github.com/toddrob99/MLB-StatsAPI)) that does a great job of explaining how the API endpoints work.
-Using it as my guide, I did my best to craft parsing functions and endpoints that would give me exactly what I needed and nothing else. Once the Flask backend 
+there's a Python wrapper on github ([MLB-StatsAPI](https://github.com/toddrob99/MLB-StatsAPI)) that does a great job of explaining how the API endpoints work.
+Using it as my guide, I did my best to craft parsing functions and endpoints that would give me exactly what I needed and nothing else. Once the Flask backend
 was mostly structured and laid out, I set myself on learning Svelte for the frontend, which I'd say was quite the success. 
 
 Svelte is an amazing up-and-coming front-end framework that really delivers on the oh-so-common promise of 'It just works.' Though I did find a few quirks
 such as the handling of API calls and reactivity updates a bit odd compared to my other favorite, Vue, it was absolutely nothing that couldn't be solved with
 a few well placed debuggers and console.log, of course. Like any front-end framework, a solid understanding of its lifecycle and tools fixes all problems, and once
-I felt comfortable, Svelte didn't just deliver on a simple setup, but on a speedy development process. Putting together the Calendar component was a breeze as any sub-components or parent components fell right into place without the common React problem of messy and never-ending component files. 
+I felt comfortable, Svelte didn't just deliver on a simple setup, but on a speedy development process. Putting together the Calendar component was a breeze as any sub-components or parent components fell right into place without the common React problem of messy and never-ending component files.
 Additionally, thanks to Svelte's special components and bindings like 'svelte:window' & 'on:customEvent', it's pretty easy to avoid complicated prop drilling or
 event messaging. While I did find myself yearning for helpers like Vue-Router, thanks to development on Sveltekit, Svelte, itself, will only continue to grow. In meantime, I can imagine updating this project for coming baseball seasons to use Svelte's already excellent store system as a nifty built-in Redux/Vuex replacement.
 
 This project felt like exactly the injection of fun that I think any developer can use every once and a while, an absolute passion project to get the creative
-juices flowing. As with any project, though, every time you reach the expected finish line, you can't help but think of just one more awesome feature to add, and 
+juices flowing. As with any project, though, every time you reach the expected finish line, you can't help but think of just one more awesome feature to add, and
 that is exactly where I stand today. In the future, I hope not only to add in Svelte's store state feature to the front-end, but I hope to continue to improve the backend, making it more flexible and simple to handle any team that someone who cloned this repo could want. Consequently, I'd also love to create several global.css
-files that can be swapped in as a particular team's theme without a single thought, beautifully matching team colors and logos to every component. Until then, I'm quite proud of this little Dodger schedule app. 
+files that can be swapped in as a particular team's theme without a single thought, beautifully matching team colors and logos to every component. Until then, I'm quite proud of this little Dodger schedule app.
 
-For anyone who finds it, hopefully it helps you as much as it has helped me, and let me know what you think I should add, thanks! 
+For anyone who finds it, hopefully it helps you as much as it has helped me, and let me know what you think I should add, thanks!
 
 ## Recent Changes
-- Updated to Flask 3.0 
+- Updated to Python 3.12 and Flask 3.0
   - Also update to Flask-SQLAlchemy 3.1 to improve `models` classes typing, SQL Schema, and SQLAlchemy queries
 - Continued Code Splitting via Python Packaging + Flask's Blueprint pattern
   - Split `app.py` into a `create_app()` oriented `__init__.py` file, allowing `app.py` to do the final configuration before launching
@@ -77,8 +77,8 @@ that contains a start command
 
 ## Workflow
 - To run the `Flask` server, it's easiest to use `flask run`
-  - It is also possible to run `Flask` like a typical python program via `python app.py` which will run the code in the `if __name__ == "__main__"` block
-  - `flask run` alongside with the `python-dotenv` package should load any `.env` files 
+  - It is also possible to run `Flask` like a typical Python program via `python app.py` which will run the code in the `if __name__ == "__main__"` block
+  - `flask run` alongside with the `python-dotenv` package should load any `.env` files
     - If it doesn't, then adding `load_dotenv=True` to the app.run method in `app.py` fixes this issue
 - To run both `Flask` and the `Svelte` app, run `hivemind Procfile.dev`
   - Alternatively, to see Flask serve a production build run `hivemind Procfile.devBuild`
@@ -88,21 +88,21 @@ that contains a start command
   - Why not just use `flask run & npm run dev`? It seems neither Flask, nor Vite like to run in the background, so one command kills the other unless you open two
   separate terminals. At that point, `hivemind` is a convenient addition for Mac users that use `homebrew` to install packages like `hivemind`
 
-## Created CLI Commands 
+## Created CLI Commands
 - Since `Flask` uses Click to make its own commands, it also exposes it for you to use, making it super easy to create your own CLI commands for all kinds of things!
 - This app has a few commands built for updating the database
   - `flask seed db` -> Simply inits the database (once Flask-Migrate has done the proper migrations of course)
   - `flask update scheduleDb` -> Updates any games in database with date from now to end of season
   - `flask update teamRecordsDb` -> Updates standings of teams in database using MLB-Stats API
   - `flask update promotionsDb` -> Updates promotions from current date to end of season
-  - `flask seed db` and `flask update scheduleDb` are the most used since the first creates the database and schedule while the other updates 
+  - `flask seed db` and `flask update scheduleDb` are the most used since the first creates the database and schedule while the other updates
   the schedule and runs the team records and promotions updaters
 
 ### Flask-Migrate
 - A useful extension of Flask-SQLAlchemy that uses Alembic to manage your app's migrations
 - Useful Commands
   - `flask db init` -> Creates and sets up the `migrations` directory
-    - FLASK_APP, which defaults to app or wsgi, env var needs to be properly set up to be sure work above command works 
+    - FLASK_APP, which defaults to app or wsgi, env var needs to be properly set up to be sure work above command works
   - `flask db migrate` -> Create a migration file inside `migrations/versions` that's based on your models
     - Since Alembic isn't perfect, ALWAYS double check the DB changes it generates
   - `flask db upgrade` -> Run any new migrations on your DB
@@ -135,19 +135,24 @@ becomes a two-item list where the game at index 0 is `gameNumber: 1` while the g
 
 ### Python 3's Virtual Environments
 - Enter the directory on the terminal and use `python3 -m venv venv` to create a new `venv` directory where you'll install dependencies via its `pip` install
-- `. venv/bin/activate` will switch into that virtual environment, with the proper version of python as well as `pip`, so you can be in a nicely 
+- `. venv/bin/activate` will switch into that virtual environment, with the proper version of Python as well as `pip`, so you can be in a nicely 
 isolated package environment, just like a node_modules folder would provide to a Node project
-  - `source venv/bin/activate` also works! See [Real Python](https://realpython.com/python-virtual-environments-a-primer/) or 
+  - `source venv/bin/activate` also works! See [Real Python](https://realpython.com/python-virtual-environments-a-primer/) or
   [PyPA](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for more info!
   - Can use `which pip` and `which python` to be sure it's using the `venv` directory versions
     - A triple check would be to run `python3 -m pip list` which should list all packages from your `requirements.txt`
-  - If the incorrect `pip` or python is listed, then it's worth checking the activate script inside of `venv/bin`, especially 
+  - If the incorrect `pip` or Python is listed, then it's worth checking the activate script inside of `venv/bin`, especially
   if you've changed the name of your parent folder
     - You can fix this by directly altering the activate script BUT it's much easier to run `python3 -m venv venv --clear` to hard reset the `venv` folder
 - If you have a `requirements.txt` file filled with the dependencies for your project, just run `python -m pip install -r requirements.txt`,
 and your virtual environment will be all set to use
   - `requirements.txt` acts just like a `package.json` file but without a fancy format, just list the names of packages you want with semantic versioning,
   and `pip` should know what to install with a version that matches the range you listed.
+- When updating the Python version, do not use `python -m venv --upgrade venv`. Instead, it's simpler to use the `--clear` flag like shown above once you've
+installed the new version of Python you want. The reset venv folder will store a new updated version of Python, and the only package left will be `pip`.
+  - Using Pyenv is preferred since it can auto-switch to the updated version of Python via a `.python-version` file placed in the root
+  - Using `pip-tools`, it's super easy to use `pip-sync` with your `requirements.txt` file (after a `pip-compile --upgrade` if desired), and you'll be all
+  set with your dependencies again!
 - When using VirtualEnvs, be sure to change VSCode's Python Interpreter in the bottom bar so it detects the installed dependencies in the `venv` folder.
 Changing this setting to `venv/bin/python` will let Pylance provide much better IntelliSense
 
@@ -166,7 +171,7 @@ Changing this setting to `venv/bin/python` will let Pylance provide much better 
   since the `python -m` command runs `pip` in module mode, guaranteeing the correct installation will be used by appending the correct system path,
   which in local development should be your `venv` installed packages
   - `pip list -o` will display all outdated packages and their latest version
-  - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the `venv` location and what packages require that package! 
+  - `pip show 'pypiPkgName'` will display all requirements for that particular package plus the `venv` location and what packages require that package!
   Super helpful if VSCode doesn't recognize imports
   - For even more tips, see [Pip PyPA](https://pip.pypa.io/en/stable/user_guide/) and [Pip CLI](https://pip.pypa.io/en/stable/cli/)
   - `pip-tools` is a super helpful set of command line tools to simplify Python dependency management by providing the `pip-compile` and `pip-sync` commands
@@ -181,7 +186,7 @@ Changing this setting to `venv/bin/python` will let Pylance provide much better 
         - To install individual packages, run `pip-compile --upgrade-package Flask requirements.in`. If semantic versioning preferred, you can
         use quotation marks in the command, i.e. `pip-compile -P 'Flask>2.3' requirements.in`
     - `pip-sync`, on the other hand, actually runs the dependency installations and updates to match the newly created `requirements.txt`
-      - In effect, this does the job of your typical `pip install` command like `python -m pip install SomePackage AnotherPkg SomeOtherPkg` or 
+      - In effect, this does the job of your typical `pip install` command like `python -m pip install SomePackage AnotherPkg SomeOtherPkg` or
       `python -m pip install -r requirements.txt`
     - To handle dev requirements:
       - `pip-compile` uses `requirements-dev.in` instead of `requirements.in`
