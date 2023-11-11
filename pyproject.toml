@@ -1,27 +1,27 @@
 [build-system]
-requires = ['setuptools', 'wheel']
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = 'mlb-team-schedule'
-version = '0.1'
-description = 'A Flask App that builds a Database from the MLB Stats API and serves a Svelte frontend that uses that data to create a Promotions Schedule'
-readme = 'README.md'
-license = 'MIT'
-requires-python = '>=3.9'
-
+name = "mlb-team-schedule"
+version = "0.1"
+description = "A Flask App that builds a Database from the MLB Stats API and serves a Svelte frontend that uses that data to create a Promotions Schedule"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
 dependencies = [
-  'Flask ~=3.0',
-  'Flask-APScheduler ~= 1.13',
-  'Flask-Migrate ~=4.0',
-  'Flask-SQLAlchemy ~=3.0',
-  'gunicorn ~=20.1',
-  'psycopg2 ~=2.9',
-  'python-dotenv ~=1.0',
-  'requests ~=2.31'
+  "Flask ~=3.0",
+  "Flask-APScheduler ~= 1.13",
+  "Flask-Migrate ~=4.0",
+  "Flask-SQLAlchemy ~=3.0",
+  "gunicorn ~=21.2",
+  "psycopg2 ~=2.9",
+  "python-dotenv ~=1.0",
+  "requests ~=2.31"
 ]
 
 [project.optional-dependencies]
-dev = ['pytest ~=7.4']
+dev = ["pytest ~=7.4"]
 
 [project.urls]
-Repository = 'https://github.com/NLCaceres/mlb-team-schedule.git'
+Repository = "https://github.com/NLCaceres/mlb-team-schedule.git"
