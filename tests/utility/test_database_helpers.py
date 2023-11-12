@@ -1,7 +1,7 @@
+from ...utility.database_helpers import saveToDb, finalizeDbUpdate
 from datetime import date
-from DodgersPromo import db
-from DodgersPromo.utility.database_helpers import saveToDb, finalizeDbUpdate
-from DodgersPromo.models import BaseballGame, BaseballTeam
+from ... import db
+from ...models import BaseballGame, BaseballTeam
 
 
 def test_saveToDb(app):
@@ -17,6 +17,7 @@ def test_saveToDb(app):
         allTeams = db.session.scalars(db.select(BaseballTeam)).all()
         assert len(allGames) == 1
         assert len(allTeams) == 2
+
 
 def test_finalizeDbUpdate(app):
     team1 = BaseballTeam(team_name='Foobar', city_name='Barfoo', team_logo='Foo', abbreviation='BF', wins=2, losses=1)

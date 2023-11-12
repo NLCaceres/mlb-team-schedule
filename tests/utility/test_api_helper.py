@@ -1,9 +1,9 @@
+from ...utility.api_helpers import (fetch, ClientErrorStatusCodeException,
+                                    ServerErrorStatusCodeException, UnexpectedHttpResponseStatusCodeException)
 import pytest
 import requests
-from DodgersPromo.utility.api_helpers import (fetch, ClientErrorStatusCodeException, 
-                                              ServerErrorStatusCodeException, UnexpectedHttpResponseStatusCodeException)
-from DodgersPromo.tests.MockHttpResponse import MockHttpResponse
-from DodgersPromo.tests.common_assertions import assertIsNotNone
+from ..common_assertions import assertIsNotNone
+from ..MockHttpResponse import MockHttpResponse
 
 
 def test_fetch(monkeypatch):

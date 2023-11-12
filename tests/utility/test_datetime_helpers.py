@@ -1,6 +1,6 @@
+from ...utility.datetime_helpers import dateToday, isDatetime, dateToStr, strToDatetime
 import pytest
 from datetime import date, datetime
-from DodgersPromo.utility.datetime_helpers import dateToday, isDatetime, dateToStr, strToDatetime
 
 
 def test_dateToday():

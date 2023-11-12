@@ -1,9 +1,8 @@
+from ...utility.utc_to_pt_converters import (utcStrToPacificTimeStr, utcStrToPacificDatetime, utcDatetimeToPacificDatetime,
+                                             utcDatetimeToPacificTimeStr, utcDatetimeToReadablePacificTimeStr)
 import pytest
 from datetime import datetime, timedelta
-from DodgersPromo.utility.datetime_helpers import strToDatetime, ISO_FORMAT
-from DodgersPromo.utility.utc_to_pt_converters import (utcStrToPacificTimeStr, 
-                                                       utcStrToPacificDatetime, utcDatetimeToPacificDatetime, 
-                                                       utcDatetimeToPacificTimeStr, utcDatetimeToReadablePacificTimeStr)
+from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
 
 #! UTC String to PT Converters

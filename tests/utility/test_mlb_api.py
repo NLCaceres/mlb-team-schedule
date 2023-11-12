@@ -1,7 +1,7 @@
-from DodgersPromo.utility.mlb_api import (fetchThisYearsSchedule, fetchRemainingSchedule,
-                                          getScheduleTotals, scheduleDates, createEndpoint)
-from DodgersPromo.utility.datetime_helpers import dateToday, dateToStr, YMD_FORMAT
-from DodgersPromo.tests.common_assertions import assertIsNone
+from ...utility.mlb_api import (fetchThisYearsSchedule, fetchRemainingSchedule,
+                                getScheduleTotals, scheduleDates, createEndpoint)
+from ..common_assertions import assertIsNone
+from ...utility.datetime_helpers import dateToday, dateToStr, YMD_FORMAT
 
 
 def test_fetchThisYearsSchedule(monkeypatch):
