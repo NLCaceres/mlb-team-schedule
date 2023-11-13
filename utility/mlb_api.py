@@ -1,7 +1,12 @@
 from .api_helpers import fetch
 from .datetime_helpers import dateToday, dateToStr, YMD_FORMAT
-from .endpoint_constants import SCHEDULE_ENDPOINT
+from .endpoint_constants import LEAGUE_STANDINGS_URL, SCHEDULE_ENDPOINT
 from .team_map import getTeamID
+
+
+def fetchTeamRecords():
+    standingsJSON = fetch(LEAGUE_STANDINGS_URL)
+    return standingsJSON.get('records', [])
 
 
 def fetchThisYearsSchedule():

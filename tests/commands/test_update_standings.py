@@ -5,6 +5,7 @@ from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
 from ...models import BaseballTeam
+from ...utility.api_helpers import ClientErrorStatusCodeException
 from ...utility.database_helpers import saveToDb
 
 
@@ -31,9 +32,11 @@ def divisionJSON(teamJSON):
 def teamJSON():
     return { 'team': { 'id': 123, 'name': 'Los Angeles Dodgers' }, 'wins': 123, 'losses': 321 }
 
+
 #! Tests
 def test_updateAllTeamRecords(app, monkeypatch, mock_404_response, standingsJSON):
-    updateAllTeamRecords() #? mock_404_response monkeypatched in by fixture
+    with pytest.raises(ClientErrorStatusCodeException):
+        updateAllTeamRecords() #? mock_404_response monkeypatched in by fixture
     with app.app_context():
         checkTeamDefaultVals() #* THEN no changes to the DB happen
 

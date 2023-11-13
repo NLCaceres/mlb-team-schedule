@@ -1,8 +1,7 @@
-import requests
 from .. import db
 from ..models import BaseballTeam
 from ..utility.database_helpers import finalizeDbUpdate
-from ..utility.endpoint_constants import LEAGUE_STANDINGS_URL
+from ..utility.mlb_api import fetchTeamRecords
 
 
 #! DIVISION NAME CONSTANT
@@ -15,12 +14,8 @@ MLB_DIVISIONS = {
 #! Main Standings Update Function
 def updateAllTeamRecords():
     print("Updating all team records in Db")
-    response = requests.get(LEAGUE_STANDINGS_URL)
-    if (response.status_code != 200):
-        print(f"Error Code: {response.status_code}")
-        return #? In case of broken link
 
-    standings = response.json().get('records', [])
+    standings = fetchTeamRecords()
     if len(standings) == 0:
         print("No team records found")
 
