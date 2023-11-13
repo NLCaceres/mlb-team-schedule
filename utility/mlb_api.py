@@ -1,6 +1,7 @@
 from .api_helpers import fetch
 from .datetime_helpers import dateToday, dateToStr, YMD_FORMAT
 from .endpoint_constants import SCHEDULE_ENDPOINT
+from .team_map import getTeamID
 
 
 def fetchThisYearsSchedule():
@@ -45,5 +46,5 @@ def createEndpoint(startDate = None, endDate = None, seasonYear = None, teamId =
     if startDate is None or endDate is None or seasonYear is None:
         return None
 
-    selectedTeamId = teamId or 119 #* The Dodgers ID acts as the default if None is found
+    selectedTeamId = teamId or getTeamID() or 119 #* If no teamId arg val, THEN getTeamID() from Config OR default to 119
     return SCHEDULE_ENDPOINT.format(startDate=startDate, endDate=endDate, seasonYear=seasonYear, teamId=selectedTeamId)
