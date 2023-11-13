@@ -7,6 +7,7 @@ from ..MockHttpResponse import MockHttpResponse
 from ... import db
 from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
 from ...models import BaseballGame, BaseballTeam
+from ...utility.api_helpers import ClientErrorStatusCodeException
 from ...utility.database_helpers import saveToDb
 from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
@@ -14,6 +15,7 @@ from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 #! Fixtures
 @pytest.fixture(autouse=True)
 def gameDbSetup(app):
+    app.config['TEAM_FULL_NAME'] = 'Los Angeles Dodgers' #? Need to ensure Config is init to the expected home team
     dodgers = BaseballTeam(team_name='Dodgers', city_name='Los Angeles', team_logo='A', abbreviation='LAD', wins=2, losses=1)
     yankees = BaseballTeam(team_name='Yankees', city_name='New York', team_logo='B', abbreviation='NYY', wins=1, losses=2)
 
@@ -34,8 +36,8 @@ def gameDbSetup(app):
         assert len(db.session.scalars(db.select(BaseballGame)).all()) == 2
 
 @pytest.fixture
-def gameDatesJSON(gameJSON):
-    return { 'dates': [{ 'games': [gameJSON] }] }
+def gameDatesJSON(gameJSON): #? Need to set 'totalGames' or else fetchSchedule fails in updater
+    return { 'dates': [{ 'games': [gameJSON] }], 'totalGames': 123 }
 
 @pytest.fixture
 def gameJSON(promoJSON):
@@ -56,7 +58,8 @@ def test_updateAllPromotions(app, monkeypatch, gameDatesJSON):
         return mockResponse
     monkeypatch.setattr(requests, "get", mock_JSON)
     with app.app_context(): #* THEN no changes to the promotions in the DB
-        updateAllPromotions()
+        with pytest.raises(ClientErrorStatusCodeException): #* Due to ClientError raised
+            updateAllPromotions()
         checkDefaultPromotions()
 
     #* WHEN status code is now 200 BUT JSON received is empty

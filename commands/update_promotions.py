@@ -1,22 +1,16 @@
 from flask import current_app as app #? Main method of accessing App's Config.py env vars
-import requests
 from sqlalchemy.exc import NoResultFound
 from .. import db
 from .database_seed import initPromotionsForGame, comparePromoLists, replaceOldPromos
 from ..models import BaseballGame
 from ..utility.datetime_helpers import strToDatetime, ISO_FORMAT
-from ..utility.mlb_api import createEndpoint, scheduleDates
+from ..utility.mlb_api import fetchRemainingSchedule
 
 
 def updateAllPromotions():
     print("Going to update all promotions")
-    #? '*' unpacks the tuple returned by scheduleDates() into the args of createEndpoint()
-    response = requests.get(createEndpoint(*scheduleDates(True)))
-    if (response.status_code != 200):
-        return #? In case of broken link
-    teamSchedule = response.json()
 
-    gameDateList = teamSchedule.get('dates', [])
+    gameDateList = fetchRemainingSchedule()[1] or [] #* Grab just the gameDates, not the gameTotal or todaysDate
     for gameDate in gameDateList:
         gameList = gameDate.get('games', [])
         #? If a date is found w/out any games, then this list comprehension ends immediately, moving on to next date
