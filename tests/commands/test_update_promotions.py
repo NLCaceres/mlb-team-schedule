@@ -55,36 +55,36 @@ def test_updateAllPromotions(app, monkeypatch, gameDatesJSON):
     def mock_JSON(*args, **kwargs):
         return mockResponse
     monkeypatch.setattr(requests, "get", mock_JSON)
-    updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB
+        updateAllPromotions()
         checkDefaultPromotions()
 
     #* WHEN status code is now 200 BUT JSON received is empty
     mockResponse.status_code = 200
     mockResponse.jsonResponse = { }
-    updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB
+        updateAllPromotions()
         checkDefaultPromotions()
         
     #* WHEN the dates received are empty
     mockResponse.jsonResponse = { 'dates': [] }
-    updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB
+        updateAllPromotions()
         checkDefaultPromotions()
 
     #* WHEN the gameDates contain no game info
     gamesDatesMissingGames = copy.deepcopy(gameDatesJSON)
     gamesDatesMissingGames['dates'] = [{ }]
     mockResponse.jsonResponse = gamesDatesMissingGames
-    updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB
+        updateAllPromotions()
         checkDefaultPromotions()
     #* WHEN the games list on any given date is empty
     gameDatesWithEmptyGamesList = copy.deepcopy(gameDatesJSON)
     gameDatesWithEmptyGamesList['dates'][0]['games'] = []
     mockResponse.jsonResponse = gameDatesWithEmptyGamesList
-    updateAllPromotions()
     with app.app_context(): #* THEN no changes to the promotions in the DB
+        updateAllPromotions()
         checkDefaultPromotions()
 
     #* WHEN the gameDatesJSON is correctly formatted and filled
