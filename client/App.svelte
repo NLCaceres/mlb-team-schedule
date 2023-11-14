@@ -24,8 +24,8 @@
 		new BsAlert(document.getElementById('offDayAlert')); //* Could use data attr but for this use case (custom event handler) easier to do this
 	})
 	beforeUpdate(() => {
-		const nextUrlParam = window.location.pathname.slice(1); //* Don't need '/foo' with slash, need 'foo'
-		const foundMonth = MONTH_MAP[nextUrlParam.slice(0,1).toUpperCase() + nextUrlParam.slice(1)];
+		const month = window.location.pathname.split('/')[1]; //* URLs should split as ['', 'month', 'day'], so just get the month
+		const foundMonth = MONTH_MAP[month.slice(0,1).toUpperCase() + month.slice(1)];
 		if (!foundMonth) { navigate('/fullSchedule'); return; } //* Basic programmatic redirect with svelte
 	})
 	//todo Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
@@ -72,7 +72,7 @@
 
 		<Alert alertID="offDayAlert" invisible={invisibleAlert} on:openAlert={displayOffdayAlert}
 			alertClasses="dodgerBlue-bg-dark border rounded border-light border-2">
-				Sorry! No Dodger Game today!
+				Sorry! No Dodger Game today! <!--TODO: Handle off-season too? Diff message? -->
 		</Alert>
 	
 	</main>
