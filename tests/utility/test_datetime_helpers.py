@@ -1,6 +1,6 @@
 from ...utility.datetime_helpers import dateToday, isDatetime, dateToStr, strToDatetime
 import pytest
-from datetime import date, datetime
+from datetime import date, datetime, UTC
 
 
 def test_dateToday():
@@ -15,7 +15,7 @@ def test_dateToday():
 
 def test_isDatetime():
     #* WHEN directly requesting a datetime via utcnow()
-    todays_datetime = datetime.utcnow()
+    todays_datetime = datetime.now(UTC)
     #* THEN isDatetime, of course, returns True
     assert isDatetime(todays_datetime) is True
     

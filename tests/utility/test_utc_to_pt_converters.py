@@ -1,7 +1,7 @@
 from ...utility.utc_to_pt_converters import (utcStrToPacificTimeStr, utcStrToPacificDatetime, utcDatetimeToPacificDatetime,
                                              utcDatetimeToPacificTimeStr, utcDatetimeToReadablePacificTimeStr)
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
 
@@ -72,7 +72,7 @@ def test_utcDatetimeToPacificDatetime():
 
 def test_utcDateTimeToPacificTimeStr():
     #* WHEN a UTC datetime is converted into a PDT string of a specific format
-    utc_datetime = datetime.utcnow()
+    utc_datetime = datetime.now(UTC)
     pdt_str = utcDatetimeToPacificTimeStr(utc_datetime, '%a %B %d %Y at %I:%M %p')
     pdt_datetime = utc_datetime - timedelta(hours=7)
     pdt_datetime_hour = pdt_datetime.hour #* Need to change the hours into military 0-23 time
