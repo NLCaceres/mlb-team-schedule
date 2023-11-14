@@ -109,12 +109,12 @@ def test_createEndpoint(app):
         endpointMissingAllValues = createEndpoint(startDate = None, endDate = None, seasonYear = None, teamId = None)
         #* THEN None is returned
         assertIsNone(endpointMissingAllValues)
-        endpointWithOnlyStartDate = createEndpoint(startDate = '2021-03-01', endDate = None, seasonYear = None, teamId = None)
-        assertIsNone(endpointWithOnlyStartDate)
-        endpointWithOnlyEndDate = createEndpoint(startDate = None, endDate = '2021-11-01', seasonYear = None, teamId = None)
-        assertIsNone(endpointWithOnlyEndDate)
-        endpointWithOnlyYear = createEndpoint(startDate = None, endDate = None, seasonYear = '2021', teamId = None)
-        assertIsNone(endpointWithOnlyYear)
+        endpointFromStartDate = createEndpoint(startDate = '2021-03-01', endDate = None, seasonYear = None, teamId = None)
+        assertIsNone(endpointFromStartDate)
+        endpointFromEndDate = createEndpoint(startDate = None, endDate = '2021-11-01', seasonYear = None, teamId = None)
+        assertIsNone(endpointFromEndDate)
+        endpointFromYear = createEndpoint(startDate = None, endDate = None, seasonYear = '2021', teamId = None)
+        assertIsNone(endpointFromYear)
 
         #* WHEN no date values are provided
         endpointMissingDateValues = createEndpoint(teamId = None)
@@ -157,7 +157,7 @@ def test_createEndpoint(app):
 
         #* WHEN the dates are input BUT poorly formatted
         app.config['TEAM_FULL_NAME'] = 'Los Angeles Dodgers' #* Reset to default for simplicity sake
-        endpointWithUnformattedDateVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020', 
+        endpointWithUnformattedDateVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020',
                                                         seasonYear = 1234, teamId = None)
         #* THEN the poorly formatted values will be injected regardless
         poorlyFormattedEndpoint = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
@@ -166,7 +166,7 @@ def test_createEndpoint(app):
         assert endpointWithUnformattedDateVals == poorlyFormattedEndpoint
 
         #* WHEN all values are input BUT poorly formatted
-        endpointWithUnformattedVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020', 
+        endpointWithUnformattedVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020',
                                                     seasonYear = 1234, teamId = 'some_id')
         #* THEN the poorly formatted values will be injected regardless
         completelyPoorlyFormattedEndpoint = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'

@@ -1,4 +1,4 @@
-#* Common and helpful assertion methods a la Vitest, Jest, or JUnit
+""" Common and helpful assertion methods a la Vitest, Jest, or JUnit """
 
 def assertIsNone(someVar):
     assert someVar is None

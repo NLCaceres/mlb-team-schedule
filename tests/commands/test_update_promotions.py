@@ -1,3 +1,4 @@
+from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
 import pytest
 import requests
 #? An alt option w/ built-in collections like lists, dicts and sets is their constructor BUT they return shallow copies
@@ -5,7 +6,6 @@ import copy #? So deep copy is super useful to avoid changes propagating in nest
 from ..common_assertions import assertIsEmpty, assertHasLengthOf
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
-from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
 from ...models import BaseballGame, BaseballTeam
 from ...utility.api_helpers import ClientErrorStatusCodeException
 from ...utility.database_helpers import saveToDb

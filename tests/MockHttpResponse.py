@@ -1,4 +1,4 @@
-#* Useful for mocking out the `requests` library's get() and json() funcs
+""" Useful for mocking out the `requests` library's get() and json() funcs """
 class MockHttpResponse:
     def __init__(self, status_code, jsonResponse = None):
         self.status_code = status_code

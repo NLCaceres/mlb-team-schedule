@@ -1,9 +1,9 @@
+from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
 import pytest
 import copy
 import requests
 from ..MockHttpResponse import MockHttpResponse
 from ... import db
-from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
 from ...models import BaseballTeam
 from ...utility.api_helpers import ClientErrorStatusCodeException
 from ...utility.database_helpers import saveToDb
