@@ -2,6 +2,7 @@
   import { navigate } from "svelte-navigator";
   import Image from "../Common/Image.svelte";
   import type BaseballGame from '../Models/DataClasses';
+  import type { Promotion } from "../Models/DataClasses";
   import { getSingleGame } from '../API';
   import getReadableDate from "../HelperFuncs/DateExtension";
 
@@ -26,6 +27,10 @@
     else gameStr = `Game #${todaysGame.gameNumInSeries}`
     return gameStr + ` in a ${todaysGame.gamesInSeries}-day Series`
   }
+  const specialTicketRequired = (todaysPromotions: Promotion[]) => {
+    if (todaysPromotions === null) return false;
+    return todaysPromotions.filter(promo => promo.name.endsWith('Ticket Package')).length > 0;
+  }
 </script>
 
 <div class='mx-3 main-title'>
@@ -47,7 +52,7 @@
 
       <hr class="mt-1 mb-4">
       
-      <div class='ms-3 me-4 subtitle'>
+      <div class='ms-3 me-4 mb-4 subtitle'>
         {#if todaysGame.promos.length > 0}
           <h3 class='text-decoration-underline'>Promotions for Today</h3>
           <ul>
@@ -64,6 +69,9 @@
           <h3>Sorry! The Dodgers are away, so no promos today!</h3>
         {/if}
       </div>
+      {#if specialTicketRequired(todaysGame.promos)}
+        <h4 class='mt-5'>Promotions today may require Special Tickets purchasable directly through the team or at MLB.com</h4>
+      {/if}
     {:else}
       <h1>Just a Dodgers Day off!</h1>
     {/if}
