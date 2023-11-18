@@ -28,7 +28,7 @@
 		const foundMonth = MONTH_MAP[month.slice(0,1).toUpperCase() + month.slice(1)];
 		if (!foundMonth) { navigate('/fullSchedule'); return; } //* Basic programmatic redirect with svelte
 	})
-	//todo Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
+	//TODO: Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
 
 	let modalBallGame: BaseballGame | null = null;
 	function displayBaseballGameModal(event: CustomEvent<BaseballGame | null>) { 
@@ -38,7 +38,9 @@
 		}
   }
 	let previousTimeout: NodeJS.Timeout | null = null;
-	function displayOffdayAlert(event: CustomEvent<boolean>) { 
+	function displayOffdayAlert(event: CustomEvent<string | null>) {
+		//TODO: Handle message by setting a prop to assign to Alert's slot (instead of invisibleAlert boolean prop)
+		//TODO: Empty string COULD accidentally display the alert BUT use null to hide the alert, AND define a default message
 		//* Event detail can only be true or false, so to be clear, receiving false will make alert invisible!
 		if (previousTimeout) clearTimeout(previousTimeout); //* Prevents quick closures by an existing timeout fn;
 		invisibleAlert = !event.detail;
@@ -52,7 +54,7 @@
 	<Navbar links={monthsInSeason} currentYear={thisYear} />
 	
 	<main>
-		<h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule {thisYear}!</h1>
+		<h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule</h1>
 
 		<Route path="/:monthName/:dayNum" let:params>
 			<SingleDayView monthName={params.monthName} day={parseInt(params.dayNum)} />
@@ -61,7 +63,7 @@
 			<SingleMonthView currentYear={thisYear} on:openModal={displayBaseballGameModal} />
 		</Route>
 		<Route path="/fullSchedule">
-			<MiniCalendarView currentYear={thisYear} months={monthsInSeason} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
+			<MiniCalendarView months={monthsInSeason} on:openModal={displayBaseballGameModal} on:openAlert={displayOffdayAlert}/>
 		</Route>
 
 		<Route path="/*">

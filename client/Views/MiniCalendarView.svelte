@@ -10,7 +10,6 @@
 
   //* Normal props
   export let months: string[]; //* Expected months of the season
-  export let currentYear: string;
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
@@ -42,13 +41,14 @@
 
   const [_, currentMonth, currentDay] = todaysSplitDate();
 
+  //TODO: Instead of this next func, let the parent view pass in its own click handler to fill a clickHandler prop in this component?
   async function propagateModalOpening(event: Event) { 
     const dividedGames = await splitGames();
     if (dividedGames) {
       const monthIndex = parseInt(currentMonth) - 3; //* Since starting season starts in March, offset is 3
       const foundMonth = dividedGames[monthIndex];
-      const foundGame = foundMonth.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
-      if (!foundGame) { dispatch('openAlert', true) } //* If offday, open alert to say so!
+      const foundGame = foundMonth?.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
+      if (!foundGame) { dispatch('openAlert', true) } //* If off-day or off-season, open alert to say so!
       else { dispatch('openModal', foundGame) }
     }
   }
@@ -57,11 +57,10 @@
 <svelte:window bind:innerWidth bind:innerHeight />
 
 <h3 class='subtitle text-center mb-2'>
-  Below you'll find a full list of the Dodgers Promo schedule {currentYear}.
-  {tabletScreen ? 'Tapping' : 'Clicking'} the date will show you the details!
+  {tabletScreen ? 'Tap' : 'Click'} the date to show game specifics
 </h3>
-
-<p class='subtitle text-center mb-0'>* indicates promo days at Dodger Stadium</p>
+<!--TODO: Replace with this next subtitle with a tooltip? -->
+<p class='subtitle text-center mb-0'>* indicates a home game with promotions</p>
 
 {#await dividedGamesList}
   <h1>Loading up this month's games!</h1>
@@ -98,6 +97,11 @@
 			margin-left: 4rem;
 			margin-right: 4rem;
 		}
+    @media @min992 {
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 
   button.btn {
