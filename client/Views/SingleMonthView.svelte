@@ -15,9 +15,11 @@
 
 <svelte:window bind:innerWidth />
 
-<h3 class='subtitle text-center mb-2'>Below you'll find all the promos for the month of {month} {currentYear} </h3>
-
-<p class='subtitle text-center mb-0'>* indicates promo days at Dodger Stadium</p>
+<h3 class='subtitle text-center mb-2'>{month} {currentYear} Games</h3>
+{#if innerWidth < 576}
+  <!--TODO: Replace with this next subtitle with a tooltip? -->
+  <p class='subtitle text-center mb-0'>* indicates a home game with promotions</p>
+{/if}
 
 {#await loadingGames}
   <h1>Loading up this month's games!</h1>
