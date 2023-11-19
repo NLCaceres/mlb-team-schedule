@@ -12,7 +12,7 @@ export async function getSingleGame(monthParam: string, dayParam: string): Promi
 
   const gameOne = response[0]; //todo More adapting needed for potential double header days
   const thisGame = new BaseballGame(
-    gameOne.id, gameOne.date, gameOne.homeTeam, gameOne.awayTeam, gameOne.promos, gameOne.gameNumInSeries, gameOne.gamesInSeries
+    gameOne.id, gameOne.date, gameOne.homeTeam, gameOne.awayTeam, gameOne.promos, gameOne.seriesGameNumber, gameOne.seriesGameCount
   );
   return thisGame;
 }
@@ -22,7 +22,7 @@ export async function getMonthsGames(monthParam: string): Promise<BaseballGame[]
   if (response === undefined) { return undefined } //todo Might be best to just return an empty array and handle in view
 
   const monthsGames = response.map((game) => new BaseballGame(
-    game.id, game.date, game.homeTeam, game.awayTeam, game.promos, game.gameNumInSeries, game.gamesInSeries
+    game.id, game.date, game.homeTeam, game.awayTeam, game.promos, game.seriesGameNumber, game.seriesGameCount
   ));
   return monthsGames;
 }
@@ -32,7 +32,7 @@ export async function getFullSchedule(): Promise<BaseballGame[]> {
   if (response === undefined) { return [] }
   
   const monthsGames = response.map((game) => new BaseballGame(
-    game.id, game.date, game.homeTeam, game.awayTeam, game.promos, game.gameNumInSeries, game.gamesInSeries
+    game.id, game.date, game.homeTeam, game.awayTeam, game.promos, game.seriesGameNumber, game.seriesGameCount
   ));
   return monthsGames;
 }

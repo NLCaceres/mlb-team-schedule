@@ -22,10 +22,10 @@
   const gameNumStr = (todaysGame: BaseballGame) => {
     if (todaysGame === null) return ''; //* Likely to never be null since null objects shouldn't cause modal event to open
     let gameStr = '';
-    if (todaysGame.gameNumInSeries === 1) gameStr = `The First Game`
-    else if (todaysGame.gameNumInSeries === todaysGame.gamesInSeries) gameStr = `The Last Game`
-    else gameStr = `Game #${todaysGame.gameNumInSeries}`
-    return gameStr + ` in a ${todaysGame.gamesInSeries}-day Series`
+    if (todaysGame.seriesGameNumber === 1) gameStr = `The First Game`
+    else if (todaysGame.seriesGameNumber === todaysGame.seriesGameCount) gameStr = `The Last Game`
+    else gameStr = `Game #${todaysGame.seriesGameNumber}`
+    return gameStr + ` in a ${todaysGame.seriesGameCount}-day Series`
   }
   const specialTicketRequired = (todaysPromotions: Promotion[]) => {
     if (todaysPromotions === null) return false;

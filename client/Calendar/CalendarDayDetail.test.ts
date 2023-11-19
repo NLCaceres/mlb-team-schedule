@@ -12,7 +12,7 @@ describe("render a single day in a typical wall-calendar style", () => {
   beforeEach(() => {
     homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-    game = { id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], gameNumInSeries: 1, gamesInSeries: 3 };
+    game = { id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
     global.innerWidth = innerWidthStart;
   })
   test("displays any promotions of the game if not a mini calendar", () => {

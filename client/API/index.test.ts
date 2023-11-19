@@ -7,15 +7,15 @@ const checkResponse = (game: BaseballGame, strVal: string, numVal: number) => {
   expect(game.id).toBe(strVal);
   expect(game.date).toBe(strVal);
   expect(game.homeTeam).toBe(strVal);
-  expect(game.gameNumInSeries).toBe(numVal);
-  expect(game.gamesInSeries).toBe(numVal);
+  expect(game.seriesGameNumber).toBe(numVal);
+  expect(game.seriesGameCount).toBe(numVal);
 }
 
 describe("provides basic API functions", () => {
   afterEach(() => { vi.restoreAllMocks() })
   test("to grab the games of the day", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([{
-      id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], gameNumInSeries: 1, gamesInSeries: 1
+      id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1
     }]));
     const response = await getSingleGame("march", "29");
     checkResponse(response!, "foo", 1);
@@ -28,8 +28,8 @@ describe("provides basic API functions", () => {
   })
   test("to grab the games for the month", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([
-      { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], gameNumInSeries: 1, gamesInSeries: 1 },
-      { id: "bar", date: "bar", homeTeam: "bar", awayTeam: "bar", promos: [], gameNumInSeries: 2, gamesInSeries: 2 }
+      { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1 },
+      { id: "bar", date: "bar", homeTeam: "bar", awayTeam: "bar", promos: [], seriesGameNumber: 2, seriesGameCount: 2 }
     ]));
     const response = await getMonthsGames("march");
     expect(response!).toHaveLength(2);
@@ -44,8 +44,8 @@ describe("provides basic API functions", () => {
   })
   test("to grab the full schedule of games", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([
-      { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], gameNumInSeries: 1, gamesInSeries: 1 },
-      { id: "bar", date: "bar", homeTeam: "bar", awayTeam: "bar", promos: [], gameNumInSeries: 2, gamesInSeries: 2 }
+      { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1 },
+      { id: "bar", date: "bar", homeTeam: "bar", awayTeam: "bar", promos: [], seriesGameNumber: 2, seriesGameCount: 2 }
     ]));
     const response = await getFullSchedule();
     expect(response).toHaveLength(2);

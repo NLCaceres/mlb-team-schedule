@@ -32,7 +32,7 @@ describe("renders a simple Calendar", () => {
     test("if any games are in the list, then a normal month will render", () => {
       const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
       const awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-      const game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], gameNumInSeries: 1, gamesInSeries: 3 };
+      const game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
       const { rerender } = render(Calendar, { monthName: "April", gamesList: [game] });
       const daysRendered = screen.getAllByRole("cell");
       expect(daysRendered.length % 7).toBe(0) //* The total # of days rendered in the calendar always a multiple of 7
