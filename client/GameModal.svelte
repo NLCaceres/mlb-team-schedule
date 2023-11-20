@@ -6,22 +6,13 @@
 
   export let modalID: string;
   export let game: BaseballGame | null;
-
-  const gameNumStr = (todaysGame: BaseballGame | null) => {
-    if (todaysGame === null) return ''; //* Likely to never be null since null objects shouldn't cause modal event to open
-    let gameStr = '';
-    if (todaysGame.seriesGameNumber === 1) gameStr = `The First Game`
-    else if (todaysGame.seriesGameNumber === todaysGame.seriesGameCount) gameStr = `The Last Game`
-    else gameStr = `Game #${todaysGame.seriesGameNumber}`
-    return gameStr + ` in a ${todaysGame.seriesGameCount}-day Series`
-  }
 </script>
 
 <Modal modalID="{modalID}" modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border"> 
   <span slot="title" class="main-title w-100">
     <div class='d-flex justify-content-between'>
       <h2 class="game-day text-decoration-underline">{getReadableDate(game?.date ?? '')}'s Matchup: </h2>
-      <p class='game-day text-end'>{gameNumStr(game)}</p>
+      <p class='game-day text-end'>{game?.seriesDescription() ?? ""}</p>
     </div>
     <h4>
       The <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo"/>

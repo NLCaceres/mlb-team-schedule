@@ -1,8 +1,7 @@
 import SingleDayView from "./SingleDayView.svelte";
 import { render, screen } from "@testing-library/svelte";
 import { vi, type SpyInstance } from "vitest";
-import type BaseballGame from "../Models/DataClasses";
-import type { BaseballTeam } from "../Models/DataClasses";
+import BaseballGame, { type BaseballTeam } from "../Models/DataClasses";
 import * as Api from "../API";
 
 describe("renders the details of a single game", () => {
@@ -13,7 +12,11 @@ describe("renders the details of a single game", () => {
     ApiSpy = vi.spyOn(Api, "getSingleGame");
     homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "fizz", abbreviation: "", wins: 1, losses: 0 };
     awayTeam = { id: "1", teamLogo: "", teamName: "bar", cityName: "buzz", abbreviation: "", wins: 0, losses: 1 };
-    game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
+    game = BaseballGame.of({
+      id: "1", date: "Thur April 05 2020 at 01:10 PM",
+      homeTeam: homeTeam, awayTeam: awayTeam, promos: [],
+      seriesGameNumber: 1, seriesGameCount: 3
+    });
   })
   afterEach(() => {
     vi.restoreAllMocks();
@@ -50,9 +53,10 @@ describe("renders the details of a single game", () => {
     describe("and may render its promotions", () => {
       test("if available", async () => {
         //* Render any promotions found REGARDLESS of home team
-        ApiSpy.mockReturnValueOnce(
-          Promise.resolve({ ...game, promos: [{ id: "bam", name: "bam", thumbnailUrl: "bam.jpg" }, { id: "boom", name: "boom", thumbnailUrl: "boom.jpg" }] })
-        );
+        const promoBaseballGame = BaseballGame.of({
+          ...game, promos: [{ id: "bam", name: "bam", thumbnailUrl: "bam.jpg" }, { id: "boom", name: "boom", thumbnailUrl: "boom.jpg" }]
+        });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(promoBaseballGame));
         render(SingleDayView, { day: 14, monthName: "foobar" });
         expect(await screen.findByText("Promotions for Today")).toBeInTheDocument();
         const images = screen.getAllByRole("listitem");
@@ -64,22 +68,25 @@ describe("renders the details of a single game", () => {
       })
       test("unless there are none, so, instead, it renders a message based on home vs away", async () => {
         //* WHEN the home team of the game is the user defined one (commonly "Dodgers")
-        ApiSpy.mockReturnValueOnce(Promise.resolve({ ...game, homeTeam: { ...homeTeam, teamName: "Dodgers" } }));
+        const homeBaseballGame = BaseballGame.of({ ...game, homeTeam: { ...homeTeam, teamName: "Dodgers" } });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(homeBaseballGame));
         const { rerender } = render(SingleDayView, { day: 14, monthName: "foobar" });
         //* THEN the team name is used in the message
         expect(await screen.findByText(/no dodgers promos today/i)).toBeInTheDocument();
 
         //* WHEN the home team of the game is NOT the user defined one (commonly "Dodgers")
-        ApiSpy.mockReturnValueOnce(Promise.resolve({ ...game, homeTeam: { ...homeTeam, teamName: "Angels" } }));
+        const awayBaseballGame = BaseballGame.of({ ...game, homeTeam: { ...homeTeam, teamName: "Angels" } });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(awayBaseballGame));
         rerender({ day: 9, monthName: "april" });
         //* THEN the message notifies the user their home team is away
         expect(await screen.findByText(/the Dodgers are away/i)).toBeInTheDocument();
       })
       test("as well as a note if special tickets required", async () => {
         //* CURRENTLY WHEN the promotion name ends in Ticket Package
-        ApiSpy.mockReturnValueOnce(
-          Promise.resolve({ ...game, promos: [{ id: "bam", name: "bam Ticket Package", thumbnailUrl: "bam.jpg" }] })
-        );
+        const ticketPackagePromoBaseballGame = BaseballGame.of({
+          ...game, promos: [{ id: "bam", name: "bam Ticket Package", thumbnailUrl: "bam.jpg" }]
+        });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(ticketPackagePromoBaseballGame));
         const { rerender } = render(SingleDayView, { day: 14, monthName: "foobar" });
         expect(await screen.findByText("Promotions for Today")).toBeInTheDocument();
         expect(screen.getAllByRole("listitem")).toHaveLength(1);
@@ -87,18 +94,20 @@ describe("renders the details of a single game", () => {
         expect(screen.getByText(/promotions today may require special tickets/i)).toBeInTheDocument();
 
         //* WHEN the promotion name includes anything else
-        ApiSpy.mockReturnValueOnce(
-          Promise.resolve({ ...game, promos: [{ id: "bam", name: "bam Ticket", thumbnailUrl: "bam.jpg" }] })
-        );
+        const normalTicketPromoBaseballGame = BaseballGame.of({
+          ...game, promos: [{ id: "bam", name: "bam Ticket", thumbnailUrl: "bam.jpg" }]
+        });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(normalTicketPromoBaseballGame));
         rerender({ day: 14, monthName: "foobar" });
         expect(await screen.findByText("Promotions for Today")).toBeInTheDocument();
         //* THEN the message will not render
         expect(screen.queryByText(/promotions today may require special tickets/i)).not.toBeInTheDocument();
 
         //* WHEN the promotion name includes "Ticket Package" BUT in a different case
-        ApiSpy.mockReturnValueOnce(
-          Promise.resolve({ ...game, promos: [{ id: "bam", name: "bam ticket package", thumbnailUrl: "bam.jpg" }] })
-        );
+        const wrongCaseTicketPackagePromoBaseballGame = BaseballGame.of({
+          ...game, promos: [{ id: "bam", name: "bam ticket package", thumbnailUrl: "bam.jpg" }]
+        });
+        ApiSpy.mockReturnValueOnce(Promise.resolve(wrongCaseTicketPackagePromoBaseballGame));
         rerender({ day: 14, monthName: "foobar" });
         expect(await screen.findByText("Promotions for Today")).toBeInTheDocument();
         //* THEN the message will not render

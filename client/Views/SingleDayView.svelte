@@ -19,14 +19,6 @@
   $: fetcher = getTodaysGame() //? Letting this reactive statement mutate `todaysGame`
   var todaysGame: BaseballGame | undefined; //? AND keeping this prop's type simple! (No Promise wrapper!)
 
-  const gameNumStr = (todaysGame: BaseballGame) => {
-    if (todaysGame === null) return ''; //* Likely to never be null since null objects shouldn't cause modal event to open
-    let gameStr = '';
-    if (todaysGame.seriesGameNumber === 1) gameStr = `The First Game`
-    else if (todaysGame.seriesGameNumber === todaysGame.seriesGameCount) gameStr = `The Last Game`
-    else gameStr = `Game #${todaysGame.seriesGameNumber}`
-    return gameStr + ` in a ${todaysGame.seriesGameCount}-day Series`
-  }
   const specialTicketRequired = (todaysPromotions: Promotion[]) => {
     if (todaysPromotions === null) return false;
     return todaysPromotions.filter(promo => promo.name.endsWith('Ticket Package')).length > 0;
@@ -48,7 +40,7 @@
         The <Image source="{todaysGame.homeTeam.teamLogo}" altText="{todaysGame.homeTeam.abbreviation} Logo"/>
         {todaysGame.homeTeam.cityName} {todaysGame.homeTeam.teamName} <sup>({todaysGame.homeTeam.wins} - {todaysGame.homeTeam.losses})</sup>
       </h3>
-      <h5 class='text-center'>{gameNumStr(todaysGame)}</h5>
+      <h5 class='text-center'>{todaysGame.seriesDescription()}</h5>
 
       <hr class="mt-1 mb-4">
       
