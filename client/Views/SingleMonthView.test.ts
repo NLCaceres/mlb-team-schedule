@@ -5,7 +5,7 @@ import { readable } from "svelte/store";
 import * as Api from "../API";
 import * as Navigator from "svelte-navigator";
 
-/* //* Using a Test Component since a Router wrapper is required thanks to useLocation being used in the SingleMonthView component */
+//? Using a Test Component since a Router wrapper is required thanks to useLocation being used in the SingleMonthView component
 describe("renders a single month", () => {
   let LocationSpy: SpyInstance; 
   let ApiSpy: SpyInstance;
@@ -26,31 +26,6 @@ describe("renders a single month", () => {
     rerender({ currentYear: "foobar" });
     //* Case-insensitive check to see "/april" turns into "April"
     expect(screen.getByText(/April foobar Games/)).toBeInTheDocument();
-  })
-  test("depending on the viewWidth to display a helpful note on Promotion availability", () => {
-    ApiSpy.mockReturnValue([]);
-    LocationSpy.mockReturnValueOnce(readable({ pathname: "/March" }));
-    //* WHEN the innerWidth > 576
-    global.innerWidth = 1024;
-    const { rerender } = render(SingleMonthView, { currentYear: "2023" });
-    //* THEN no notice to let the user know which games are at home with promotions
-    expect(screen.queryByText("* indicates a home game with promotions")).not.toBeInTheDocument();
-    //* WHEN the innerWidth > 576
-    global.innerWidth = 768;
-    rerender({ currentYear: "2023" });
-    //* THEN no notice to let the user know which games are at home with promotions
-    expect(screen.queryByText("* indicates a home game with promotions")).not.toBeInTheDocument();
-    //* WHEN the innerWidth > 576
-    global.innerWidth = 576;
-    rerender({ currentYear: "2023" });
-    //* THEN no notice to let the user know which games are at home with promotions
-    expect(screen.queryByText("* indicates a home game with promotions")).not.toBeInTheDocument();
-
-    //* WHEN the innerWidth < 576
-    global.innerWidth = 575;
-    rerender({ currentYear: "2023" });
-    //* THEN show the notice to let the user know which games are at home with promotions
-    expect(screen.getByText("* indicates a home game with promotions")).toBeInTheDocument();
   })
   test("depending on if any games are returned by the API", () => {
     LocationSpy.mockReturnValueOnce(readable({ pathname: "/March" }));

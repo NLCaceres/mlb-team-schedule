@@ -2,7 +2,7 @@ import MiniCalendarView from "./MiniCalendarView.svelte";
 import { render, screen } from "@testing-library/svelte";
 import { vi, type SpyInstance } from "vitest";
 import * as Api from "../API";
-import * as DateHelpers from '../HelperFuncs/DateExtension';
+import * as DateHelpers from "../HelperFuncs/DateExtension";
 
 //? Generally innerWidth starts at 1024 and innerHeight starts at 768, BUT being explicit might help CI tests
 const innerWidthStart = global.innerWidth;
@@ -23,25 +23,25 @@ describe("renders several calendar months to briefly detail game info for each d
   test("depending on viewport width & height to display the view's subtitle", () => {
     ApiSpy.mockReturnValue(undefined);
     const { rerender } = render(MiniCalendarView, { months: [] });
-    expect(screen.getByText(`Click the date to show game specifics`));
+    expect(screen.getByText("Click the date to show game specifics"));
 
     global.innerHeight = 1125; //* This would qualify as "1125 > innerWidth + 100" i.e. 1125 > 1024 + 100 -> 1125 > 1124
     rerender({ months: [] }); //* Treating this pretty big screen as a tablet
-    expect(screen.getByText(`Tap the date to show game specifics`));
+    expect(screen.getByText("Tap the date to show game specifics"));
 
     global.innerHeight = 728; //* For a more normal tablet size
     global.innerWidth = 500;
     rerender({ months: [] });
-    expect(screen.getByText(`Tap the date to show game specifics`));
+    expect(screen.getByText("Tap the date to show game specifics"));
 
     global.innerHeight = 768; //* Mid to Large Desktops render "Click"
     global.innerWidth = 1025;
     rerender({ months: [] });
-    expect(screen.getByText(`Click the date to show game specifics`));
+    expect(screen.getByText("Click the date to show game specifics"));
 
     global.innerHeight = 1126; //* Despite "1126 > innerWidth + 100", innerWidth > 1024 forces the view to use "Click"
     rerender({ months: [] });
-    expect(screen.getByText(`Click the date to show game specifics`));
+    expect(screen.getByText("Click the date to show game specifics"));
   })
   test("using hyperlinks if in a small viewport", async () => {
     const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "fizz", abbreviation: "", wins: 1, losses: 0 };
@@ -50,15 +50,15 @@ describe("renders several calendar months to briefly detail game info for each d
     ApiSpy.mockReturnValue([game]);
     const { rerender } = render(MiniCalendarView, { months: [] });
     const expectedText = "Today's Game is:";
-    const button = await screen.findByRole("button");
-    expect(button).toHaveTextContent(expectedText);
+    const button = await screen.findByRole("button", { name: expectedText });
+    expect(button).toBeInTheDocument();
 
     //* Convert the button into a hyperlink (<a> tag) on mobile screens
     DateHelperSpy.mockReturnValueOnce(["year", "3", "20"]);
     global.innerWidth = 575;
     rerender({ months: [] });
-    const link = await screen.findByRole("link");
-    expect(link).toHaveTextContent(expectedText);
+    const link = await screen.findByRole("link", { name: expectedText });
+    expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "March/20");
   })
   test("depending on the schedule returned by the API to render a full calendar", async () => {

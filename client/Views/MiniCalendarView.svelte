@@ -1,11 +1,12 @@
-<script lang='ts'>
-  import Calendar from '../Calendar/Calendar.svelte';
-  import { link } from 'svelte-navigator';
+<script lang="ts">
+  import Calendar from "../Calendar/Calendar.svelte";
+  import SubtitleWithTooltip from "./SubtitleWithTooltip.svelte";
+  import { link } from "svelte-navigator";
   import type BaseballGame from "../Models/DataClasses";
-  import { MONTH_NUM_MAP } from '../Models/Month';
+  import { MONTH_NUM_MAP } from "../Models/Month";
   import { getFullSchedule } from "../API";
-  import { getDayFromDateStr, getMonthFromDateStr, todaysSplitDate } from '../HelperFuncs/DateExtension';
-  import { createEventDispatcher } from 'svelte';
+  import { getDayFromDateStr, getMonthFromDateStr, todaysSplitDate } from "../HelperFuncs/DateExtension";
+  import { createEventDispatcher } from "svelte";
 	const dispatch = createEventDispatcher();
 
   //* Normal props
@@ -25,7 +26,7 @@
     //? Can't use Array(length).fill([]) since it fills each spot with the same array ref, so each change affects the other
     const gamesSplitByMonth: BaseballGame[][] = Array.from({ length: months.length }, _ => []);
     let gamesIndex = 0;
-    for (let i = 0; i < gamesSplitByMonth.length; i++) { //todo May be able to condense these loops into single "while" loop
+    for (let i = 0; i < gamesSplitByMonth.length; i++) { //TODO: May be able to condense these loops into single "while" loop
       for (let j = gamesIndex; j < loadedGames.length; j++) {
         const monthName = getMonthFromDateStr(loadedGames[j].date);
         if (monthName !== months[i]) {
@@ -48,19 +49,15 @@
       const monthIndex = parseInt(currentMonth) - 3; //* Since starting season starts in March, offset is 3
       const foundMonth = dividedGames[monthIndex];
       const foundGame = foundMonth?.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
-      if (!foundGame) { dispatch('openAlert', true) } //* If off-day or off-season, open alert to say so!
-      else { dispatch('openModal', foundGame) }
+      if (!foundGame) { dispatch("openAlert", true) } //* If off-day or off-season, open alert to say so!
+      else { dispatch("openModal", foundGame) }
     }
   }
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
-<h3 class='subtitle text-center mb-2'>
-  {tabletScreen ? 'Tap' : 'Click'} the date to show game specifics
-</h3>
-<!--TODO: Replace with this next subtitle with a tooltip? -->
-<p class='subtitle text-center mb-0'>* indicates a home game with promotions</p>
+<SubtitleWithTooltip subtitle={`${tabletScreen ? "Tap" : "Click"} the date to show game specifics`} />
 
 {#await dividedGamesList}
   <h1>Loading up this month's games!</h1>
@@ -70,13 +67,13 @@
         {#if smallScreen}
           <a use:link href="{MONTH_NUM_MAP[parseInt(currentMonth)]}/{currentDay}" class="btn">Today's Game is:</a>
         {:else}
-          <button type='button' class="btn ms-lg-5" on:click={propagateModalOpening}>Today's Game is:</button>
+          <button type="button" class="btn ms-lg-5" on:click={propagateModalOpening}>Today's Game is:</button>
         {/if}
     </div>
 
     <div class="d-flex flex-wrap w-100 justify-content-center">
       {#each months as month, i (month)}
-        <Calendar mini tableClass={`mx-2`} monthName={month} gamesList={gamesByMonth[i]} on:openModal />
+        <Calendar mini tableClass="mx-2" monthName={month} gamesList={gamesByMonth[i]} on:openModal />
       {/each}
     </div>
   {:else}
@@ -85,24 +82,7 @@
 {/await}
 
 <style lang="less">
-  @import '../CSS/variables';
-
-  .subtitle {
-    color: #004680;
-    @media @max575 {
-			margin-left: 2rem;
-			margin-right: 2rem;
-		}
-		@media @min576 {
-			margin-left: 4rem;
-			margin-right: 4rem;
-		}
-    @media @min992 {
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
+  @import "../CSS/variables";
 
   button.btn {
     @media @min576 {
