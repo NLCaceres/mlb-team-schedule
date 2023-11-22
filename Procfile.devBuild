@@ -1,2 +1,2 @@
-web: npm run dev-build
+web: pnpm dev-build
 api: flask run

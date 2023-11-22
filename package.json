@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": "18.9.0",
-    "npm": "8.19.1"
+    "node": "20.9.0",
+    "pnpm": "^8.10.5"
   },
   "scripts": {
     "build": "vite build",
