@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import { svelte, vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { defineConfig } from "vite";
+import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 export default defineConfig({
   plugins: [svelte({
@@ -7,8 +7,8 @@ export default defineConfig({
   })],
   server: {
     proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
+      "/api": {
+        target: "http://127.0.0.1:5000",
         changeOrigin: true,
         secure: false
       }
@@ -17,9 +17,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: 'assets/[name][extname]',
-        entryFileNames: 'assets/[name].js'
+        assetFileNames: "assets/[name][extname]",
+        entryFileNames: "assets/[name].js"
       }
     }
   }
-})
+});

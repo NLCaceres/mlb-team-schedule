@@ -1,5 +1,5 @@
-import { defineConfig } from "vitest/config"
-import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte"
+import { defineConfig } from "vitest/config";
+import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 export default defineConfig({
   plugins: [
@@ -10,4 +10,4 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "client/setupTest.ts"
   },
-})
+});

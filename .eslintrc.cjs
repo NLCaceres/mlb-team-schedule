@@ -23,6 +23,15 @@ module.exports = {
     "@typescript-eslint"
   ],
   root: true,
+  rules: {
+    "no-trailing-spaces": "error",
+    "indent": "off",
+    "@typescript-eslint/indent": ["error", 2],
+    "quotes": "off",
+    "@typescript-eslint/quotes": "error",
+    "semi": "off",
+    "@typescript-eslint/semi": "error",
+  },
   overrides: [
     {
       files: ["*.js"],
