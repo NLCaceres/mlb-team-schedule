@@ -2,9 +2,11 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "strictPropertyInitialization": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowJs": true,
+    "outDir": "dist" // Required when using allowJs
   },
 
-  "include": ["client/**/*"],
-  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+  "include": ["client/**/*", ".eslintrc.cjs", "svelte.config.js", "vite.config.ts", "vitest.config.ts"],
+  "exclude": ["dist/*", "node_modules/*", "public/*"]
 }
