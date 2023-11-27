@@ -31,6 +31,7 @@ module.exports = {
     "@typescript-eslint/quotes": "error",
     "semi": "off",
     "@typescript-eslint/semi": "error",
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"]
   },
   overrides: [
     {

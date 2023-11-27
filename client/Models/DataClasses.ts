@@ -3,7 +3,7 @@ export type BaseballGameProps = {
   id: string, date: string,
   homeTeam: BaseballTeam, awayTeam: BaseballTeam,
   promos: Promotion[], seriesGameNumber: number, seriesGameCount: number
-}
+};
 //? Implementing a TS type treats it like an interface
 export default class BaseballGame implements BaseballGameProps {
   constructor(public id: string, public date: string,
@@ -21,14 +21,14 @@ export default class BaseballGame implements BaseballGameProps {
   seriesDescription(this: BaseballGame) { //? `this` param will work like Python, getting erased at compile
     const gameNumStr = (this.seriesGameNumber === 1) ? "The First Game" :
       (this.seriesGameNumber === this.seriesGameCount) ? "The Last Game" : `Game #${this.seriesGameNumber}`;
-    return gameNumStr + ` in a ${this.seriesGameCount}-day Series`
+    return gameNumStr + ` in a ${this.seriesGameCount}-day Series`;
   }
 }
 
 export type BaseballTeamProps = {
   id: string, teamLogo: string, teamName: string, cityName: string, abbreviation: string,
   wins: number, losses: number, homeGames?: BaseballGameProps[], awayGames?: BaseballGameProps[]
-}
+};
 export class BaseballTeam {
   constructor(public id: string, public teamLogo: string, public teamName: string,
     public cityName: string, public abbreviation: string, public wins: number, public losses: number,
@@ -37,7 +37,7 @@ export class BaseballTeam {
 
 export type PromotionProps = {
   id: string, name: string, thumbnailUrl: string, baseballGame?: BaseballGameProps
-}
+};
 export class Promotion implements PromotionProps {
   constructor(public id: string, public name: string,
     public thumbnailUrl: string, public baseballGame?: BaseballGameProps) { }

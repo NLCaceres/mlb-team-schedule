@@ -1,4 +1,4 @@
-export const MONTH_MAP = {
+export const MONTH_MAP: Record<string, number> = {
   "January": 1,
   "February": 2,
   "March": 3,
@@ -11,9 +11,9 @@ export const MONTH_MAP = {
   "October": 10,
   "November": 11,
   "December": 12,
-}
+};
 
-export const MONTH_NUM_MAP = {
+export const MONTH_NUM_MAP: Record<number, string> = {
   1: "January",
   2: "February",
   3: "March",
@@ -26,4 +26,4 @@ export const MONTH_NUM_MAP = {
   10: "October",
   11: "November",
   12: "December",
-}
+};
