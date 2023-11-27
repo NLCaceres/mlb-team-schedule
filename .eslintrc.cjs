@@ -36,6 +36,12 @@ module.exports = {
     {
       files: ["*.js"],
       extends: ["plugin:@typescript-eslint/disable-type-checked"]
+    },
+    {
+      "files": ["*test.ts"],
+      "rules": {
+        "@typescript-eslint/no-non-null-assertion": "off"
+      }
     }
   ]
 };

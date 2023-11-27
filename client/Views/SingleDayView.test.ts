@@ -17,10 +17,10 @@ describe("renders the details of a single game", () => {
       homeTeam: homeTeam, awayTeam: awayTeam, promos: [],
       seriesGameNumber: 1, seriesGameCount: 3
     });
-  })
+  });
   afterEach(() => {
     vi.restoreAllMocks();
-  })
+  });
   describe("if the Game was fetched", () => {
     test("successfully", async () => {
       //* No game from the API, so render a "Day off" message
@@ -28,7 +28,7 @@ describe("renders the details of a single game", () => {
       const { rerender } = render(SingleDayView, { day: 14, monthName: "foobar" });
       expect(ApiSpy).toBeCalledWith("foobar", "14");
       expect(await screen.findByText(/just a dodgers day off/i)).toBeInTheDocument();
-      
+
       //* WHEN a game is successfully fetched from the API
       ApiSpy.mockReturnValueOnce(Promise.resolve(game));
       rerender({ day: 9, monthName: "april" });
@@ -43,13 +43,13 @@ describe("renders the details of a single game", () => {
       expect(await screen.findByText("The First Game in a 3-day Series"));
 
       //* WHEN catching an error from the API
-      ApiSpy.mockRejectedValue(new Error('Unexpected Error'));
+      ApiSpy.mockRejectedValue(new Error("Unexpected Error"));
       rerender({ day: 9, monthName: "april" });
       //* THEN the view will get an undefined value, resetting itself to an "Off-Day"
       expect(await screen.findByText(/just a dodgers day off/i)).toBeInTheDocument();
       //? BUT when that error is caught, a real user will just see the view navigate back to the homepage
       //? Unfortunately, Svelte-navigator is not setup in a way that lets Testing-Library render route changes
-    })
+    });
     describe("and may render its promotions", () => {
       test("if available", async () => {
         //* Render any promotions found REGARDLESS of home team
@@ -65,7 +65,7 @@ describe("renders the details of a single game", () => {
         expect(images[0].firstElementChild).toHaveAttribute("src", "bam.jpg");
         expect(images[1]).toHaveTextContent("boom");
         expect(images[1].firstElementChild).toHaveAttribute("src", "boom.jpg");
-      })
+      });
       test("unless there are none, so, instead, it renders a message based on home vs away", async () => {
         //* WHEN the home team of the game is the user defined one (commonly "Dodgers")
         const homeBaseballGame = BaseballGame.of({ ...game, homeTeam: { ...homeTeam, teamName: "Dodgers" } });
@@ -80,7 +80,7 @@ describe("renders the details of a single game", () => {
         rerender({ day: 9, monthName: "april" });
         //* THEN the message notifies the user their home team is away
         expect(await screen.findByText(/the Dodgers are away/i)).toBeInTheDocument();
-      })
+      });
       test("as well as a note if special tickets required", async () => {
         //* CURRENTLY WHEN the promotion name ends in Ticket Package
         const ticketPackagePromoBaseballGame = BaseballGame.of({
@@ -112,7 +112,7 @@ describe("renders the details of a single game", () => {
         expect(await screen.findByText("Promotions for Today")).toBeInTheDocument();
         //* THEN the message will not render
         expect(screen.queryByText(/promotions today may require special tickets/i)).not.toBeInTheDocument();
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});

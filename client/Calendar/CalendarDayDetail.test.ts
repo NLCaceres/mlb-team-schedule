@@ -7,14 +7,14 @@ const innerWidthStart = global.innerWidth;
 
 describe("render a single day in a typical wall-calendar style", () => {
   let homeTeam: BaseballTeam;
-  let awayTeam: BaseballTeam
+  let awayTeam: BaseballTeam;
   let game: BaseballGame;
   beforeEach(() => {
     homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
     game = { id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
     global.innerWidth = innerWidthStart;
-  })
+  });
   test("displays any promotions of the game if not a mini calendar", () => {
     const { rerender } = render(CalendarDayDetail, { game: game });
     expect(screen.getByText(/dodgers away/i)).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("render a single day in a typical wall-calendar style", () => {
 
     rerender({ game: gameWithPromos, mini: true });
     expect(screen.getByText("*")).toBeInTheDocument(); //* Just render an asterisk for promo days in a mini calendar
-  })
+  });
   describe("altering the style", () => {
     test("based on if the component is mini", () => {
       const gameWithPromos = { ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] };
@@ -56,7 +56,7 @@ describe("render a single day in a typical wall-calendar style", () => {
       expect(miniLogoContainer).toHaveClass("flex-column");
       const miniPromoContainer = miniComponentRoot!.lastElementChild;
       expect(miniPromoContainer).not.toHaveClass("mt-3");
-    })
+    });
     test("based on if the week is odd (1st, 3rd, 5th) or even (2nd or 4th)", () => {
       const gameWithPromos = { ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] };
       const { rerender, container } = render(CalendarDayDetail, { game: gameWithPromos });
@@ -71,7 +71,7 @@ describe("render a single day in a typical wall-calendar style", () => {
       );
       const oddComponentRoot = container.firstElementChild!.firstElementChild;
       expect(oddComponentRoot).toHaveClass("odd");
-    })
+    });
     test("based on if the viewWidth is less than or equal to 768", () => {
       const gameWithPromos = { ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] };
       const { rerender, container } = render(CalendarDayDetail, { game: gameWithPromos });
@@ -83,6 +83,6 @@ describe("render a single day in a typical wall-calendar style", () => {
       expect(screen.getByText(/missing thumbnail/i)).toHaveStyle("font-size:10px"); //* Use smaller font
       const oddComponentRoot = container.firstElementChild!.firstElementChild;
       expect(oddComponentRoot).toHaveClass("odd");
-    })
-  })
-})
+    });
+  });
+});

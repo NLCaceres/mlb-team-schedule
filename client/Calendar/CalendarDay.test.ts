@@ -7,36 +7,36 @@ const innerWidthStart = global.innerWidth; //* For test resetting purposes
 
 describe("render a single day in a typical wall-calendar style", () => {
   let homeTeam: BaseballTeam;
-  let awayTeam: BaseballTeam
+  let awayTeam: BaseballTeam;
   let game: BaseballGame;
   beforeEach(() => {
     homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
     game = { id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
     global.innerWidth = innerWidthStart;
-  })
+  });
   test("unless missing a dayNum", () => {
     const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "", games: [game] });
-    
+
     const calendarDayBody = screen.getByRole("cell");
     expect(calendarDayBody.firstChild).toBeEmptyDOMElement();
 
     rerender({ currentMonth: "", dayNum: "foo", games: [game] });
     const gameDayBody = screen.getByRole("cell");
     expect(gameDayBody.firstChild).not.toBeEmptyDOMElement();
-  })
+  });
   test("including the start time of any given game", () => {
     const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Thur June 09 2021 at 07:10 PM" }] });
     expect(screen.getByText("7:10 PM"));
 
     //* Poorly formatted dates or strings without a time get left empty
     rerender({ currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Thur June 09" }] });
-    const calendarDayNumWithHalfDate = screen.getByText("foo")
+    const calendarDayNumWithHalfDate = screen.getByText("foo");
     const startTimeElemWithHalfDate = calendarDayNumWithHalfDate.nextElementSibling;
     expect(startTimeElemWithHalfDate).toHaveTextContent(""); //* No text inserted, just an empty string
 
     rerender({ currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Barfoo" }] });
-    const calendarDayNumWithBadDate = screen.getByText("foo")
+    const calendarDayNumWithBadDate = screen.getByText("foo");
     const startTimeElemWithBadDate = calendarDayNumWithBadDate.nextElementSibling;
     expect(startTimeElemWithBadDate).toHaveTextContent("");
 
@@ -45,8 +45,8 @@ describe("render a single day in a typical wall-calendar style", () => {
     //* As a sanity check, grab the calendar day number and check if it has the start time sibling
     expect(screen.getByText("foo").nextElementSibling).toBeNull(); //* Time should non-existent
     //? use "nextElementSibling" because "nextSibling" may treat the text inside a <p> tag as a sibling
-  })
-  test("altering the game/promo section depending on the screen width and if a game is happening", () => { 
+  });
+  test("altering the game/promo section depending on the screen width and if a game is happening", () => {
     //todo Since small screens, use a simplified/smaller version of the CalendarDayDetail
     //todo Seems best to find a way to merge the simpler stylings into CalendarDayDetail, simplifying this entire conditional block
     //* On small screens, each calendar day gets a smaller version of the CalendarDayDetail component
@@ -54,7 +54,7 @@ describe("render a single day in a typical wall-calendar style", () => {
     const { rerender } = render(CalendarDay, { currentMonth: "foo", dayNum: "bar", games: [game] });
     expect(screen.getByText("vs")).toBeInTheDocument();
     expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("");
-    //* The link gets an asterisk if it has promotions 
+    //* The link gets an asterisk if it has promotions
     rerender({ currentMonth: "foo", dayNum: "bar", games: [{ ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] }] });
     expect(screen.getByText("vs")).toBeInTheDocument();
     expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("*");
@@ -71,7 +71,7 @@ describe("render a single day in a typical wall-calendar style", () => {
 
     rerender({ currentMonth: "bar", dayNum: "12", games: [] });
     expect(screen.getByText(/off day/i)).toBeInTheDocument();
-  })
+  });
   describe("altering the style", () => {
     test("based on if the component is mini", () => {
       const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [game] });
@@ -108,7 +108,7 @@ describe("render a single day in a typical wall-calendar style", () => {
       expect(screen.getByText(/off day/i)).toHaveClass("mini");
       rerender({ currentMonth: "bar", dayNum: "12", games: [], mini: false });
       expect(screen.getByText(/off day/i)).not.toHaveClass("mini");
-    })
+    });
     test("to style the calendar for large screens", () => {
       const gameWithDate = { ...game, date: "Thur June 09 2021 at 07:10 PM" };
       const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [gameWithDate] });
@@ -137,7 +137,7 @@ describe("render a single day in a typical wall-calendar style", () => {
       //! Small quirk: The child container used for the CalendarDayDetails adds its largeCalendar CSS on days without a game
       rerender({ currentMonth: "", dayNum: "foo", games: [], mini: true }); //* Regardless of screen size and mini == false
       expect(screen.getByRole("cell").firstElementChild).toHaveClass("flex-column");
-    })
+    });
     test("based on if the week is odd (1st, 3rd, 5th) or even (2nd or 4th)", () => {
       const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [game] });
       //* Even by default
@@ -149,23 +149,23 @@ describe("render a single day in a typical wall-calendar style", () => {
       rerender({ currentMonth: "", dayNum: "foo", games: [game], even: false });
       expect(screen.getByRole("cell")).toHaveClass("odd");
       expect(screen.getByText("foo")).toHaveClass("text-white");
-    })
+    });
     describe("of the root element", () => {
       test("via a CssClass prop", () => {
         const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [game], cssClasses: "foobar" });
         expect(screen.getByRole("cell")).toHaveClass("foobar");
-  
+
         rerender({ currentMonth: "", dayNum: "foo", games: [game] });
         expect(screen.getByRole("cell")).not.toHaveClass("foobar");
         expect(screen.getByRole("cell")).toHaveClass("standard-detail"); //* Just has its normal base CSS class
-      })
+      });
       test("via an empty dayNum string", () => {
         const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "", games: [game] });
         expect(screen.getByRole("cell")).toHaveClass("different-month");
 
         rerender({ currentMonth: "", dayNum: "foo", games: [game] });
         expect(screen.getByRole("cell")).not.toHaveClass("different-month");
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});

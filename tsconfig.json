@@ -1,10 +1,12 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
     "strictPropertyInitialization": true,
     "strictNullChecks": true,
     "allowJs": true,
-    "outDir": "dist" // Required when using allowJs
+    "outDir": "dist", // Required when using allowJs
+    "types": ["jest", "@testing-library/jest-dom"]
   },
 
   "include": ["client/**/*", ".eslintrc.cjs", "svelte.config.js", "vite.config.ts", "vitest.config.ts"],

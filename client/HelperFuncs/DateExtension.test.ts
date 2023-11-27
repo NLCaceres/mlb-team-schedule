@@ -1,4 +1,4 @@
-import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero, 
+import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero,
   utcDate, currentYear, getMonthFromDateStr, getDayFromDateStr, todaysSplitDate } from "./DateExtension";
 
 describe("Utility functions relating to JS Date types", () => {
@@ -28,7 +28,7 @@ describe("Utility functions relating to JS Date types", () => {
 
     //! Very important edge case - Saturday is an issue if splitting string with "at" instead of " at "
     expect(getReadableDate("Sat June 11 2021 at 07:10 PM")).toBe("Sat June 11 2021 at 7:10 PM");
-  })
+  });
   test("formats the expected date from the API", () => {
     const emptyStringExample = dateFormatter("");
     expect(emptyStringExample).toBe("");
@@ -41,13 +41,13 @@ describe("Utility functions relating to JS Date types", () => {
     const properLengthString = "foo bar fizz buzz";
     //* Correct length so it's returned back "formatted" BUT not actually the expected date string i.e. Thur June 09 2021
     expect(dateFormatter(properLengthString)).toBe(properLengthString);
-    
+
     const normalDateFormat = "Thur June 09 2021";
     expect(dateFormatter(normalDateFormat)).toBe("Thur June 9 2021");
-  })
+  });
   test("extract the month from the typical dateStr", () => {
     expect(getMonthFromDateStr("")).toBe(""); //* Empty strings return empty strings
-    
+
     expect(getMonthFromDateStr("Hello")).toBe(""); //* Invalid string due to length
 
     //* Technically valid but not expected
@@ -60,10 +60,10 @@ describe("Utility functions relating to JS Date types", () => {
 
     const expectedDateStr = "Thur June 09 2021 at 07:10 PM";
     expect(getMonthFromDateStr(expectedDateStr)).toBe("June");
-  })
+  });
   test("extract the day of the month from the typical dateStr", () => {
     expect(getDayFromDateStr("")).toBe(""); //* Empty strings return empty strings
-    
+
     //* Invalid string due to length
     expect(getDayFromDateStr("Hello")).toBe("");
     expect(getDayFromDateStr("Hello world")).toBe("");
@@ -79,7 +79,7 @@ describe("Utility functions relating to JS Date types", () => {
 
     const expectedDateStr = "Thur June 09 2021 at 07:10 PM";
     expect(getDayFromDateStr(expectedDateStr)).toBe("09");
-  })
+  });
 
   //! Time
   test("gets the expected time out of the expected date returned by the API", () => {
@@ -95,13 +95,13 @@ describe("Utility functions relating to JS Date types", () => {
     const validStr = "The dog is at the house";
     expect(getTimeFromDateStr(validStr)).toBe("the house");
 
-    //* Expected date string 
+    //* Expected date string
     const normalDateFormat = "Thur June 09 2021 at 07:10 PM";
     expect(getTimeFromDateStr(normalDateFormat)).toBe("7:10 PM");
 
     //! Time version also has the Saturday edge case, split() MUST use " at ", NOT "at"
     expect(getReadableDate("Sat June 11 2021 at 07:10 PM")).toBe("Sat June 11 2021 at 7:10 PM");
-  })
+  });
   test("formats the expected time from the API", () => {
     const emptyStringExample = timeFormatter("");
     expect(emptyStringExample).toBe("");
@@ -110,22 +110,22 @@ describe("Utility functions relating to JS Date types", () => {
     expect(timeFormatter(invalidLengthStr)).toBe("");
 
     //* Correct length so it's returned back "formatted" BUT not actually the expected date string i.e. 07:10 PM
-    const properLengthStr = "foo bar"; 
+    const properLengthStr = "foo bar";
     expect(timeFormatter(properLengthStr)).toBe("foo bar");
 
     const normalDateFormat = " 07:10 PM ";
     expect(timeFormatter(normalDateFormat)).toBe("7:10 PM");
-  })
+  });
 
   //! Quick Helpers
   test("removes leading zeros in a string", () => {
     expect(removeLeadingZero("")).toBe("");
 
     const expectedResult = "Hello World";
-    
+
     const basicExample = "0000Hello World";
     expect(removeLeadingZero(basicExample)).toBe(expectedResult);
-    
+
     const normalStr = "Hello World";
     expect(removeLeadingZero(normalStr)).toBe(expectedResult);
 
@@ -141,25 +141,25 @@ describe("Utility functions relating to JS Date types", () => {
     const randomZeroActualResult = removeLeadingZero(randomZeroExample);
     expect(randomZeroActualResult).not.toBe(randomZeroExample); //* Change has occurred
     expect(randomZeroActualResult).toBe("Hello00000World000");
-  })
+  });
   //* Quick Getters
   test("gets a simple UTC String", () => {
     const utcString = utcDate();
     expect(utcString[10]).toBe("T"); //? 10th char is always T for the start of the Hour:Minute:Second time
     expect(utcString[utcString.length - 1]).toBe("Z"); //? All UTC Strings end with Z for Zulu Time Zone
-    
-    const [date, time] = utcString.split('T');
 
-    const [year, month, day] = date.split('-'); //? [YYYY, MM, DD]
-    expect(year).toHaveLength(4); 
-    expect(month).toHaveLength(2); 
+    const [date, time] = utcString.split("T");
+
+    const [year, month, day] = date.split("-"); //? [YYYY, MM, DD]
+    expect(year).toHaveLength(4);
+    expect(month).toHaveLength(2);
     expect(day).toHaveLength(2);
 
-    const [hour, minute, second] = time.slice(0, time.length - 1).split(':'); //? [HH, MM, SS.SSS]
-    expect(hour).toHaveLength(2); 
+    const [hour, minute, second] = time.slice(0, time.length - 1).split(":"); //? [HH, MM, SS.SSS]
+    expect(hour).toHaveLength(2);
     expect(minute).toHaveLength(2);
     expect(second).toHaveLength(6);
-  })
+  });
   test("grabs the year, month and day as an array from a UTC string", () => {
     const dateElements = todaysSplitDate();
     expect(dateElements).toHaveLength(3); //* Should always be [YYYY, MM, DD]
@@ -174,10 +174,10 @@ describe("Utility functions relating to JS Date types", () => {
     expect(day).toHaveLength(2);
     expect(parseInt(day)).toBeLessThanOrEqual(31); //* Should never be higher than 31 since no month has more days
     //todo Keep thinking of consistent properties to further assert that the correct date info is being returned
-  })
+  });
   test("grabs the year from a UTC string", () => {
     const thisYear = currentYear();
     expect(thisYear).toHaveLength(4); //* Should always be 4 digits
     expect(thisYear.slice(0, 2)).toBe("20"); //* It'll be a while before this test fails
-  })
-})
+  });
+});

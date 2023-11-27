@@ -1,6 +1,5 @@
 import BaseballGame, { Promotion } from "./DataClasses";
 
-
 describe("forms the main models of the app like", () => {
   describe("a BaseballGame", () => {
     test("with an optional static builder", () => {
@@ -32,7 +31,7 @@ describe("forms the main models of the app like", () => {
       expect(builderGame.promos).toStrictEqual([]);
       expect(builderGame.seriesGameNumber).toBe(1);
       expect(builderGame.seriesGameCount).toBe(2);
-    })
+    });
     test("with a series description method", () => {
       const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "fizz", abbreviation: "", wins: 1, losses: 0 };
       const awayTeam = { id: "1", teamLogo: "", teamName: "bar", cityName: "buzz", abbreviation: "", wins: 0, losses: 1 };
@@ -69,6 +68,6 @@ describe("forms the main models of the app like", () => {
       //* WHEN the seriesGameNumber == seriesGameCount (BOTH 4 here), THEN the series description should start with "The Last Game"
       expect(game.seriesDescription()).toContain("The Last Game");
       expect(game.seriesDescription()).toContain("in a 4-day Series");
-    })
-  })
-})
+    });
+  });
+});

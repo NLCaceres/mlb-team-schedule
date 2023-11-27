@@ -7,15 +7,15 @@ import * as Navigator from "svelte-navigator";
 
 //? Using a Test Component since a Router wrapper is required thanks to useLocation being used in the SingleMonthView component
 describe("renders a single month", () => {
-  let LocationSpy: SpyInstance; 
+  let LocationSpy: SpyInstance;
   let ApiSpy: SpyInstance;
   beforeEach(() => {
     ApiSpy = vi.spyOn(Api, "getMonthsGames");
     LocationSpy = vi.spyOn(Navigator, "useLocation");
-  })
+  });
   afterEach(() => {
     vi.restoreAllMocks();
-  })
+  });
   test("depending on the useLocation hook + currentYear prop to create the subtitle header", () => {
     ApiSpy.mockReturnValue([]);
     LocationSpy.mockReturnValueOnce(readable({ pathname: "/March" }));
@@ -26,7 +26,7 @@ describe("renders a single month", () => {
     rerender({ currentYear: "foobar" });
     //* Case-insensitive check to see "/april" turns into "April"
     expect(screen.getByText(/April foobar Games/)).toBeInTheDocument();
-  })
+  });
   test("depending on if any games are returned by the API", () => {
     LocationSpy.mockReturnValueOnce(readable({ pathname: "/March" }));
     ApiSpy.mockReturnValueOnce([]); //* Renders even if empty
@@ -44,5 +44,5 @@ describe("renders a single month", () => {
     ApiSpy.mockReturnValueOnce([game]);
     rerender({ currentYear: "2023" });
     expect(screen.getByRole("table")).toBeInTheDocument();
-  })
-})
+  });
+});

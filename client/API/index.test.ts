@@ -9,10 +9,10 @@ const checkResponse = (game: BaseballGame, strVal: string, numVal: number) => {
   expect(game.homeTeam).toBe(strVal);
   expect(game.seriesGameNumber).toBe(numVal);
   expect(game.seriesGameCount).toBe(numVal);
-}
+};
 
 describe("provides basic API functions", () => {
-  afterEach(() => { vi.restoreAllMocks() })
+  afterEach(() => { vi.restoreAllMocks(); });
   test("to grab the games of the day", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([{
       id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1
@@ -25,7 +25,7 @@ describe("provides basic API functions", () => {
     const badResponse = await getSingleGame("march", "29");
     expect(badResponse).toBe(undefined);
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-  })
+  });
   test("to grab the games for the month", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([
       { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1 },
@@ -41,7 +41,7 @@ describe("provides basic API functions", () => {
     const badResponse = await getMonthsGames("march");
     expect(badResponse).toBe(undefined);
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-  })
+  });
   test("to grab the full schedule of games", async () => {
     const fetchSpy = vi.spyOn(Utility, "default").mockReturnValueOnce(Promise.resolve([
       { id: "foo", date: "foo", homeTeam: "foo", awayTeam: "foo", promos: [], seriesGameNumber: 1, seriesGameCount: 1 },
@@ -49,8 +49,8 @@ describe("provides basic API functions", () => {
     ]));
     const response = await getFullSchedule();
     expect(response).toHaveLength(2);
-    checkResponse(response![0], "foo", 1);
-    checkResponse(response![1], "bar", 2);
+    checkResponse(response[0], "foo", 1);
+    checkResponse(response[1], "bar", 2);
     expect(fetchSpy).toHaveBeenCalledWith("/api/fullSchedule");
 
     fetchSpy.mockReturnValueOnce(Promise.resolve(undefined));
@@ -62,5 +62,5 @@ describe("provides basic API functions", () => {
     const emptyResponse = await getFullSchedule();
     expect(emptyResponse).toStrictEqual([]);
     expect(fetchSpy).toHaveBeenCalledTimes(3);
-  })
-})
+  });
+});

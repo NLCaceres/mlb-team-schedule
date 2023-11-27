@@ -6,10 +6,10 @@ describe("renders a subtitle with a tooltip noting which games are at home with 
     const { rerender } = render(SubtitleWithTooltip, { subtitle: "March 2023" });
     expect(screen.getByText("March 2023")).toBeInTheDocument();
 
-    rerender({ subtitle: "Foobar 2121 "})
+    rerender({ subtitle: "Foobar 2121 "});
     //* WHEN the subtitle prop is filled, the heading tag in the component is filled with that prop value
     expect(screen.getByRole("heading", { name: "Foobar 2121" })).toBeInTheDocument();
-  })
+  });
   test("depending on the viewWidth to place the tooltip hint", () => {
     //* WHEN the innerWidth > 991
     global.innerWidth = 1024;
@@ -33,5 +33,5 @@ describe("renders a subtitle with a tooltip noting which games are at home with 
     //* THEN place the tooltip hint above the main element
     expect(screen.getByText(/indicates a home game with promotions/i).parentElement).toHaveClass("top-placed");
     global.innerWidth = 1024;
-  })
-})
+  });
+});

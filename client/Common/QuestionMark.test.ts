@@ -14,7 +14,7 @@ describe("render an SVG question mark", () => {
     const resizedIcon = screen.getByRole("img", { name: "Question Mark Icon" });
     expect(resizedIcon).toHaveAttribute("width", "20"); //* THEN the SVG shrinks to 20 width
     expect(resizedIcon).toHaveAttribute("height", "80"); //* AND grows to 80 height
-  })
+  });
   test("with dynamic outline and fill color", () => {
     const { rerender } = render(QuestionMark, { width: 40, height: 40 });
     const questionMarkIcon = screen.getByRole("img", { name: "Question Mark Icon" });
@@ -53,5 +53,5 @@ describe("render an SVG question mark", () => {
     expect(filledIcon.lastElementChild).not.toHaveAttribute("stroke", "red");
     //* BUT the fill attribute will appear with its added value
     expect(filledIcon.lastElementChild).toHaveAttribute("fill", "blue");
-  })
-})
+  });
+});

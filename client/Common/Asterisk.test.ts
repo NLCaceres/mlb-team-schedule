@@ -16,7 +16,7 @@ describe("render an SVG asterisk", () => {
     //* WHEN multiple classes added to the svgClasses prop, THEN they are all injected
     rerender({ width: 40, height: 40, svgClasses: "bar foo" });
     expect(screen.getByRole("img", { name: "Asterisk Icon" })).toHaveClass("foo bar", { exact: true });
-  })
+  });
   test("with dynamic height and width", () => {
     const { rerender } = render(Asterisk, { width: 40, height: 40 });
     const asteriskIcon = screen.getByRole("img", { name: "Asterisk Icon" });
@@ -29,7 +29,7 @@ describe("render an SVG asterisk", () => {
     const resizedIcon = screen.getByRole("img", { name: "Asterisk Icon" });
     expect(resizedIcon).toHaveAttribute("width", "20"); //* THEN the SVG shrinks to 20 width
     expect(resizedIcon).toHaveAttribute("height", "80"); //* AND grows to 80 height
-  })
+  });
   test("with dynamic outline and fill color", () => {
     const { rerender } = render(Asterisk, { width: 40, height: 40 });
     const asteriskIcon = screen.getByRole("img", { name: "Asterisk Icon" });
@@ -68,5 +68,5 @@ describe("render an SVG asterisk", () => {
     expect(filledIcon.lastElementChild).not.toHaveAttribute("stroke", "red");
     //* BUT the fill attribute will appear with its added value
     expect(filledIcon.lastElementChild).toHaveAttribute("fill", "blue");
-  })
-})
+  });
+});

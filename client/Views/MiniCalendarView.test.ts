@@ -16,10 +16,10 @@ describe("renders several calendar months to briefly detail game info for each d
     global.innerHeight = innerHeightStart;
     ApiSpy = vi.spyOn(Api, "getFullSchedule");
     DateHelperSpy = vi.spyOn(DateHelpers, "todaysSplitDate");
-  })
+  });
   afterEach(() => {
     vi.restoreAllMocks();
-  })
+  });
   test("depending on viewport width & height to display the view's subtitle", () => {
     ApiSpy.mockReturnValue(undefined);
     const { rerender } = render(MiniCalendarView, { months: [] });
@@ -42,7 +42,7 @@ describe("renders several calendar months to briefly detail game info for each d
     global.innerHeight = 1126; //* Despite "1126 > innerWidth + 100", innerWidth > 1024 forces the view to use "Click"
     rerender({ months: [] });
     expect(screen.getByText("Click the date to show game specifics"));
-  })
+  });
   test("using hyperlinks if in a small viewport", async () => {
     const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "fizz", abbreviation: "", wins: 1, losses: 0 };
     const awayTeam = { id: "1", teamLogo: "", teamName: "bar", cityName: "buzz", abbreviation: "", wins: 0, losses: 1 };
@@ -60,7 +60,7 @@ describe("renders several calendar months to briefly detail game info for each d
     const link = await screen.findByRole("link", { name: expectedText });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "March/20");
-  })
+  });
   test("depending on the schedule returned by the API to render a full calendar", async () => {
     //* If undefined schedule, "sorry" message is rendered
     ApiSpy.mockReturnValue(undefined);
@@ -106,5 +106,5 @@ describe("renders several calendar months to briefly detail game info for each d
     expect(screen.getByText("May")).toBeInTheDocument();
     expect(screen.getByText("June")).toBeInTheDocument();
     expect(screen.getAllByText(/missing/i)).toHaveLength(2);
-  })
-})
+  });
+});
