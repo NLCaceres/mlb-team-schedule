@@ -26,7 +26,7 @@ describe("renders the details of a single game", () => {
       //* No game from the API, so render a "Day off" message
       ApiSpy.mockReturnValueOnce(Promise.resolve(undefined));
       const { rerender } = render(SingleDayView, { day: 14, monthName: "foobar" });
-      expect(ApiSpy).toBeCalledWith("foobar", "14");
+      expect(ApiSpy).toHaveBeenCalledWith("foobar", "14");
       expect(await screen.findByText(/just a dodgers day off/i)).toBeInTheDocument();
 
       //* WHEN a game is successfully fetched from the API
