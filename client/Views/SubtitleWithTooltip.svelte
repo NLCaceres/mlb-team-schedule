@@ -1,10 +1,10 @@
 <script lang="ts">
-import Tooltip from "../Common/Tooltip.svelte";
-import Asterisk from "../Common/Asterisk.svelte";
+  import Tooltip from "../Common/Tooltip.svelte";
+  import Asterisk from "../Common/Asterisk.svelte";
 
-export let subtitle: string;
+  export let subtitle: string;
 
-$: innerWidth = window.innerWidth;
+  $: innerWidth = window.innerWidth;
 </script>
 
 <svelte:window bind:innerWidth />
@@ -13,7 +13,7 @@ $: innerWidth = window.innerWidth;
   <h2 class="subtitle text-center mb-0">{subtitle}</h2>
   <Tooltip placement={innerWidth > 991 ? "right-placed" : "top-placed"}>
     <svelte:fragment slot="hint">
-      <Asterisk svgClasses="asterisk-icon" width={10} height={10} outlineColor="transparent" fillColor="white"/> indicates a home game with promotions
+      <Asterisk svgClasses="asterisk-icon" width={10} height={10} outlineColor="transparent" fillColor="white" /> indicates a home game with promotions
     </svelte:fragment>
   </Tooltip>
 </div>

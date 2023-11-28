@@ -6,5 +6,5 @@
 </script>
 
 <Router>
-  <SingleMonthView currentYear={currentYear} />
+  <SingleMonthView {currentYear} />
 </Router>

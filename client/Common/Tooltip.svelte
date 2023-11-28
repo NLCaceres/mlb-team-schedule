@@ -1,25 +1,25 @@
 <script lang="ts">
-import QuestionMark from "./QuestionMark.svelte";
+  import QuestionMark from "./QuestionMark.svelte";
 
-let hovering = false;
-$: hintVisibility = (hovering) ? "d-block" : "d-none";
-const updateVisibility = (isHovered: boolean) => { hovering = isHovered }
-export let placement: "top-placed" | "right-placed" = "right-placed";
+  let hovering = false;
+  $: hintVisibility = (hovering) ? "d-block" : "d-none";
+  const updateVisibility = (isHovered: boolean) => { hovering = isHovered; };
+  export let placement: "top-placed" | "right-placed" = "right-placed";
 </script>
 
 <!--? Screen Readers usually append "Button" when reading a button. In the case of this default button slot, "Question Mark Icon BUTTON" gets read -->
-<div class="app-tooltip-container {placement}" on:mouseenter={() => updateVisibility(true)}
-  on:focus={() => updateVisibility(true)} on:mouseleave={() => updateVisibility(false)}>
-    <button type="button" class="app-tooltip-button">
-      <slot name="button-icon">
-        <QuestionMark width={20} height={20} outlineColor="black" fillColor="black" />
-      </slot>
-    </button>
-    <p class="{hintVisibility} app-tooltip-hint">
-      <slot name="hint">
-        <!--? Can use <svelte:fragment> to wrap elements and fill this slot -->
-      </slot>
-    </p>
+<div role="tooltip" class="app-tooltip-container {placement}" on:mouseenter={() => { updateVisibility(true); }}
+  on:focus={() => { updateVisibility(true); }} on:mouseleave={() => { updateVisibility(false); }}>
+  <button type="button" class="app-tooltip-button">
+    <slot name="button-icon">
+      <QuestionMark width={20} height={20} outlineColor="black" fillColor="black" />
+    </slot>
+  </button>
+  <p class="{hintVisibility} app-tooltip-hint">
+    <slot name="hint">
+      <!--? Can use <svelte:fragment> to wrap elements and fill this slot -->
+    </slot>
+  </p>
 </div>
 
 <style lang="less">

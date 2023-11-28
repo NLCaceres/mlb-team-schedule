@@ -2,50 +2,50 @@
   import type BaseballGame from "./Models/DataClasses";
   import Modal from "./Common/Modal.svelte";
   import Image from "./Common/Image.svelte";
-  import getReadableDate from './HelperFuncs/DateExtension';
+  import getReadableDate from "./HelperFuncs/DateExtension";
 
   export let modalID: string;
   export let game: BaseballGame | null;
 </script>
 
-<Modal modalID="{modalID}" modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border"> 
+<Modal {modalID} modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border">
   <span slot="title" class="main-title w-100">
-    <div class='d-flex justify-content-between'>
-      <h2 class="game-day text-decoration-underline">{getReadableDate(game?.date ?? '')}'s Matchup: </h2>
-      <p class='game-day text-end'>{game?.seriesDescription() ?? ""}</p>
+    <div class="d-flex justify-content-between">
+      <h2 class="game-day text-decoration-underline">{getReadableDate(game?.date ?? "")}'s Matchup: </h2>
+      <p class="game-day text-end">{game?.seriesDescription() ?? ""}</p>
     </div>
     <h4>
-      The <Image source="{game?.awayTeam.teamLogo ?? ""}" altText="{game?.awayTeam.abbreviation} Logo"/>
+      The <Image source={game?.awayTeam.teamLogo ?? ""} altText="{game?.awayTeam.abbreviation} Logo" />
       {game?.awayTeam.cityName} {game?.awayTeam.teamName} <sup>({game?.awayTeam.wins} - {game?.awayTeam.losses})</sup>
     </h4>
     <h6>vs</h6>
     <h4>
-      The <Image source="{game?.homeTeam.teamLogo ?? ""}" altText="{game?.homeTeam.abbreviation} Logo"/>
+      The <Image source={game?.homeTeam.teamLogo ?? ""} altText="{game?.homeTeam.abbreviation} Logo" />
       {game?.homeTeam.cityName} {game?.homeTeam.teamName} <sup>({game?.homeTeam.wins} - {game?.homeTeam.losses})</sup>
     </h4>
   </span>
   <div slot="body" class="subtitle">
     {#if game && game.promos.length > 0}
-      <h4 class='text-decoration-underline'>Promo List!</h4>
+      <h4 class="text-decoration-underline">Promo List!</h4>
       <ul>
-        {#each game?.promos ?? [] as promo (promo.id)}
+        {#each game.promos as promo (promo.id)}
           <li>
             {promo.name}
-            <Image source="{promo.thumbnailUrl}" altText="{promo.name} Thumbnail" 
-              placeholderStyleString="display:inline;" height={100} width={75}/>
+            <Image source={promo.thumbnailUrl} altText="{promo.name} Thumbnail"
+              placeholderStyleString="display:inline;" height={100} width={75} />
           </li>
         {/each}
       </ul>
-    {:else if game && game.homeTeam.teamName === 'Dodgers'}
+    {:else if game && game.homeTeam.teamName === "Dodgers"}
       <h2>Sorry! No Dodgers Promos tonight!</h2>
     {:else}
       <h2>Sorry! The Dodgers are away, so no promos today!</h2>
     {/if}
   </div>
-</Modal>  
+</Modal>
 
 <style lang="less">
-  @import './CSS/variables';
+  @import "./CSS/variables";
 
   //* Using :global tells svelte to unscope and expand what this component's CSS can affect
   :global(.modal-content.custom-content) { //* Bootstrap will normally override so the !important is necessary
@@ -55,7 +55,7 @@
   :global(.modal-header.dodger-low-border) {
     border-bottom: 1.5px solid @dodgerBlue;
   }
-  
+
   .main-title {
     color: lighten(#004680, 5%);
   }

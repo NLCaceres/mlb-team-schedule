@@ -1,38 +1,38 @@
-<script lang='ts'>
-  import { beforeUpdate } from 'svelte';
+<script lang="ts">
+  import { beforeUpdate } from "svelte";
   import CalendarDay from "./CalendarDay.svelte";
-  import type BaseballGame from '../Models/DataClasses';
-  import { CreateMonth } from './CreateCalendar';
-  import { getDayFromDateStr } from '../HelperFuncs/DateExtension';
-  
+  import type BaseballGame from "../Models/DataClasses";
+  import { CreateMonth } from "./CreateCalendar";
+  import { getDayFromDateStr } from "../HelperFuncs/DateExtension";
+
   //* Normal Props
   export let monthName: string;
   export let gamesList: BaseballGame[];
-  let offDays: number = 0; //* Tracks days without a game to calc game assignment
+  let offDays = 0; //* Tracks days without a game to calc game assignment
   //* Css Props
-  export let mini: boolean = false;
-  export let tableClass: string = ''; //* Allow default prop
+  export let mini = false;
+  export let tableClass = ""; //* Allow default prop
 
   $: month = CreateMonth(gamesList);
-  
+
   beforeUpdate(() => {
     offDays = 0; //* Useful to prevent accessing negative indices
-  })
+  });
   function getTodaysGames(day: string): BaseballGame[] {
-    if (day.length === 0 || gamesList.length === 0) { return [] }
+    if (day.length === 0 || gamesList.length === 0) { return []; }
 
-    const calendarDayNum = parseInt(day); //* Proper way of turning '1' -> 1 (rather than +day via "+" unary operator)
+    const calendarDayNum = parseInt(day); //* Proper way of turning "1" -> 1 (rather than +day via "+" unary operator)
     const nextIndex = calendarDayNum - (1 + offDays); //* Goal: Assign every game in list to a day!
-    if (nextIndex >= gamesList.length) { return [] } //* At end of the month, so no more off-days/games. Rest of calendar is empty
-    const expectedGame = gamesList[nextIndex]
-    const todaysGames = [expectedGame]
+    if (nextIndex >= gamesList.length) { return []; } //* At end of the month, so no more off-days/games. Rest of calendar is empty
+    const expectedGame = gamesList[nextIndex];
+    const todaysGames = [expectedGame];
     if (nextIndex < gamesList.length - 1) {
       todaysGames.push(gamesList[nextIndex + 1]); //* Add next game just in case a doubleheader is happening
     }
 
     //* Each iteration takes the day # of the month in int form, not string form
     const finalGamesList = todaysGames.filter(game => parseInt(getDayFromDateStr(game.date)) === calendarDayNum);
-    if (finalGamesList.length === 0) { offDays++; return [] } //* No game on this day, so this keeps the gameList index in the same spot
+    if (finalGamesList.length === 0) { offDays++; return []; } //* No game on this day, so this keeps the gameList index in the same spot
     return finalGamesList;
   }
 </script>
@@ -41,27 +41,27 @@
   <caption>{monthName}</caption>
   <thead>
     <tr>
-      {#each ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'] as day (day+'-head')}
-        <th class='text-center'>{day}</th>
+      {#each ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"] as day (day+"-head")}
+        <th class="text-center">{day}</th>
       {/each}
     </tr>
   </thead>
   <tbody>
     {#each month as week, i ("week-"+i)} <!-- Can actually loop thru ANYTHING with length prop so {length: 6} would work too -->
       <tr> <!-- Following key seems to rerender multiple times but uncertain why -->
-        {#each week as day, j ("date-box-"+i*7+j) } <!--"date-box-" + WeekNum*7 DateBoxNum e.g. 'date-box-6'-->
-          <CalendarDay games={getTodaysGames(day)} currentMonth={monthName.toLowerCase()} dayNum={day} mini={mini} even={i % 2 === 0} on:openModal/>
+        {#each week as day, j ("date-box-"+i*7+j) } <!--"date-box-" + WeekNum*7 DateBoxNum e.g. "date-box-6"-->
+          <CalendarDay games={getTodaysGames(day)} currentMonth={monthName.toLowerCase()} dayNum={day} {mini} even={i % 2 === 0} on:openModal />
         {/each}
       </tr>
     {/each}
   </tbody>
 </table>
 
-<style lang='less'>
-  @import '../CSS/variables';
+<style lang="less">
+  @import "../CSS/variables";
 
   table {
-    font-family: 'Rambla', sans-serif !important;
+    font-family: "Rambla", sans-serif !important;
     border-collapse: collapse;
     margin-left: auto;
     margin-right: auto;
@@ -69,7 +69,7 @@
       width: 350px;
       height: 350px;
     }
-    @media @min576 { //* Only way to use 'and' as expected in an @media query
+    @media @min576 { //* Only way to use `and` as expected in an @media query
       @media @max767 {
         width: 600px;
         height: 600px;
@@ -89,7 +89,7 @@
     &.mini-calendar {
       max-width: 375px;
       max-height: 325px;
-      @media @min576 { //* Only way to use 'and' as expected in an @media query
+      @media @min576 { //* Only way to use `and` as expected in an @media query
         @media @max991 {
           max-width: 380px;
           width: 380px; //* Solves an odd safari issue for wider screens
@@ -125,7 +125,7 @@
       }
     }
   }
-  
+
   tbody, th, thead, tr {
     border-color: black;
   }
