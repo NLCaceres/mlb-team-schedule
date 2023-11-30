@@ -21,7 +21,7 @@ describe("renders several calendar months to briefly detail game info for each d
     vi.restoreAllMocks();
   });
   test("depending on viewport width & height to display the view's subtitle", () => {
-    ApiSpy.mockReturnValue(undefined);
+    ApiSpy.mockReturnValue([]);
     const { rerender } = render(MiniCalendarView, { months: [] });
     expect(screen.getByText("Click the date to show game specifics"));
 
@@ -48,7 +48,7 @@ describe("renders several calendar months to briefly detail game info for each d
     const awayTeam = { id: "1", teamLogo: "", teamName: "bar", cityName: "buzz", abbreviation: "", wins: 0, losses: 1 };
     const game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
     ApiSpy.mockReturnValue([game]);
-    const { rerender } = render(MiniCalendarView, { months: [] });
+    const { rerender } = render(MiniCalendarView, { months: ["April"] });
     const expectedText = "Today's Game is:";
     const button = await screen.findByRole("button", { name: expectedText });
     expect(button).toBeInTheDocument();
@@ -56,14 +56,14 @@ describe("renders several calendar months to briefly detail game info for each d
     //* Convert the button into a hyperlink (<a> tag) on mobile screens
     DateHelperSpy.mockReturnValueOnce(["year", "3", "20"]);
     global.innerWidth = 575;
-    rerender({ months: [] });
+    rerender({ months: ["April"] });
     const link = await screen.findByRole("link", { name: expectedText });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "March/20");
   });
   test("depending on the schedule returned by the API to render a full calendar", async () => {
     //* If undefined schedule, "sorry" message is rendered
-    ApiSpy.mockReturnValue(undefined);
+    ApiSpy.mockReturnValue([]);
     const { rerender } = render(MiniCalendarView, { months: [] });
     const sorryMessage = await screen.findByText("Sorry! Seems we hit a snag!");
     expect(sorryMessage).toBeInTheDocument();
@@ -77,11 +77,10 @@ describe("renders several calendar months to briefly detail game info for each d
     const awayTeam = { id: "1", teamLogo: "", teamName: "bar", cityName: "buzz", abbreviation: "", wins: 0, losses: 1 };
     const game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
     ApiSpy.mockReturnValue([game]);
-    //* If the API returns a normal list, BUT the months prop is empty, then no calendar months are rendered
+    //* If the API returns a normal list, BUT the months prop is empty, then "Sorry" error message rendered instead
     rerender({ months: [] });
-    const button = await screen.findByText("Today's Game is:");
-    const calendarContainer = button.parentElement!.nextElementSibling;
-    expect(calendarContainer).toBeEmptyDOMElement();
+    const emptyCalendarErrMessage = await screen.findByText("Sorry! Seems we hit a snag!");
+    expect(emptyCalendarErrMessage).toBeInTheDocument();
 
     //* Still getting normal list from API BUT game found is in April, so it's not displayed
     rerender({ months: ["March"] });
