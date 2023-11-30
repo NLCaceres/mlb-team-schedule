@@ -1,52 +1,51 @@
-<script lang='ts'>
-  import Image from '../Common/Image.svelte';
-  import CalendarDayDetail from './CalendarDayDetail.svelte';
-  import type BaseballGame from '../Models/DataClasses';
-  import { getTimeFromDateStr } from '../HelperFuncs/DateExtension';
-  import { link, navigate } from 'svelte-navigator';
-  import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
+<script lang="ts">
+  import CalendarDayDetail from "./CalendarDayDetail.svelte";
+  import Image from "../Common/Image.svelte";
+  import type BaseballGame from "../Models/DataClasses";
+  import { getTimeFromDateStr } from "../HelperFuncs/DateExtension";
+  import { navigate } from "svelte-navigator";
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame }>();
 
   //* Normal Props
   export let currentMonth: string;
-  export let dayNum: string; //* Day N of this month, i.e. 1 to 31 
+  export let dayNum: string; //* Day N of this month, i.e. 1 to 31
   export let games: BaseballGame[] = [];
   //* Css Related Props
-  export let even: boolean = true; //* Helps create contrast in colors
-  export let mini: boolean = false;
-  export let cssClasses: string = '';
+  export let even = true; //* Helps create contrast in colors
+  export let mini = false;
+  export let cssClasses = "";
 
   $: innerWidth = window.innerWidth;
   $: smallScreen = innerWidth < 576;
   $: largeCalendarView = !smallScreen && !mini; //* When in a tablet or greater view + not in the multicalendar month page == true
 
-  function handleClick(event: Event) { //* Nav to DetailView on mobile, Else open the app-wide modal
-    if (smallScreen) { navigate(`${currentMonth}/${dayNum}`) }
-    else { dispatch('openModal', games[0]) }
+  function handleClick() { //* Nav to DetailView on mobile, Else bubble up the click event
+    if (smallScreen) { navigate(`${currentMonth}/${dayNum}`); }
+    else { dispatch("clickCalendarDay", games[0]); }
   }
-  /* Good Example of Svelte Reactivity - common pattern: handle complex computed props with a reactive block
+/* Good Example of Svelte Reactivity - common pattern: handle complex computed props with a reactive block
   $: { //* When DRYing code, note Svelte can't react to vars in or changed by an external func, of course!
     const dimensions = (smallScreen || mini) ? '15' : (bigScreen) ? '45' : '30' //* Since img is square, can set to both height/width
     //* BUT svelte CAN react to the above dimensions init, and we can pass 'dimensions' to our DRY fn, making non reactive props reactive!
-    awayLogoSvg = createSvgElem(awayLogo, dimensions); 
+    awayLogoSvg = createSvgElem(awayLogo, dimensions);
   } */
 </script>
 
 <svelte:window bind:innerWidth />
 
-<!-- Bootstrap 5 does expose events to listen on modal opening/closing BUT -->
-<td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ''} class:even class:odd={!even}>
+<td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ""} class:even class:odd={!even}>
   <!--todo Divs aren't clickable so the following causes an a11y issue, so need to convert this div into a button -->
-  <div class="fs-6 justify-content-between d-flex {(largeCalendarView || games.length === 0) ? 'flex-column' : ''}" on:click={handleClick}>
+  <div class="fs-6 justify-content-between d-flex" class:flex-column={largeCalendarView || games.length === 0} on:click={handleClick}>
     {#if dayNum.length > 0}
       <!--* Calendar Days always need the numbered day of the week (1-31) -->
-      <div class="{(largeCalendarView) ? 'd-flex justify-content-between' : ''}">
-        <p class="calendar-text text-decoration-underline {even ? 'text-dodger-blue' : 'text-white'} me-2" class:mini>
+      <div class={(largeCalendarView) ? "d-flex justify-content-between" : ""}>
+        <p class="calendar-text text-decoration-underline me-2" class:text-dodger-blue={even} class:text-white={!even} class:mini>
           {dayNum}
         </p>
         <!--* If game happening, give the time -->
         {#if games.length > 0}
-          <p class="game-time link-shadow {(largeCalendarView) ? 'fs-5 text-end lh-1 mt-1' : ''}">
+          <p class="game-time link-shadow {(largeCalendarView) ? "fs-5 text-end lh-1 mt-1" : ""}">
             {getTimeFromDateStr(games[0].date)}
           </p>
         {/if}
@@ -54,29 +53,29 @@
 
       <!--* Main Game + Promo Section -->
       {#if games.length > 0 && !smallScreen}
-        <CalendarDayDetail game={games[0]} mini={mini} even={even} />
+        <CalendarDayDetail game={games[0]} {mini} {even} />
 
       {:else if games.length > 0}
-        <div class='d-flex justify-content-evenly align-items-center link-shadow mt-2 text-decoration-underline {(mini) ? 'flex-column': ''}'>
-            <Image source="{games[0].awayTeam.teamLogo}" altText="{games[0].awayTeam.abbreviation} Logo" miniView="{mini}" />
-            vs 
-            <Image source="{games[0].homeTeam.teamLogo}" altText="{games[0].homeTeam.abbreviation} Logo" miniView="{mini}" />
+        <div class="d-flex justify-content-evenly align-items-center link-shadow mt-2 text-decoration-underline" class:flex-column={mini}>
+          <Image source={games[0].awayTeam.teamLogo} altText="{games[0].awayTeam.abbreviation} Logo" miniView={mini} />
+          vs
+          <Image source={games[0].homeTeam.teamLogo} altText="{games[0].homeTeam.abbreviation} Logo" miniView={mini} />
         </div>
-        <div class='link-shadow me-1'><sup>{games[0].promos.length > 0 ? '*' : ''}</sup></div>
+        <div class="link-shadow me-1"><sup>{games[0].promos.length > 0 ? "*" : ""}</sup></div>
 
-      {:else if currentMonth === 'march' && parseInt(dayNum) < 20 }
-        <p class:mini class='calendar-text text-center lh-1'>Spring Training!</p>
+      {:else if currentMonth === "march" && parseInt(dayNum) < 20 }
+        <p class:mini class="calendar-text text-center lh-1">Spring Training!</p>
 
-      {:else if currentMonth === 'october' && parseInt(dayNum) > 30}
-        <p class:mini class='calendar-text text-center lh-1'>Season Over!</p>
+      {:else if currentMonth === "october" && parseInt(dayNum) > 30}
+        <p class:mini class="calendar-text text-center lh-1">Season Over!</p>
 
-      {:else if currentMonth === 'october'}
-        <p class:mini class='calendar-text text-center lh-1'>Post Season!</p>
+      {:else if currentMonth === "october"}
+        <p class:mini class="calendar-text text-center lh-1">Post Season!</p>
 
       {:else}
         <p class:mini class="calendar-text text-center lh-1">Off Day!</p>
       {/if}
-    
+
     {:else}
       <!--* Just a colored-in empty space -->
     {/if}
@@ -84,12 +83,12 @@
 </td>
 
 <style lang="less">
-  @import '../CSS/variables';
+  @import "../CSS/variables";
 
   .standard-detail {
     @media @max575 {
       max-width: 25px; //* Prevents overly wide td elems
-      height: 80px; //* Keeps equal table rows/tds in mobile view 
+      height: 80px; //* Keeps equal table rows/tds in mobile view
     }
     @media @min576 {
       max-width: 40px; //* Only width setting needed to limit table at lower widths
@@ -108,7 +107,7 @@
 
     &.mini { //* Following keeps table rows/tds equal in mini calendar
       @media @min576 {
-        height: 100px; 
+        height: 100px;
       }
       @media @min992 {
         height: 131px; //* Oddly works
@@ -168,7 +167,7 @@
       text-shadow: 0px 1px 1px darkgoldenrod;
     }
   }
-  
+
   .different-month {
     &.even {
       background-color: darken(#ececec, 50%);
