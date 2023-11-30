@@ -50,7 +50,7 @@
     {#each month as week, i ("week-"+i)} <!-- Can actually loop thru ANYTHING with length prop so {length: 6} would work too -->
       <tr> <!-- Following key seems to rerender multiple times but uncertain why -->
         {#each week as day, j ("date-box-"+i*7+j) } <!--"date-box-" + WeekNum*7 DateBoxNum e.g. "date-box-6"-->
-          <CalendarDay games={getTodaysGames(day)} currentMonth={monthName.toLowerCase()} dayNum={day} {mini} even={i % 2 === 0} on:openModal />
+          <CalendarDay games={getTodaysGames(day)} currentMonth={monthName.toLowerCase()} dayNum={day} {mini} even={i % 2 === 0} on:clickCalendarDay />
         {/each}
       </tr>
     {/each}

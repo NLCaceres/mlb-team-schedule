@@ -22,7 +22,7 @@
   <h1>Loading up this month's games!</h1>
 {:then fullGames}
   {#if fullGames}
-    <Calendar monthName={month} mini={innerWidth < 576} gamesList={fullGames} on:openModal />
+    <Calendar monthName={month} mini={innerWidth < 576} gamesList={fullGames} on:clickCalendarDay />
   {:else}
     <h1>Sorry! Seems we hit a snag!</h1>
   {/if}
