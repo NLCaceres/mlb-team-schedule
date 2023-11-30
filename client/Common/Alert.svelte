@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
   import CloseIcon from "./CloseIcon.svelte";
+  import { fade } from "svelte/transition";
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher<{ openAlert: boolean }>();
 
-  export let alertID;
-  export let alertClasses = '';
+  export let alertID = "";
+  export let alertClasses = "";
 
   //* CSS Props
   export let fading = false;
@@ -13,13 +13,13 @@
 </script>
 
 {#if !invisible}
-  <div transition:fade id="{alertID}" class="alert {alertClasses} align-middle {(fading) ? 'alert-dismissable fade show' : ''}" role="alert">
-      <slot>Alert!</slot>
-      {#if fading || invisible !== null}
-        <button type="button" class="close-btn text-white border-0" aria-label="Close" on:click="{e => dispatch('openAlert', false)}"> 
-          <CloseIcon />
-        </button>
-      {/if}
+  <div transition:fade id={alertID} class="alert {alertClasses} align-middle {(fading) ? "alert-dismissable fade show" : ""}" role="alert">
+    <slot>Alert!</slot>
+    {#if fading || invisible !== null}
+      <button type="button" class="close-btn text-white border-0" aria-label="Close" on:click={() => dispatch("openAlert", false)}>
+        <CloseIcon />
+      </button>
+    {/if}
   </div>
 {/if}
 
