@@ -3,7 +3,8 @@
 module.exports = {
   env: {
     browser: true,
-    es2022: true
+    es2022: true,
+    node: true
   },
   extends: [
     "eslint:recommended",
@@ -61,7 +62,7 @@ module.exports = {
       parserOptions: { // Parse the `<script>` in `.svelte` as TS via the following
         parser: "@typescript-eslint/parser"
       },
-      "rules": {
+      rules: {
         "indent": "off",
         "svelte/indent": "error",
         "no-trailing-spaces": "off", // Don't need ESLint's no-trailing-spaces rule, so turn it off.
@@ -69,8 +70,11 @@ module.exports = {
       }
     },
     {
-      "files": ["*test.ts"],
-      "rules": {
+      env: {
+        jest: true
+      },
+      files: ["*test.ts"],
+      rules: {
         "@typescript-eslint/no-non-null-assertion": "off"
       }
     }
