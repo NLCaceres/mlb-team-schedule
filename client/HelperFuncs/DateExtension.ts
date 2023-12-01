@@ -72,15 +72,24 @@ export function removeLeadingZero(strWithZero: string) {
 export function utcDate() {
   return new Date().toISOString();
 }
-export function todaysSplitDate() {
-  const currentDatetime = utcDate();
-  const splitDate = currentDatetime.split("-");
-  const year = splitDate[0];
-  const month = splitDate[1];
-  const day = splitDate[2].slice(0, 2); //* Take only the day; slice out time elements of the UTC string
-  return [year, month, day]; //* Useful for destructuring
+export function localDate() {
+  return new Date().toString();
+}
+export function todaysSplitUtcDate() {
+  const currentDatetime = new Date();
+  const year = currentDatetime.getUTCFullYear();
+  const month = currentDatetime.getUTCMonth(); //? Months are 0-indexed, so MUST add 1 to get actual month number
+  const day = currentDatetime.getUTCDate();
+  return [`${year}`, `${month + 1}`, `${day}`]; //* Useful for destructuring
+}
+export function todaysSplitLocalDate() {
+  const currentDatetime = new Date();
+  const year = currentDatetime.getFullYear();
+  const month = currentDatetime.getMonth();
+  const day = currentDatetime.getDate();
+  return [`${year}`, `${month + 1}`, `${day}`]; //* Useful for destructuring
 }
 export function currentYear() {
-  const currentDatetime = utcDate(); //? Should be YYYY-MM-DDTHH:MM:SS.SSSZ
-  return currentDatetime.split("-")[0]; //* So first index should contain "YYYY"
+  const [thisYear] = todaysSplitLocalDate();
+  return `${thisYear}`;
 }

@@ -1,4 +1,4 @@
-import { todaysSplitDate, getMonthFromDateStr } from "../HelperFuncs/DateExtension";
+import { getMonthFromDateStr, todaysSplitLocalDate } from "../HelperFuncs/DateExtension";
 import type BaseballGame from "../Models/DataClasses";
 import { MONTH_MAP } from "../Models/Month";
 import { getDaysInMonth } from "date-fns";
@@ -8,7 +8,7 @@ export function CreateMonth(games: BaseballGame[]): string[][] {
   const exampleGame = games[0];
 
   const monthStr = getMonthFromDateStr(exampleGame.date);
-  const [year, month] = todaysSplitDate();
+  const [year, month] = todaysSplitLocalDate();
   const thisMonth = (monthStr === "") ? month : monthStr; //* If monthStr is an emptyStr, use the current month
   const monthNum = MONTH_MAP[thisMonth] - 1; //* MONTH_MAP is 1-indexed so must subtract 1 to 0-index it
   const yearNum = parseInt(year);

@@ -1,7 +1,14 @@
 import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero,
-  utcDate, currentYear, getMonthFromDateStr, getDayFromDateStr, todaysSplitDate } from "./DateExtension";
+  utcDate, currentYear, getMonthFromDateStr, getDayFromDateStr, todaysSplitUtcDate, localDate } from "./DateExtension";
+import { vi } from "vitest";
 
 describe("Utility functions relating to JS Date types", () => {
+  beforeAll(() => {
+    vi.useFakeTimers(); //? Use fake timers to allow the tests to set any Date they need
+  });
+  afterAll(() => {
+    vi.useRealTimers();
+  });
   //! Date
   test("gets a simple to read date string using the expected date from the API", () => {
     const emptyStringExample = getReadableDate("");
@@ -143,41 +150,64 @@ describe("Utility functions relating to JS Date types", () => {
     expect(randomZeroActualResult).toBe("Hello00000World000");
   });
   //* Quick Getters
-  test("gets a simple UTC String", () => {
-    const utcString = utcDate();
-    expect(utcString[10]).toBe("T"); //? 10th char is always T for the start of the Hour:Minute:Second time
-    expect(utcString[utcString.length - 1]).toBe("Z"); //? All UTC Strings end with Z for Zulu Time Zone
+  describe("using universal time", () => {
+    test("getting a simple ISO formatted string", () => {
+      vi.setSystemTime(new Date(2021, 2, 27).getTime());
+      vi.setSystemTime(Date.UTC(2021, 2, 27, 3, 15, 22, 123)); //? Set fake System Time with Epoch Milliseconds aka Unix Time
+      const utcString = utcDate();
+      expect(utcString[10]).toBe("T"); //? 10th char is always T for the start of the Hour:Minute:Second time
+      expect(utcString[utcString.length - 1]).toBe("Z"); //? All UTC Strings end with Z for Zulu Time Zone
 
-    const [date, time] = utcString.split("T");
+      const [date, time] = utcString.split("T");
 
-    const [year, month, day] = date.split("-"); //? [YYYY, MM, DD]
-    expect(year).toHaveLength(4);
-    expect(month).toHaveLength(2);
-    expect(day).toHaveLength(2);
+      const [year, month, day] = date.split("-"); //? [YYYY, MM, DD]
+      expect(year).toBe("2021");
+      expect(month).toBe("03");
+      expect(day).toBe("27");
 
-    const [hour, minute, second] = time.slice(0, time.length - 1).split(":"); //? [HH, MM, SS.SSS]
-    expect(hour).toHaveLength(2);
-    expect(minute).toHaveLength(2);
-    expect(second).toHaveLength(6);
+      const [hour, minute, second] = time.slice(0, time.length - 1).split(":"); //? [HH, MM, SS.SSS]
+      expect(hour).toBe("03");
+      expect(minute).toBe("15");
+      expect(second).toBe("22.123");
+    });
+    test("grabbing the current year, month and day as an array", () => {
+      vi.setSystemTime(Date.UTC(2021, 2, 27, 3, 15, 22));
+      const dateElements = todaysSplitUtcDate();
+      expect(dateElements).toHaveLength(3); //* Should always be [YYYY, MM, DD]
+
+      const [year, month, day] = dateElements; //* Easily destructured for use
+      expect(year).toBe("2021");
+      expect(month).toBe("3");
+      expect(day).toBe("27");
+    });
   });
-  test("grabs the year, month and day as an array from a UTC string", () => {
-    const dateElements = todaysSplitDate();
-    expect(dateElements).toHaveLength(3); //* Should always be [YYYY, MM, DD]
+  describe("using a user's local date", () => {
+    test("getting a simple string in a particular format", () => {
+      vi.setSystemTime(new Date(2020, 8, 7, 20, 41, 5, 321).getTime()); //? STILL set fake System Time with Unix Time
+      const localString = localDate(); //? Mon Sep 07 2020 20:41:05 GMT-0700 (Pacific Daylight Time)
+      expect(localString.endsWith("(Pacific Daylight Time)")).toBe(true); //TODO: May be a failing point in a CI context
 
-    const [year, month, day] = dateElements; //* Easily destructured for use
-    //* Because, there's no consistent method of matching the date to a specific set of numbers
-    //* Instead, identify the consistent properties of these dates to gauge that we receive the correct data
-    expect(year).toHaveLength(4);
-    expect(year.slice(0, 2)).toBe("20"); //* It'll be a while before this test fails
-    expect(month).toHaveLength(2);
-    expect(parseInt(month)).toBeLessThanOrEqual(12); //* Should never be higher than 12, i.e. December
-    expect(day).toHaveLength(2);
-    expect(parseInt(day)).toBeLessThanOrEqual(31); //* Should never be higher than 31 since no month has more days
-    //todo Keep thinking of consistent properties to further assert that the correct date info is being returned
-  });
-  test("grabs the year from a UTC string", () => {
-    const thisYear = currentYear();
-    expect(thisYear).toHaveLength(4); //* Should always be 4 digits
-    expect(thisYear.slice(0, 2)).toBe("20"); //* It'll be a while before this test fails
+      const [dayName, monthAbbrev, dayNum, yearNum, time] = localString.split(" ");
+      expect(dayName).toBe("Mon");
+      expect(monthAbbrev).toBe("Sep");
+      expect(dayNum).toBe("07");
+      expect(yearNum).toBe("2020");
+      expect(time).toBe("20:41:05");
+    });
+    test("grabbing the year, month and day as an array", () => {
+      vi.setSystemTime(new Date(2018, 9, 31).getTime());
+      const dateElements = todaysSplitUtcDate();
+      expect(dateElements).toHaveLength(3); //* Should always be [YYYY, MM, DD]
+
+      const [year, month, day] = dateElements; //* Easily destructured for use
+      expect(year).toBe("2018");
+      expect(month).toBe("10");
+      expect(day).toBe("31");
+    });
+    test("grabbing the year", () => {
+      vi.setSystemTime(new Date(2019, 5, 2).getTime());
+      const thisYear = currentYear();
+      expect(thisYear).toBe("2019");
+    });
   });
 });

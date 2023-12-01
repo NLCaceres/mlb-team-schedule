@@ -15,7 +15,7 @@ describe("renders several calendar months to briefly detail game info for each d
     global.innerWidth = innerWidthStart;
     global.innerHeight = innerHeightStart;
     ApiSpy = vi.spyOn(Api, "getFullSchedule");
-    DateHelperSpy = vi.spyOn(DateHelpers, "todaysSplitDate");
+    DateHelperSpy = vi.spyOn(DateHelpers, "todaysSplitLocalDate");
   });
   afterEach(() => {
     vi.restoreAllMocks();

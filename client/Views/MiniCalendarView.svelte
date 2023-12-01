@@ -3,9 +3,9 @@
   import SubtitleWithTooltip from "./SubtitleWithTooltip.svelte";
   import { link } from "svelte-navigator";
   import type BaseballGame from "../Models/DataClasses";
+  import { getDayFromDateStr, getMonthFromDateStr, todaysSplitLocalDate } from "../HelperFuncs/DateExtension";
   import { MONTH_NUM_MAP } from "../Models/Month";
   import { getFullSchedule } from "../API";
-  import { getDayFromDateStr, getMonthFromDateStr, todaysSplitDate } from "../HelperFuncs/DateExtension";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame, clickTodaysGame: BaseballGame | undefined }>();
 
@@ -40,7 +40,7 @@
   $: fetcher = splitGames();
   let gamesByMonth: BaseballGame[][] = [];
 
-  const [, currentMonth, currentDay] = todaysSplitDate();
+  const [, currentMonth, currentDay] = todaysSplitLocalDate();
 
   function clickTodaysGame() {
     if (gamesByMonth.length === 0) { return; }
