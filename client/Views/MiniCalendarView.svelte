@@ -7,7 +7,7 @@
   import { MONTH_NUM_MAP } from "../Models/Month";
   import { getFullSchedule } from "../API";
   import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame, clickTodaysGame: BaseballGame | undefined }>();
+  const dispatch = createEventDispatcher<{ clickTodaysGame: BaseballGame | string }>();
 
   //* Normal props
   export let months: string[]; //* Expected months of the season
@@ -44,10 +44,11 @@
 
   function clickTodaysGame() {
     if (gamesByMonth.length === 0) { return; }
-    const monthIndex = parseInt(currentMonth) - 3; //* Since starting season starts in March, offset is 3
+    const normalMonthNum = parseInt(currentMonth);
+    const monthIndex = normalMonthNum - 3; //* Since starting season starts in March, offset is 3
     const gamesOfTheMonth = gamesByMonth[monthIndex] ?? [];
     const foundGame = gamesOfTheMonth.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
-    dispatch("clickTodaysGame", foundGame);
+    dispatch("clickTodaysGame", (foundGame) ? foundGame : `${normalMonthNum}/${currentDay}`);
   }
 </script>
 

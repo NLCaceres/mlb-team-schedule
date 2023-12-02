@@ -1,11 +1,12 @@
 <script lang="ts">
   import CalendarDayDetail from "./CalendarDayDetail.svelte";
   import Image from "../Common/Image.svelte";
-  import type BaseballGame from "../Models/DataClasses";
   import { getTimeFromDateStr } from "../HelperFuncs/DateExtension";
+  import type BaseballGame from "../Models/DataClasses";
+  import { MONTH_MAP } from "../Models/Month";
   import { navigate } from "svelte-navigator";
   import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame }>();
+  const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame | string }>();
 
   //* Normal Props
   export let currentMonth: string;
@@ -22,7 +23,10 @@
 
   function handleClick() { //* Nav to DetailView on mobile, Else bubble up the click event
     if (smallScreen) { navigate(`${currentMonth}/${dayNum}`); }
-    else { dispatch("clickCalendarDay", games[0]); }
+    else {
+      const monthNum = MONTH_MAP[currentMonth.slice(0,1).toUpperCase() + currentMonth.slice(1)];
+      dispatch("clickCalendarDay", (games.length > 0) ? games[0] : `${monthNum}/${dayNum}`);
+    }
   }
 /* Good Example of Svelte Reactivity - common pattern: handle complex computed props with a reactive block
   $: { //* When DRYing code, note Svelte can't react to vars in or changed by an external func, of course!
