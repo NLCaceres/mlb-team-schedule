@@ -1,5 +1,5 @@
 import getReadableDate, { dateFormatter, getTimeFromDateStr, timeFormatter, removeLeadingZero,
-  utcDate, currentYear, getMonthFromDateStr, getDayFromDateStr, todaysSplitUtcDate, localDate } from "./DateExtension";
+  utcDate, currentYear, getMonthFromDateStr, getDayFromDateStr, todaysSplitUtcDate, localDate, getDateElemsFromDateStr } from "./DateExtension";
 import { vi } from "vitest";
 
 describe("Utility functions relating to JS Date types", () => {
@@ -51,6 +51,20 @@ describe("Utility functions relating to JS Date types", () => {
 
     const normalDateFormat = "Thur June 09 2021";
     expect(dateFormatter(normalDateFormat)).toBe("Thur June 9 2021");
+  });
+  test("extract the year, month and day from the typical dateStr", () => {
+    expect(getDateElemsFromDateStr("")).toBe(""); //* Empty strings return empty strings
+
+    //* Invalid strings due to length
+    expect(getDateElemsFromDateStr("Hello")).toBe("");
+    expect(getDateElemsFromDateStr("Thur June 09")).toBe("");
+
+    //* Technically valid but not expected, returning unpredictable results
+    expect(getDateElemsFromDateStr("03 June 2021 Fri")).toStrictEqual(["Fri", "June", "2021"]);
+    expect(getDateElemsFromDateStr("June 03 2021 Thur 05:12 PM")).toStrictEqual(["Thur", "03", "2021"]);
+
+    const expectedDateStr = "Thur June 09 2021 at 07:10 PM";
+    expect(getDateElemsFromDateStr(expectedDateStr)).toStrictEqual(["2021", "June", "09"]);
   });
   test("extract the month from the typical dateStr", () => {
     expect(getMonthFromDateStr("")).toBe(""); //* Empty strings return empty strings

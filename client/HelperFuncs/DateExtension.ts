@@ -23,10 +23,20 @@ export function dateFormatter(dateStr: string) { //* Idea: Split, modify, join
 
   return splitStr.join(" "); //* "Thur June 9 2021" instead of "Thur June 09 2021"
 }
+export function getDateElemsFromDateStr(dateStr: string) {
+  if (dateStr.length === 0) { return ""; } //* Undefined or invalid string
+  const splitStr = dateStr.split(" ");
+
+  //* Should be 4 words i.e. "Thur June 9 2021"
+  if (splitStr.length <= 3) { return ""; }
+
+  return [splitStr[3], splitStr[1], splitStr[2]]; //* Expect: [Year, Month, Day] strings
+}
 export function getMonthFromDateStr(dateStr: string) {
   if (dateStr.length === 0) { return ""; } //* Undefined or invalid string
   const splitStr = dateStr.split(" ");
 
+  //* Since expected format of dateStr is "Thur June 9 2021", there must be at least 2 words, i.e. "Thur June"
   if (splitStr.length <= 1) { return ""; }
 
   return splitStr[1]; //* At index 1 should be June, i.e. the month
