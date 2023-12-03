@@ -8,12 +8,17 @@
   export let alertClasses = "";
 
   //* CSS Props
-  export let fading = false;
+  export let fading = false; //* If fade transition needed, set to true, and following will fade in and out over 400 milliseconds
+  const duration = (fading) ? 400 : 0; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
   export let invisible: boolean | null = null;
+//TODO: Not sure `fading` needs to control the button visibility anymore + `invisible` might not need `null` either
+  // Instead, an `autoFade` property could indicate an alert that hides itself, `fading` could toggle the transition on/off regardless
+  // AND `invisible` could control if the view is in the DOM or not.
+  // If `autoFade` was on, then a button might not be needed. A backup prop like `closeable` could force-provide a button if desired though!
 </script>
 
 {#if !invisible}
-  <div transition:fade id={alertID} class="alert {alertClasses} align-middle {(fading) ? "alert-dismissable fade show" : ""}" role="alert">
+  <div transition:fade={{ delay: 0, duration }} id={alertID} class="alert {alertClasses} align-middle" role="alert">
     <slot>Alert!</slot>
     {#if fading || invisible !== null}
       <button type="button" class="close-btn text-white border-0" aria-label="Close" on:click={() => dispatch("openAlert", false)}>
@@ -46,5 +51,8 @@
     right: 0;
     top: 0;
     background-color: transparent;
+    &:focus-visible {
+      box-shadow: -2px 2px 0 0.1rem #ffffff90;
+    }
   }
 </style>

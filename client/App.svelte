@@ -7,7 +7,7 @@
   import MiniCalendarView from "./Views/MiniCalendarView.svelte";
   import SingleDayView from "./Views/SingleDayView.svelte";
   import SingleMonthView from "./Views/SingleMonthView.svelte";
-  import { Modal as BsModal, Alert as BsAlert } from "bootstrap";
+  import { Modal as BsModal } from "bootstrap";
   import { MONTH_MAP } from "./Models/Month";
   import type BaseballGame from "./Models/DataClasses";
   import { currentYear } from "./HelperFuncs/DateExtension";
@@ -24,7 +24,6 @@
   let invisibleAlert = true; //* Alert starts invisible
   onMount(()=> {
     ballGameModal = new BsModal(document.getElementById("gameModal")); //* Must specify here or modal div does not exist!
-    new BsAlert(document.getElementById("offDayAlert")); //* Could use data attr but for this use case (custom event handler) easier to do this
   });
   beforeUpdate(() => {
     const month = window.location.pathname.split("/")[1]; //* URLs should split as ['', 'month', 'day'], so just get the month
@@ -84,7 +83,7 @@
 
     <GameModal modalID="gameModal" game={modalBallGame} />
 
-    <Alert alertID="offDayAlert" invisible={invisibleAlert} on:openAlert={onOpenAlert}
+    <Alert alertID="offDayAlert" fading invisible={invisibleAlert} on:openAlert={onOpenAlert}
       alertClasses="dodgerBlue-bg-dark border rounded border-light border-2">{alertMessage}</Alert>
 
   </main>

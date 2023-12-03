@@ -56,12 +56,5 @@ describe("renders a simple Alert", () => {
       rerender({ invisible: false, alertClasses: "foo bar", alertID: "" });
       expect(screen.getByRole("alert")).toHaveClass("alert align-middle foo bar");
     });
-    test("adding in necessary 'fade' classes if 'fading' set to true ", () => {
-      const { rerender } = render(Alert, { invisible: false, fading: true, alertID: "" }); //* Alert reappears + button visible thanks to both props
-      expect(screen.getByRole("alert")).toHaveClass("alert-dismissable fade show");
-
-      rerender({ invisible: false, fading: false, alertID: "" });
-      expect(screen.getByRole("alert")).not.toHaveClass("alert-dismissable fade show");
-    });
   });
 });
