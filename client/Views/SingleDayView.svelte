@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigate } from "svelte-navigator";
+  import { navigate } from "svelte-routing";
   import Image from "../Common/Image.svelte";
   import type BaseballGame from "../Models/DataClasses";
   import type { Promotion } from "../Models/DataClasses";

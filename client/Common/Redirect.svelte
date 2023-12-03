@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { navigate } from "svelte-navigator";
+  import { navigate } from "svelte-routing";
 
   export let to: string;
 

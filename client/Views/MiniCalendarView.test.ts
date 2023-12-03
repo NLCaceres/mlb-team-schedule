@@ -59,7 +59,7 @@ describe("renders several calendar months to briefly detail game info for each d
     rerender({ months: ["April"] });
     const link = await screen.findByRole("link", { name: expectedText });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "March/20");
+    expect(link).toHaveAttribute("href", "/march/20");
   });
   test("depending on the schedule returned by the API to render a full calendar", async () => {
     //* If undefined schedule, "sorry" message is rendered

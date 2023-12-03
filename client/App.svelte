@@ -1,6 +1,5 @@
 <script lang="ts">
   import { beforeUpdate, onMount } from "svelte";
-  import { Router, Route, navigate } from "svelte-navigator";
   import Alert from "./Common/Alert.svelte";
   import GameModal from "./GameModal.svelte";
   import Navbar from "./Navbar.svelte";
@@ -14,6 +13,8 @@
   import { currentYear } from "./HelperFuncs/DateExtension";
   import { isString } from "./HelperFuncs/TypePredicates";
   import { isToday } from "date-fns";
+  //? TSConfig sets moduleResolution to "Node" to fix the Svelte-Routing typing BUT TS 5.0 prefers "Bundler" resolution for Vite
+  import { Router, Route, navigate } from "svelte-routing";
 
   //? Using a function introduces a bit of reactivity! Instead of a simple var or even just writing the main find() fn
   const monthsInSeason = Object.keys(MONTH_MAP).slice(2, -2);
@@ -30,7 +31,6 @@
     const foundMonth = MONTH_MAP[month.slice(0,1).toUpperCase() + month.slice(1)];
     if (!foundMonth) { navigate("/fullSchedule"); return; } //* Basic programmatic redirect with svelte
   });
-  //TODO: Svelte-Routing now offers a useLocation hook, just like svelte-navigator, useful for the Navbar!
 
   //! Click Listeners
   let modalBallGame: BaseballGame | null = null;
@@ -61,9 +61,7 @@
   }
 </script>
 
-<!-- Svelte-Navigator unlike svelte-routing includes 'a11y' which, while helpful, manages focus!
-  and can lead to somewhat odd behavior like unexpected outlined headers -->
-<Router primary={false}> <!-- Setting primary to false prevents the odd focus a11y behavior -->
+<Router>
   <Navbar links={monthsInSeason} currentYear={thisYear} />
 
   <main>

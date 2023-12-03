@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigate, useLocation } from "svelte-navigator";
+  import { navigate, useLocation } from "svelte-routing";
 
   export let links: string[] = [];
   export let currentYear: string;
@@ -16,15 +16,13 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav fs-4">
-        {#each links as link (link)} <!-- COULD include a key but not dynamic so not helpful-->
+        {#each links as linkURL (linkURL)}
           <li class="nav-item">
-            <!-- Without on:click event, Bootstrap 5 will prevent link from working as normal -->
-            <!-- Also! navigate(to:string) will append 'toLink' to end of current url so be specific! add the prefix '/' if wanted to change baseUrl-->
-            <a href="/{link.toLowerCase()}" on:click={() => { navigate(`/${link.toLowerCase()}`); }}
-              class="nav-link" class:active={$location.pathname.slice(1) === link.toLowerCase()}
-              data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show">
-              {link}
-            </a>
+            <!-- Without on:click event, the <li> tag seems to swallow the <a>'s routing event -->
+            <!-- ALSO better to use toLowerCase() since search engines may prefer simple all lowercased URLs -->
+            <a href="/{linkURL.toLowerCase()}" on:click={() => { navigate(`/${linkURL.toLowerCase()}`); }}
+              class="nav-link" class:active={$location.pathname.slice(1) === linkURL.toLowerCase()}
+              data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show"> {linkURL} </a>
           </li>
         {/each}
       </ul>

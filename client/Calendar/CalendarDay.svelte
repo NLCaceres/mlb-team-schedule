@@ -4,7 +4,7 @@
   import { getTimeFromDateStr } from "../HelperFuncs/DateExtension";
   import type BaseballGame from "../Models/DataClasses";
   import { MONTH_MAP } from "../Models/Month";
-  import { navigate } from "svelte-navigator";
+  import { navigate } from "svelte-routing";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{ clickCalendarDay: BaseballGame | string }>();
 

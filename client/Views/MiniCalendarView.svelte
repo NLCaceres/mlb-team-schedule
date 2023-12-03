@@ -1,12 +1,12 @@
 <script lang="ts">
   import Calendar from "../Calendar/Calendar.svelte";
   import SubtitleWithTooltip from "./SubtitleWithTooltip.svelte";
-  import { link } from "svelte-navigator";
   import type BaseballGame from "../Models/DataClasses";
   import { getDayFromDateStr, getMonthFromDateStr, todaysSplitLocalDate } from "../HelperFuncs/DateExtension";
   import { MONTH_NUM_MAP } from "../Models/Month";
   import { getFullSchedule } from "../API";
   import { differenceInCalendarDays, isBefore } from "date-fns";
+  import { link } from "svelte-routing";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{ clickTodaysGame: BaseballGame, errorMessage: string }>();
 
@@ -80,7 +80,7 @@
   {#if gamesByMonth.length > 0}
     <div class="container mt-2">
       {#if smallScreen}
-        <a use:link href="{MONTH_NUM_MAP[parseInt(currentMonth)]}/{currentDay}" class="btn">Today's Game is:</a>
+        <a use:link href="/{MONTH_NUM_MAP[parseInt(currentMonth)].toLowerCase()}/{currentDay}" class="btn">Today's Game is:</a>
       {:else}
         <button type="button" class="btn ms-lg-5" on:click={clickTodaysGame}>Today's Game is:</button>
       {/if}

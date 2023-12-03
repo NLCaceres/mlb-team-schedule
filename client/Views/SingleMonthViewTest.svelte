@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Router } from "svelte-navigator";
+  import { Router } from "svelte-routing";
   import SingleMonthView from "./SingleMonthView.svelte";
 
   export let currentYear: string;

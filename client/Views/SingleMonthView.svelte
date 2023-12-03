@@ -2,9 +2,8 @@
   import Calendar from "../Calendar/Calendar.svelte";
   import SubtitleWithTooltip from "./SubtitleWithTooltip.svelte";
   import { getMonthsGames } from "../API";
-  import { useLocation } from "svelte-navigator";
+  import { useLocation } from "svelte-routing";
 
-  //? As a bonus the following location is completely compatible with svelte-routing
   const location = useLocation(); //? Ex: Grab "/april" and ONLY take "april"
   $: month = $location.pathname.slice(1, 2).toUpperCase() + $location.pathname.slice(2);
   export let currentYear: string;

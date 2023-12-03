@@ -48,7 +48,7 @@ describe("renders the details of a single game", () => {
       //* THEN the view will get an undefined value, resetting itself to an "Off-Day"
       expect(await screen.findByText(/just a dodgers day off/i)).toBeInTheDocument();
       //? BUT when that error is caught, a real user will just see the view navigate back to the homepage
-      //? Unfortunately, Svelte-navigator is not setup in a way that lets Testing-Library render route changes
+      //? Unfortunately, Svelte-Routing is not setup in a way that lets Testing-Library render route changes
     });
     describe("and may render its promotions", () => {
       test("if available", async () => {
