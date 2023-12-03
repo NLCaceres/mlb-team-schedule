@@ -6,8 +6,9 @@
   import { getDayFromDateStr, getMonthFromDateStr, todaysSplitLocalDate } from "../HelperFuncs/DateExtension";
   import { MONTH_NUM_MAP } from "../Models/Month";
   import { getFullSchedule } from "../API";
+  import { differenceInCalendarDays, isBefore } from "date-fns";
   import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{ clickTodaysGame: BaseballGame | string }>();
+  const dispatch = createEventDispatcher<{ clickTodaysGame: BaseballGame, errorMessage: string }>();
 
   //* Normal props
   export let months: string[]; //* Expected months of the season
@@ -40,7 +41,7 @@
   $: fetcher = splitGames();
   let gamesByMonth: BaseballGame[][] = [];
 
-  const [, currentMonth, currentDay] = todaysSplitLocalDate();
+  const [currentYear, currentMonth, currentDay] = todaysSplitLocalDate();
 
   function clickTodaysGame() {
     if (gamesByMonth.length === 0) { return; }
@@ -48,7 +49,24 @@
     const monthIndex = normalMonthNum - 3; //* Since starting season starts in March, offset is 3
     const gamesOfTheMonth = gamesByMonth[monthIndex] ?? [];
     const foundGame = gamesOfTheMonth.find(game => parseInt(getDayFromDateStr(game.date)) === parseInt(currentDay));
-    dispatch("clickTodaysGame", (foundGame) ? foundGame : `${normalMonthNum}/${currentDay}`);
+    if (foundGame) { dispatch("clickTodaysGame", foundGame); }
+    else { dispatch("errorMessage", checkTodaysDate(`${normalMonthNum}/${currentDay}`)); }
+  }
+  function checkTodaysDate(dateStr: string) {
+    const [monthNum, dayNum] = dateStr.split("/"); //* Grab date vals from Slash-Split string: "MonthNum/DayNum"
+    const expectedDate =  new Date(parseInt(currentYear), parseInt(monthNum) - 1, parseInt(dayNum));
+    const daysUntilRegularSeason = differenceInCalendarDays(new Date(2024, 2, 20), expectedDate);
+    const daysUntilSeasonMessage = `Only ${daysUntilRegularSeason} days until the ${expectedDate.getFullYear() + 1} Season officially begins!`;
+    if (expectedDate.getMonth() === 1) { // TODO: Handle dynamic Spring Training game dates
+      const springTrainingStart = new Date(2024, 1, 22); //? Spring Training starts February 22 2024
+      return (isBefore(expectedDate, springTrainingStart)) ? "Spring Training is starting soon! Season's almost here!" :
+        `Spring Training has begun! ${daysUntilSeasonMessage}`;
+    }
+    else if (expectedDate.getMonth() === 2) {
+      const springTrainingEnd = new Date(2024, 2, 26); //? AND ends March 26 2024, BUT, oddly, with an International regular season game on March 20th...
+      return (isBefore(expectedDate, springTrainingEnd)) ? `Spring Training has begun! ${daysUntilSeasonMessage}` : "The regular season has begun!";
+    }
+    else { return `Off-Season has begun! ${daysUntilSeasonMessage}`; }
   }
 </script>
 
