@@ -13,7 +13,7 @@
   import type BaseballGame from "./Models/DataClasses";
   import { currentYear } from "./HelperFuncs/DateExtension";
   import { isString } from "./HelperFuncs/TypePredicates";
-  import { differenceInCalendarDays, isBefore, isToday } from "date-fns";
+  import { isToday } from "date-fns";
 
   //? Using a function introduces a bit of reactivity! Instead of a simple var or even just writing the main find() fn
   const monthsInSeason = Object.keys(MONTH_MAP).slice(2, -2);
@@ -35,7 +35,11 @@
   //! Click Listeners
   let modalBallGame: BaseballGame | null = null;
   function displayBaseballGameModal(event: CustomEvent<BaseballGame | string>) { //? `event.type` === name of custom event
-    if (isString(event.detail)) { displayOffdayAlert(true, event.detail); }
+    if (isString(event.detail)) {
+      const [monthNum, dayNum] = event.detail.split("/"); //* Grab date vals from Slash-Split string: "MonthNum/DayNum"
+      const isItToday = isToday(new Date(parseInt(thisYear), parseInt(monthNum) - 1, parseInt(dayNum)));
+      displayOffdayAlert(true, `Sorry! No Dodger Game on ${isItToday ? "this" : "that"} day!`);
+    }
     else { //* ELSE a BaseballGame bubbled up
       ballGameModal.show();
       modalBallGame = event.detail;
@@ -46,35 +50,14 @@
   function onOpenAlert(event: CustomEvent<boolean>) {
     displayOffdayAlert(event.detail, "Closing Alert"); //? onOpenAlert currently only fires on closing of the Alert
   }
+  function onErrorMessage(event: CustomEvent<string>) {
+    displayOffdayAlert(true, event.detail);
+  }
   function displayOffdayAlert(shouldOpen: boolean, message: string) {
     if (previousTimeout) { clearTimeout(previousTimeout); } //* Prevents quick closures by an existing timeout fn;
-    alertMessage = computeAlertMessage(message); //TODO: Maybe let the Child Routed View decide/compute the message?
+    alertMessage = message;
     invisibleAlert = !shouldOpen;
     previousTimeout = setTimeout(() => { if (!invisibleAlert) { invisibleAlert = true; } }, 3000); //* Hide alert after 3 seconds
-  }
-  function computeAlertMessage(message: string) {
-    const [monthNum, dayNum] = message.split("/"); //* Grab date vals from Slash-Split string: "MonthNum/DayNum"
-    const parsedMonthNum = parseInt(monthNum);
-    const parsedYearNum = parseInt(thisYear);
-    const expectedDate =  new Date(parsedYearNum, parsedMonthNum - 1, parseInt(dayNum));
-    const isItToday = isToday(expectedDate);
-    const daysUntilRegularSeason = differenceInCalendarDays(new Date(2024, 2, 20), expectedDate);
-    const daysUntilSeasonMessage = `Only ${daysUntilRegularSeason} days until the ${parsedYearNum + 1} Season officially begins!`;
-    if (isItToday && parsedMonthNum === 2) { //TODO: Handle March Spring Training Dates
-      const springTrainingStart = new Date(2024, 1, 22); //? Spring Training starts February 22 2024
-      const springTrainingEnd = new Date(2024, 2, 26); //? AND ends just over a month later March 26 2024
-      //? BUT due to early regular season international games, it seems Spring Training is briefly interrupted by actual games... Weird.
-      const beforeSpringTraining = isBefore(expectedDate, springTrainingStart);
-      return (beforeSpringTraining) ? "Spring Training is starting soon! Season's almost here!" :
-        (isBefore(expectedDate, springTrainingEnd)) ? `Spring Training has begun! ${daysUntilSeasonMessage}` : "The regular season has begun!";
-    }
-    else {
-      //* Ternary if fires when user clicks a date on the calendar OR if today is during the regular season
-      //* Else condition assumes Today button was clicked because it's some unclickable date in November, December, or January
-      //* Must offset months by 3 to account for March Season start
-      return (monthsInSeason[parsedMonthNum - 3]) ? `Sorry! No Dodger Game on ${isItToday ? "this" : "that"} day!`
-        : `Off-Season has begun! ${daysUntilSeasonMessage}`;
-    }
   }
 </script>
 
@@ -93,7 +76,8 @@
       <SingleMonthView currentYear={thisYear} on:clickCalendarDay={displayBaseballGameModal} />
     </Route>
     <Route path="/fullSchedule">
-      <MiniCalendarView months={monthsInSeason} on:clickCalendarDay={displayBaseballGameModal} on:clickTodaysGame={displayBaseballGameModal} />
+      <MiniCalendarView months={monthsInSeason} on:clickCalendarDay={displayBaseballGameModal}
+        on:clickTodaysGame={displayBaseballGameModal} on:errorMessage={onErrorMessage} />
     </Route>
 
     <Route path="/*">
