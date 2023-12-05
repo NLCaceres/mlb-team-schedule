@@ -17,7 +17,7 @@
   }
   //? Async Funcs always return a promise, so save it in `fetcher`, so we can await it!
   $: fetcher = getTodaysGame(); //? Letting this reactive statement mutate `todaysGame`
-  var todaysGame: BaseballGame | undefined; //? AND keeping this prop's type simple! (No Promise wrapper!)
+  let todaysGame: BaseballGame | undefined; //? AND keeping this prop's type simple! (No Promise wrapper!)
 
   const specialTicketRequired = (todaysPromotions: Promotion[]) => {
     if (todaysPromotions.length === 0) { return false; }
