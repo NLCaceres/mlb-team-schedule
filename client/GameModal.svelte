@@ -1,6 +1,6 @@
 <script lang="ts">
   import type BaseballGame from "./Models/DataClasses";
-  import Modal from "./Common/Modal.svelte";
+  import AllyModal from "./Common/AllyModal.svelte";
   import Image from "./Common/Image.svelte";
   import getReadableDate from "./HelperFuncs/DateExtension";
 
@@ -8,7 +8,7 @@
   export let game: BaseballGame | null;
 </script>
 
-<Modal {modalID} modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border">
+<AllyModal {modalID} visible={!!game} modalContentClasses="custom-content" modalHeaderClasses="dodger-low-border" on:openModal>
   <span slot="title" class="main-title w-100">
     <div class="d-flex justify-content-between">
       <h2 class="game-day text-decoration-underline">{getReadableDate(game?.date ?? "")}'s Matchup: </h2>
@@ -42,14 +42,14 @@
       <h2>Sorry! The Dodgers are away, so no promos today!</h2>
     {/if}
   </div>
-</Modal>
+</AllyModal>
 
 <style lang="less">
   @import "./CSS/variables";
 
   //* Using :global tells svelte to unscope and expand what this component's CSS can affect
-  :global(.modal-content.custom-content) { //* Bootstrap will normally override so the !important is necessary
-    background-color: lighten(@bodyColor, 10%);
+  :global(.dialog-content.custom-content) { //* Bootstrap will normally override so the !important is necessary
+    background-color: lighten(@bodyColor, 10%) !important;
     border: 3px solid #012e70 !important;
   }
   :global(.modal-header.dodger-low-border) {
