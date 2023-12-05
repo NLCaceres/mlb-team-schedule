@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { beforeUpdate, onMount } from "svelte";
+  import { beforeUpdate } from "svelte";
   import Alert from "./Common/Alert.svelte";
   import GameModal from "./GameModal.svelte";
   import Navbar from "./Navbar.svelte";
@@ -7,7 +7,6 @@
   import MiniCalendarView from "./Views/MiniCalendarView.svelte";
   import SingleDayView from "./Views/SingleDayView.svelte";
   import SingleMonthView from "./Views/SingleMonthView.svelte";
-  import { Modal as BsModal } from "bootstrap";
   import { MONTH_MAP } from "./Models/Month";
   import type BaseballGame from "./Models/DataClasses";
   import { currentYear } from "./HelperFuncs/DateExtension";
@@ -20,11 +19,7 @@
   const monthsInSeason = Object.keys(MONTH_MAP).slice(2, -2);
   const thisYear = currentYear();
 
-  let ballGameModal;
   let invisibleAlert = true; //* Alert starts invisible
-  onMount(()=> {
-    ballGameModal = new BsModal(document.getElementById("gameModal")); //* Must specify here or modal div does not exist!
-  });
   beforeUpdate(() => {
     const month = window.location.pathname.split("/")[1]; //* URLs should split as ['', 'month', 'day'], so just get the month
     const foundMonth = MONTH_MAP[month.slice(0,1).toUpperCase() + month.slice(1)];
@@ -39,10 +34,7 @@
       const isItToday = isToday(new Date(parseInt(thisYear), parseInt(monthNum) - 1, parseInt(dayNum)));
       displayOffdayAlert(true, `Sorry! No Dodger Game on ${isItToday ? "this" : "that"} day!`);
     }
-    else { //* ELSE a BaseballGame bubbled up
-      ballGameModal.show();
-      modalBallGame = event.detail;
-    }
+    else { modalBallGame = event.detail; } //* ELSE a BaseballGame bubbled up
   }
   let alertMessage = "";
   let previousTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -81,7 +73,7 @@
       <Redirect to="/fullSchedule" />
     </Route>
 
-    <GameModal modalID="gameModal" game={modalBallGame} />
+    <GameModal modalID="gameModal" game={modalBallGame} on:openModal={() => modalBallGame = null} />
 
     <Alert alertID="offDayAlert" fading invisible={invisibleAlert} on:openAlert={onOpenAlert}
       alertClasses="dodgerBlue-bg-dark border rounded border-light border-2">{alertMessage}</Alert>
