@@ -1,6 +1,6 @@
 import CalendarDay from "./CalendarDay.svelte";
 import { render, screen } from "@testing-library/svelte";
-import type BaseballGame from "../Models/DataClasses";
+import BaseballGame from "../Models/DataClasses";
 import type { BaseballTeam } from "../Models/DataClasses";
 
 const innerWidthStart = global.innerWidth; //* For test resetting purposes
@@ -12,7 +12,7 @@ describe("render a single day in a typical wall-calendar style", () => {
   beforeEach(() => {
     homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-    game = { id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
+    game = BaseballGame.of({ id: "1", date: "", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 });
     global.innerWidth = innerWidthStart;
   });
   test("unless missing a dayNum", () => {
@@ -26,16 +26,17 @@ describe("render a single day in a typical wall-calendar style", () => {
     expect(gameDayBody.firstChild).not.toBeEmptyDOMElement();
   });
   test("including the start time of any given game", () => {
-    const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Thur June 09 2021 at 07:10 PM" }] });
+    const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo",
+      games: [BaseballGame.of({ ...game, date: "Thur June 09 2021 at 07:10 PM" })] });
     expect(screen.getByText("7:10 PM"));
 
     //* Poorly formatted dates or strings without a time get left empty
-    rerender({ currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Thur June 09" }] });
+    rerender({ currentMonth: "", dayNum: "foo", games: [BaseballGame.of({ ...game, date: "Thur June 09" })] });
     const calendarDayNumWithHalfDate = screen.getByText("foo");
     const startTimeElemWithHalfDate = calendarDayNumWithHalfDate.nextElementSibling;
     expect(startTimeElemWithHalfDate).toHaveTextContent(""); //* No text inserted, just an empty string
 
-    rerender({ currentMonth: "", dayNum: "foo", games: [{ ...game, date: "Barfoo" }] });
+    rerender({ currentMonth: "", dayNum: "foo", games: [BaseballGame.of({ ...game, date: "Barfoo" })] });
     const calendarDayNumWithBadDate = screen.getByText("foo");
     const startTimeElemWithBadDate = calendarDayNumWithBadDate.nextElementSibling;
     expect(startTimeElemWithBadDate).toHaveTextContent("");
@@ -55,7 +56,7 @@ describe("render a single day in a typical wall-calendar style", () => {
     expect(screen.getByText("vs")).toBeInTheDocument();
     expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("");
     //* The link gets an asterisk if it has promotions
-    rerender({ currentMonth: "foo", dayNum: "bar", games: [{ ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] }] });
+    rerender({ currentMonth: "foo", dayNum: "bar", games: [BaseballGame.of({ ...game, promos: [{ id: "foo", name: "", thumbnailUrl: "" }] })] });
     expect(screen.getByText("vs")).toBeInTheDocument();
     expect(screen.getByText("vs").nextElementSibling?.firstElementChild).toHaveTextContent("*");
 
@@ -110,7 +111,7 @@ describe("render a single day in a typical wall-calendar style", () => {
       expect(screen.getByText(/off day/i)).not.toHaveClass("mini");
     });
     test("to style the calendar for large screens", () => {
-      const gameWithDate = { ...game, date: "Thur June 09 2021 at 07:10 PM" };
+      const gameWithDate = BaseballGame.of({ ...game, date: "Thur June 09 2021 at 07:10 PM" });
       const { rerender } = render(CalendarDay, { currentMonth: "", dayNum: "foo", games: [gameWithDate] });
       //* Viewport should be 1024 AND mini is false by default so use the following classes
       expect(screen.getByRole("cell").firstElementChild).toHaveClass("flex-column");

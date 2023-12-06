@@ -1,5 +1,6 @@
 import Calendar from "./Calendar.svelte";
 import { render, screen } from "@testing-library/svelte";
+import BaseballGame from "../Models/DataClasses";
 
 describe("renders a simple Calendar", () => {
   test("setting the name of the Calendar month via 'monthName' prop", () => {
@@ -32,14 +33,19 @@ describe("renders a simple Calendar", () => {
     test("if any games are in the list, then a normal month will render", () => {
       const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
       const awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-      const game = { id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
+      const game = BaseballGame.of({
+        id: "1", date: "Thur April 05 2020 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3
+      });
       const { rerender } = render(Calendar, { monthName: "April", gamesList: [game] });
       const daysRendered = screen.getAllByRole("cell");
       expect(daysRendered.length % 7).toBe(0); //* The total # of days rendered in the calendar always a multiple of 7
       expect(screen.getByText("5")).toBeInTheDocument();
       expect(screen.getAllByText(/missing logo/i)).toHaveLength(2); //* Each game day gets 2
 
-      rerender({ monthName: "July", gamesList: [{ ...game, date: "Mon July 18 2023 at 06:15 PM" }, { ...game, date: "Tues July 19 2023 at 10:40 AM" }] });
+      rerender({ monthName: "July", gamesList: [
+        BaseballGame.of({ ...game, date: "Mon July 18 2023 at 06:15 PM" }), //? Turns out classes can be spread like regular JS objects!
+        BaseballGame.of({ ...game, date: "Tues July 19 2023 at 10:40 AM" })
+      ]});
       const julyDaysRendered = screen.getAllByRole("cell");
       expect(julyDaysRendered.length % 7).toBe(0);
       expect(screen.getByText("5")).toBeInTheDocument(); //* Previous days, even if off-days, get their day num

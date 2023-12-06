@@ -1,18 +1,20 @@
 import { BaseballSeasonLength, CreateMonth, CreateRemainingMonth, CreateStartingWeek } from "./CreateCalendar";
 import { vi } from "vitest";
+import BaseballGame from "../Models/DataClasses";
 import * as DateFns from "date-fns";
 
 describe("provides utility functions for creating a data representation of a Calendar", () => {
   test("uses the Baseball game list to check the number of months in the season", () => {
     const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     const awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-    const game = { id: "1", date: "Thur March 20 2021 at 01:10 PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
-    const gameList = [game, { ...game, date: "Sat June 30 2021 at 07:10 PM" }];
+    const game = BaseballGame.of({ id: "1", date: "Thur March 20 2021 at 01:10 PM",
+      homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 });
+    const gameList = [game, BaseballGame.of({ ...game, date: "Sat June 30 2021 at 07:10 PM" })];
     //* June is the 6th month, March is the 3rd, so (6-3) + 1 = 4
     //* If 1 isn't added at the end, then it would be excluding June, i.e. March, April, May AND finally June
     expect(BaseballSeasonLength(gameList)).toBe(4);
 
-    const invalidGameList = [{ ...game, date: "Sat June 30 2021 at 07:10 PM" }, game];
+    const invalidGameList = [BaseballGame.of({ ...game, date: "Sat June 30 2021 at 07:10 PM" }), game];
     expect(BaseballSeasonLength(invalidGameList)).toBe(0); //* If the first and last games are out of order, 0 is sent back
   });
   describe("creates a single month of the Calendar", () => {
@@ -80,7 +82,8 @@ describe("provides utility functions for creating a data representation of a Cal
       vi.spyOn(DateFns, "getDaysInMonth").mockReturnValue(31);
       const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
       const awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-      const game = { id: "1", date: "Thur June 09 2023 at 07:10PM", homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 };
+      const game = BaseballGame.of({ id: "1", date: "Thur June 09 2023 at 07:10PM",
+        homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 });
 
       const normalCalendarWeeks = CreateMonth([game]);
       expect(normalCalendarWeeks).toHaveLength(5);
