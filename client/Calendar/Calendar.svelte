@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { beforeUpdate } from "svelte";
   import CalendarDay from "./CalendarDay.svelte";
   import type BaseballGame from "../Models/DataClasses";
   import { CreateMonth } from "./CreateCalendar";
@@ -13,11 +12,8 @@
   export let mini = false;
   export let tableClass = ""; //* Allow default prop
 
-  $: month = CreateMonth(gamesList);
+  const month = CreateMonth(gamesList[0]); //* If gamesList is empty, then val at index 0 is undefined
 
-  beforeUpdate(() => {
-    offDays = 0; //* Useful to prevent accessing negative indices
-  });
   function getTodaysGames(day: string): BaseballGame[] {
     if (day.length === 0 || gamesList.length === 0) { return []; }
 

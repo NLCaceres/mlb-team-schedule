@@ -4,18 +4,17 @@ import BaseballGame from "../Models/DataClasses";
 import * as DateFns from "date-fns";
 
 describe("provides utility functions for creating a data representation of a Calendar", () => {
-  test("uses the Baseball game list to check the number of months in the season", () => {
+  test("uses a pair of Baseball games with dates to check the number of months in the season", () => {
     const homeTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 1, losses: 0 };
     const awayTeam = { id: "1", teamLogo: "", teamName: "foo", cityName: "", abbreviation: "", wins: 0, losses: 1 };
-    const game = BaseballGame.of({ id: "1", date: "Thur March 20 2021 at 01:10 PM",
+    const firstGame = BaseballGame.of({ id: "1", date: "Thur March 20 2021 at 01:10 PM",
       homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 });
-    const gameList = [game, BaseballGame.of({ ...game, date: "Sat June 30 2021 at 07:10 PM" })];
-    //* June is the 6th month, March is the 3rd, so (6-3) + 1 = 4
-    //* If 1 isn't added at the end, then it would be excluding June, i.e. March, April, May AND finally June
-    expect(BaseballSeasonLength(gameList)).toBe(4);
+    const lastGame = BaseballGame.of({ ...firstGame, date: "Sat June 30 2021 at 07:10 PM" });
+    //* WHEN the firstGame and lastGame are input in order, THEN the number of months elapsed is returned
+    expect(BaseballSeasonLength(firstGame, lastGame)).toBe(4); //* i.e. March, April, May, June, so 4-month span, OR ((6 - 3) + 1 == 4) in math terms
 
-    const invalidGameList = [BaseballGame.of({ ...game, date: "Sat June 30 2021 at 07:10 PM" }), game];
-    expect(BaseballSeasonLength(invalidGameList)).toBe(0); //* If the first and last games are out of order, 0 is sent back
+    //* WHEN the first and last games are out of order, THEN 0 is sent back
+    expect(BaseballSeasonLength(lastGame, firstGame)).toBe(0);
   });
   describe("creates a single month of the Calendar", () => {
     test("handling the starting week by prepending blank days until the starting day", () => {
@@ -71,9 +70,10 @@ describe("provides utility functions for creating a data representation of a Cal
       expect(negativeStartRemainingWeeks[0][0]).toBe("4");
       expect(negativeStartRemainingWeeks[3][6]).toBe("31");
     });
-    test("creates a full calendar depending on a list of baseball games", () => {
-      const emptyCalendarWeeks = CreateMonth([]); //* No list provided
-      expect(emptyCalendarWeeks).toHaveLength(1); //* So empty 7 day single week returned
+    test("creates a full calendar depending on an example game", () => {
+      const baseballGameList: BaseballGame[] = [];
+      const emptyCalendarWeeks = CreateMonth(baseballGameList[0]); //* WHEN Undefined val input
+      expect(emptyCalendarWeeks).toHaveLength(1); //* THEN empty 7 day single week returned
       expect(emptyCalendarWeeks[0]).toStrictEqual(["", "", "", "", "", "", ""]);
 
       //* Using spies here eliminates the guess work since CreateMonth() dynamically grabs the year
@@ -85,7 +85,7 @@ describe("provides utility functions for creating a data representation of a Cal
       const game = BaseballGame.of({ id: "1", date: "Thur June 09 2023 at 07:10PM",
         homeTeam: homeTeam, awayTeam: awayTeam, promos: [], seriesGameNumber: 1, seriesGameCount: 3 });
 
-      const normalCalendarWeeks = CreateMonth([game]);
+      const normalCalendarWeeks = CreateMonth(game);
       expect(normalCalendarWeeks).toHaveLength(5);
       expect(normalCalendarWeeks[0][4]).toBe("1"); //* Starting week used and Thursday is day 1
       expect(normalCalendarWeeks[4][6]).toBe("31"); //* So day 31 lands perfectly at the end of the 2d array

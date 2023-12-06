@@ -3,9 +3,8 @@ import type BaseballGame from "../Models/DataClasses";
 import { MONTH_MAP } from "../Models/Month";
 import { getDaysInMonth } from "date-fns";
 
-export function CreateMonth(games: BaseballGame[]): string[][] {
-  if (games.length === 0) { return [["", "", "", "", "", "", ""]]; }
-  const exampleGame = games[0];
+export function CreateMonth(exampleGame: BaseballGame | undefined) {
+  if (!exampleGame) { return [["", "", "", "", "", "", ""]]; }
 
   const monthStr = getMonthFromDateStr(exampleGame.date);
   const [year, month] = todaysSplitLocalDate();
@@ -49,10 +48,7 @@ export function CreateRemainingMonth(startDay: number, numOfDays: number): strin
   return restOfMonth;
 }
 
-export function BaseballSeasonLength(games: BaseballGame[]) {
-  const firstGame = games[0];
-  const lastGame = games[games.length - 1];
-
+export function BaseballSeasonLength(firstGame: BaseballGame, lastGame: BaseballGame) {
   const firstMonth = getMonthFromDateStr(firstGame.date);
   const lastMonth = getMonthFromDateStr(lastGame.date);
 
