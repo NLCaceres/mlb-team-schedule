@@ -20,10 +20,12 @@
   const thisYear = currentYear();
 
   let invisibleAlert = true; //* Alert starts invisible
-  beforeUpdate(() => {
+  beforeUpdate(() => { //? useLocation is not available in beforeUpdate so not useful here unfortunately!
+    if (window.location.pathname === "/" || window.location.pathname === "/fullSchedule") { return; } //* No need to calculate/redirect, just load the page
+
     const month = window.location.pathname.split("/")[1]; //* URLs should split as ['', 'month', 'day'], so just get the month
     const foundMonth = MONTH_MAP[month.slice(0,1).toUpperCase() + month.slice(1)];
-    if (!foundMonth) { navigate("/fullSchedule"); return; } //* Basic programmatic redirect with svelte
+    if (!foundMonth || foundMonth < 3 || foundMonth > 10) { navigate("/fullSchedule"); return; } //* Basic programmatic redirect with svelte
   });
 
   //! Click Listeners
