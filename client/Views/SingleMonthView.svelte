@@ -6,14 +6,14 @@
   import { useLocation } from "svelte-routing";
 
   const location = useLocation(); //? Ex: Grab "/april" and ONLY take "april"
-  const month = $location.pathname.slice(1, 2).toUpperCase() + $location.pathname.slice(2);
+  $: month = $location.pathname.slice(1, 2).toUpperCase() + $location.pathname.slice(2);
   export let currentYear: string;
 
   //? This pattern is useful for ensuring the async HTTP request is called ONLY ONCE!
-  async function getThisMonthsGames() {
-    monthsGames = await getMonthsGames(month) ?? [];
+  async function getThisMonthsGames(thisMonth: string) {
+    monthsGames = await getMonthsGames(thisMonth) ?? [];
   }
-  $: fetcher = getThisMonthsGames();
+  $: fetcher = getThisMonthsGames(month); //? Using `month` as a param seems to keep `$location.pathname` from being read as `undefined` in the async func
   let monthsGames: BaseballGame[] = [];
 
   $: innerWidth = window.innerWidth;
