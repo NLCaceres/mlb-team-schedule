@@ -13,7 +13,7 @@
   export let placeholderStyleString = "";
 </script>
 
-{#if hasError || source === ""}
+{#if hasError || source === "" || source === "undefined"}
   <div class="placeholder-img" style={placeholderStyleString}>
     Missing {altText}
   </div>
