@@ -38,9 +38,8 @@
 
 <svelte:window bind:innerWidth />
 
-<td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ""} class:even class:odd={!even}>
-  <!--todo Divs aren't clickable so the following causes an a11y issue, so need to convert this div into a button -->
-  <div class="fs-6 justify-content-between d-flex" class:flex-column={largeCalendarView || games.length === 0} on:click={handleClick}>
+<td class={`standard-detail ${cssClasses}`} class:different-month={dayNum === ""} class:even class:odd={!even} on:click={handleClick}>
+  <div class="fs-6 justify-content-between d-flex" class:flex-column={largeCalendarView || games.length === 0}>
     {#if dayNum.length > 0}
       <!--* Calendar Days always need the numbered day of the week (1-31) -->
       <div class={(largeCalendarView) ? "d-flex justify-content-between" : ""}>
@@ -125,11 +124,11 @@
         font-size: 12px;
         @media @min576 { //* Only way to use 'and' as expected in an @media query
           @media @max991 {
-            font-size: 14px;
+            font-size: 13px;
           }
         }
         @media @min992 {
-          font-size: 16px;
+          font-size: 15px;
         }
       }
       font-size: 12px;
