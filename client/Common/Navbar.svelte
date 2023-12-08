@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useLocation, Link } from "svelte-routing";
   import { fade } from "svelte/transition";
-  import { expandable } from "./Actions/UseExpandable";
+  import { expandable } from "../Actions/UseExpandable";
 
   $: innerWidth = window.innerWidth;
 
@@ -43,7 +43,7 @@
 </nav>
 
 <style lang="less">
-  @import "./CSS/variables";
+  @import "../CSS/variables";
 
   .custom-nav {
     background-color: darken(@dodgerBlue, 30%);

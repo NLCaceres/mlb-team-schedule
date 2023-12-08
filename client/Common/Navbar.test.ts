@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { vi, type SpyInstance } from "vitest";
 import { readable } from "svelte/store";
 import * as SvelteRouting from "svelte-routing";
-import * as UseExpandable from "./Actions/UseExpandable";
+import * as UseExpandable from "../Actions/UseExpandable";
 
 describe("renders a Navbar", () => {
   let LocationSpy: SpyInstance;

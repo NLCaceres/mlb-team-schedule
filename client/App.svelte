@@ -2,7 +2,7 @@
   import { beforeUpdate } from "svelte";
   import Alert from "./Common/Alert.svelte";
   import GameModal from "./GameModal.svelte";
-  import Navbar from "./Navbar.svelte";
+  import Navbar from "./Common/Navbar.svelte";
   import Redirect from "./Common/Redirect.svelte";
   import MiniCalendarView from "./Views/MiniCalendarView.svelte";
   import SingleDayView from "./Views/SingleDayView.svelte";
