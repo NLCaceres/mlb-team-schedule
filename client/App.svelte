@@ -1,5 +1,6 @@
 <script lang="ts">
   import { beforeUpdate } from "svelte";
+  import { Router, Route, navigate } from "svelte-routing";
   import Alert from "./Common/Alert.svelte";
   import GameModal from "./GameModal.svelte";
   import Navbar from "./Common/Navbar.svelte";
@@ -12,8 +13,6 @@
   import { currentYear } from "./HelperFuncs/DateExtension";
   import { isString } from "./HelperFuncs/TypePredicates";
   import { isToday } from "date-fns";
-  //? TSConfig sets moduleResolution to "Node" to fix the Svelte-Routing typing BUT TS 5.0 prefers "Bundler" resolution for Vite
-  import { Router, Route, navigate } from "svelte-routing";
 
   //? Using a function introduces a bit of reactivity! Instead of a simple var or even just writing the main find() fn
   const monthsInSeason = Object.keys(MONTH_MAP).slice(2, -2);
