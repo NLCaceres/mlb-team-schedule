@@ -57,7 +57,7 @@
 <Router>
   <Navbar links={monthsInSeason} currentYear={thisYear} />
 
-  <main>
+  <main class="pt-6">
     <h1 class="main-title text-center mx-3 mb-4">Dodger Stadium Promotional Schedule</h1>
 
     <Route path="/:monthName/:dayNum" let:params>
@@ -87,6 +87,10 @@
 
 <style lang="less">
   @import "./CSS/variables";
+
+  .pt-6 { //* Compensate for fixed navbar
+    padding-top: 5rem;
+  }
 
   .main-title {
     color: #004680;

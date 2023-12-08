@@ -50,7 +50,7 @@
     overflow: hidden;
     align-items: start;
     width: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
     z-index: 1000;
   }
