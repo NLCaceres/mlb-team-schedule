@@ -8,7 +8,6 @@
   export let links: string[] = [];
   export let currentYear: string;
   const location = useLocation(); //? Exposes $location which acts as a basic reactive location obj
-  const isActive = (linkURL: string) => ($location.pathname.slice(1) === linkURL.toLowerCase()) ? "active" : "";
 
   let expanded = false;
 </script>
@@ -30,9 +29,9 @@
           {#each links as linkURL (linkURL)}
             <li class="nav-item">
               <!-- Good to use toLowerCase() since search engines may prefer simple all lowercased URLs -->
-              <Link to="/{linkURL.toLowerCase()}" class={`nav-link ${isActive(linkURL)}`.trim()} on:click={() => { expanded = false; }}>
-                {linkURL}
-              </Link>
+              <!-- ALSO the ternary to set ".active" class only works inline. Splitting it into a func kills the reactivity -->
+              <Link to="/{linkURL.toLowerCase()}" class={`nav-link ${$location.pathname.slice(1) === linkURL.toLowerCase() ? "active" : ""}`.trim()}
+                on:click={() => { expanded = false; }}>{linkURL}</Link>
             </li>
           {/each}
         </ul>
