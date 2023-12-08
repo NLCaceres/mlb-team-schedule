@@ -1,6 +1,6 @@
 import MiniCalendarView from "./MiniCalendarView.svelte";
 import { render, screen } from "@testing-library/svelte";
-import { vi, type SpyInstance } from "vitest";
+import { vi, type MockInstance } from "vitest";
 import * as Api from "../API";
 import * as DateHelpers from "../HelperFuncs/DateExtension";
 
@@ -9,8 +9,8 @@ const innerWidthStart = global.innerWidth;
 const innerHeightStart = global.innerHeight;
 
 describe("renders several calendar months to briefly detail game info for each day", () => {
-  let ApiSpy: SpyInstance;
-  let DateHelperSpy: SpyInstance;
+  let ApiSpy: MockInstance;
+  let DateHelperSpy: MockInstance;
   beforeEach(() => {
     global.innerWidth = innerWidthStart;
     global.innerHeight = innerHeightStart;

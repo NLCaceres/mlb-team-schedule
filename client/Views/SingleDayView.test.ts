@@ -1,11 +1,11 @@
 import SingleDayView from "./SingleDayView.svelte";
 import { render, screen } from "@testing-library/svelte";
-import { vi, type SpyInstance } from "vitest";
+import { vi, type MockInstance } from "vitest";
 import BaseballGame, { type BaseballTeam } from "../Models/DataClasses";
 import * as Api from "../API";
 
 describe("renders the details of a single game", () => {
-  let ApiSpy: SpyInstance;
+  let ApiSpy: MockInstance;
   let homeTeam: BaseballTeam; let awayTeam: BaseballTeam;
   let game: BaseballGame;
   beforeEach(() => {

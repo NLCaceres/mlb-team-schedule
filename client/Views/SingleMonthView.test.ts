@@ -1,14 +1,14 @@
 import SingleMonthView from "./SingleMonthViewTest.svelte";
 import { render, screen } from "@testing-library/svelte";
-import { vi, type SpyInstance } from "vitest";
+import { vi, type MockInstance } from "vitest";
 import { readable } from "svelte/store";
 import * as Api from "../API";
 import * as SvelteRouting from "svelte-routing";
 
 //? Using a Test Component since a Router wrapper is required thanks to useLocation being used in the SingleMonthView component
 describe("renders a single month", () => {
-  let LocationSpy: SpyInstance;
-  let ApiSpy: SpyInstance;
+  let LocationSpy: MockInstance;
+  let ApiSpy: MockInstance;
   beforeEach(() => {
     ApiSpy = vi.spyOn(Api, "getMonthsGames");
     LocationSpy = vi.spyOn(SvelteRouting, "useLocation");

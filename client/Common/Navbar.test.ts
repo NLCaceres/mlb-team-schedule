@@ -1,14 +1,14 @@
 import Navbar from "./NavbarTest.svelte"; //? Need to use a Test component because Svelte-Routing's <Link> component needs a parent <Router>
 import { render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
-import { vi, type SpyInstance } from "vitest";
+import { vi, type MockInstance } from "vitest";
 import { readable } from "svelte/store";
 import * as SvelteRouting from "svelte-routing";
 import * as UseExpandable from "../Actions/UseExpandable";
 
 describe("renders a Navbar", () => {
-  let LocationSpy: SpyInstance;
-  let UseExpandableSpy: SpyInstance;
+  let LocationSpy: MockInstance;
+  let UseExpandableSpy: MockInstance;
   beforeEach(() => {
     LocationSpy = vi.spyOn(SvelteRouting, "useLocation");
     LocationSpy.mockReturnValue(readable({ pathname: "/March" }));
