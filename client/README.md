@@ -22,45 +22,54 @@
 
 
 ## Recent Changes
-- Prep for Svelte 4 by updating package.json completely, in particular to Typescript 5.1 and Node 18
-- Add Vitest for unit testing + `testing-library/Svelte` for Component testing
-- Update Calendar props to adapt to a normal/generalized Baseball season each year
-  - Speed up rendering with less prop-drilling, simpler algorithm, quick dependencies like date-fns, and more edge-cases considered
-  - Get rid of TS enums + unnecessary Month interface
-- Use current year to set the schedule year dynamically
+- Upgraded to Svelte 4 with Typescript 5.3 and Node 20.9
+  - Also replaced Svelte-Navigator with Svelte-Routing, in particular, `<Link>` replaced simple `<a>` tags for better testability
+- Added Vitest 1.0! Alongside `testing-library/Svelte`, `testing-library/jest-dom`, and `testing-library/user-event` for easy component testing
+- Added ESLint plus the Typescript and Svelte plugins to speed up linting and get novel recommendations
+- Improved Data Fetching process
+  - Now handling GET requests with generic method plus custom Error typing
+  - Adapted API fetch methods + models to API's latest changes to the JSON structure
+  - Main View pages optimized fetching to run only once, preventing extra requests
+  - `<Image>` now catches `undefined` URLs to prevent extra requests
+- Updated Calendar props to adapt to a normal/generalized Baseball season each year
+  - Faster rendering with less prop-drilling, simpler algorithm, quick dependencies like date-fns, and more edge-cases considered
+  - Dropped TS enums + unnecessary Month interface
+  - Updated Calendar creation methods to accept params more specific to their responsibilities
+  - Renamed and improved reusability of dispatched Calendar click events
+- Added type guards to simplify complicated but common type checking
+  - Includes String, Array, and Object `isEmpty()` checker
+- The schedule year now dynamically sets itself to the current year
+  - Added hoverable Tooltip + Subtitle which uses both Tooltip and dynamic year
+  - Simplified date getter methods
 - `Client/Utility` directory reorganized across the `Client` folder into `Common` components, `CSS` style files, and `HelperFuncs` directories
-  - Several files moved entirely, specifically `CreateCalendar.ts` moved into `Calendar` and `CreateSvgElement` now contains its necessary `unescape()` function
+  - `CreateCalendar.ts` moved into `Calendar`
+  - `CreateSvgElement` added an `unescape()` function
   - Lodash dropped entirely
-- `API` folder added to organize common HTTP Request functionality, the main set of API endpoints, and, in the future, a set of MLB endpoints
+  - `<Navbar>` moved into `Common` after dropping Bootstrap data attributes in favor of Svelte control
+- `<Navbar>`, `<Alert>`, and `<Modal>` no longer use Bootstrap Javascript to function. Now fully Svelte controlled and animated
+  - `<Modal>` added [A11y-Dialog](https://github.com/KittyGiraudel/a11y-dialog) to remain accessible
+  - `<Navbar>` added a reusable Expandable Action to animate height resizes on mobile viewports when `<Navbar>` opens to show links
+- `<CalendarDay>` moved clickListener from the `<div>` to the `<td>` to improve accessibility and increase the touch target size
 
 
 ## Future Changes
-- Svelte 4 is now an option! BUT Svelte-Navigator is currently the main issue as it lags behind in development
-  - Svelte-Routing is an option since it, now, includes the useLocation hook
 - If Flask changes the selected team, use the new team to theme the app, i.e. instead of Dodger blue, use Yankee blue, etc.
-  - Is it possible to dynamically update the favicon?
+  - Dynamically update the favicon? Use `<svelte:head />`?
   - Similarly, can the individual detail view of a game be better themed based partly on the opposing team?
 - Provide a view that shows the box score of a game in progress AND completed games
   - Best to directly call the MLB stats API to limit work of Flask server and reduce storage cost in DB
     - Update in real time? setInterval API call? websocket?
 - Update calendar view
+  - Add `role="grid"` to improve click interactions with the Calendar views
+    - Add `tabindex=-1` to actual days in a Calendar month enabling interactivity once the Calendar view is `TAB` selected
   - Double header -> Diagonally or horizontally split box?
-  - Update Image Component to not only provide a placeholder but lazy load only when on-screen
-  - CalendarDay currently is difficult to access for screen readers since a `<div>` will only have its text read aloud without any interactivity.
-  Consequently, the `<div>` inside `<td>` should be swapped for a `<button>` that calls the new onClick handler
-    - Alternatively, the tap target can be made larger by placing the onClick handler on the `<td>` itself, which is already easily accessible.
-    - Additionally, to simplify the conditional rendering of its Game/Promo section, CalendarDayDetail should be styled so that the first
-    `{:else if game}` condition is not needed. Instead, CalendarDayDetail should render something similar to the `else if` condition's simple layout
-- If dropping Bootstrap, one of the first components that can be improved is the Modal via the new `<dialog>` elem
-  - Partially because testing Svelte Slots currently requires making test components because there is no simple internal Svelte createSlot API
+  - Simplify conditional rendering of the Game/Promo section, so CalendarDayDetail can be used on big and small screens
+- Update Image Component to not only provide a placeholder but lazy load only when on-screen
+- Update Alert to allow the component itself to control its visibility e.g. enable auto-fading
+- Drop Bootstrap in favor of TailwindCSS to make the design more custom, less Bootstrap-y, and to handle cases where only simple CSS styling is needed
 - `DynamicEventBinding` is an incredibly powerful option for Components BUT completely unused at the moment so it may be a case of
 optimizing too early, and better to drop rather than work out the testing
-- A `StringHelper` file would probably be super helpful to process a number of strings across the app, in particular:
-  - Trim concatenated `string` props as well as CSS & Style strings
-  - Identify empty strings (i.e. "") since Svelte Props can't be set to Optional via the `?` marker
-    - An alternative around this limitation is either:
-      - `export let someProp: someClass | undefined = undefined`
-      - `export let someProp: Optional<someClass> = undefined` via a type alias like `type Optional<T> = T | undefined;`
+- String helper method that trims concatenated `string` props as well as CSS & Style strings
 
 ## Deploying to the web
 - Modern Svelte recommends using SvelteKit, since it handles just about everything you can think of, BUT it's still possible to deploy a standard Svelte
