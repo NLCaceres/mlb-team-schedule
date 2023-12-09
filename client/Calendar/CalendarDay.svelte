@@ -2,6 +2,7 @@
   import CalendarDayDetail from "./CalendarDayDetail.svelte";
   import Image from "../Common/Image.svelte";
   import { getTimeFromDateStr } from "../HelperFuncs/DateExtension";
+  import { isEmpty } from "../HelperFuncs/TypePredicates";
   import type BaseballGame from "../Models/DataClasses";
   import { MONTH_MAP } from "../Models/Month";
   import { navigate } from "svelte-routing";
@@ -22,6 +23,7 @@
   $: largeCalendarView = !smallScreen && !mini; //* When in a tablet or greater view + not in the multicalendar month page == true
 
   function handleClick() { //* Nav to DetailView on mobile, Else bubble up the click event
+    if (isEmpty(dayNum)) { return; } //? Early return to prevent unneeded click event on empty <td> where no day of the month actually exists
     if (smallScreen) { navigate(`${currentMonth}/${dayNum}`); }
     else {
       const monthNum = MONTH_MAP[currentMonth.slice(0,1).toUpperCase() + currentMonth.slice(1)];
