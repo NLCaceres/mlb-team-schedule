@@ -13,14 +13,15 @@ LATEST_GAME_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&te
 
 #? Helpful URL to grab info on known meta/key/urlParam types - https://github.com/toddrob99/MLB-StatsAPI/wiki/Function:-meta
 GAME_TYPE_META_KEYS_URL = 'https://statsapi.mlb.com/api/v1/gameTypes'
+#* Meta Tag Definition: 'S' = 'Spring Training Game'
+SPRING_TRAINING_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season={seasonYear}&teamId={teamId}&gameType=S'
 #* Meta Tag Definition: 'A' = 'All Star Game'
-ALL_STAR_GAME_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season=2023&gameType=A'
+ALL_STAR_GAME_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season={seasonYear}&gameType=A'
 #* Meta Tag Definitions: 'F' = 'Wild Card', 'D' = 'Division Series', 'L' = 'League Series', 'W' = 'World Series'
 #* 'P' = 'Playoff' BUT it seems to be some kind of legacy meta-tag that is no longer used
 #? Seems as of 2023, Playoff dates aren't available until the teams are finalized in late Sept or early October
 #? With the playoffs POSSIBLY lasting until a November 4th (in 2023) World Series Game 7
-PLAYOFFS_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season=2023&gameType=F,D,L,W'
-SPRING_TRAINING_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season=2024&teamId=119&gameType=S'
+PLAYOFFS_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season={seasonYear}&gameType=F,D,L,W'
 
 
 #! More useful endpoints constants
