@@ -20,6 +20,7 @@ ALL_STAR_GAME_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&
 #? Seems as of 2023, Playoff dates aren't available until the teams are finalized in late Sept or early October
 #? With the playoffs POSSIBLY lasting until a November 4th (in 2023) World Series Game 7
 PLAYOFFS_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season=2023&gameType=F,D,L,W'
+SPRING_TRAINING_URL = 'https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&season=2024&teamId=119&gameType=S'
 
 
 #! More useful endpoints constants
