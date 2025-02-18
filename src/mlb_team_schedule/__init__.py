@@ -42,7 +42,7 @@ def create_app(test_config = None):
 
     return app
 
-BASE_CONFIG_NAME = 'DodgersPromo.config'
+BASE_CONFIG_NAME = 'mlb_team_schedule.config'
 DEV_CONFIG = f"{BASE_CONFIG_NAME}.DevelopmentConfig"
 TESTING_CONFIG = f"{BASE_CONFIG_NAME}.TestingConfig"
 
