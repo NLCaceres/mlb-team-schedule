@@ -1,2 +1,2 @@
 web: pnpm dev-build
-api: flask run
+api: flask --app src/mlb_team_schedule run
