@@ -1,8 +1,0 @@
-Flask ~=3.0
-Flask-APScheduler ~= 1.13
-Flask-Migrate ~=4.0
-Flask-SQLAlchemy ~=3.0
-gunicorn ~=21.2
-psycopg2 ~=2.9
-python-dotenv ~=1.0
-requests ~=2.31
