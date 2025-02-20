@@ -16,7 +16,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      output: {
+      output: { // Outputs to "/dist", as "/dist/assets/..."
         assetFileNames: "assets/[name][extname]",
         entryFileNames: "assets/[name].js"
       }
