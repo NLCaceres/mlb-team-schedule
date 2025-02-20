@@ -6,7 +6,7 @@
   "type": "module",
   "engines": {
     "node": "20.9.0",
-    "pnpm": "^8.10.5"
+    "pnpm": "^9.2.0"
   },
   "scripts": {
     "build": "vite build",
