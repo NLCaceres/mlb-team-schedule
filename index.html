@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- Used by Procfile.dev to link Vite to Svelte and proxy requests to Flask API -->
+
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>Dodgers Promo Schedule</title>
 
+	<!-- Searches for these in "/public" -->
 	<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
@@ -14,9 +17,11 @@
 	<link rel="stylesheet" href="/global.css">
 	<link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
 
+	<!-- Attaches to Svelte launch file in "/client" -->
 	<script type="module" src="/client/main.ts"></script>
 </head>
 
 <body>
 </body>
+
 </html>
