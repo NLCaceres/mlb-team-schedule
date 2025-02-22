@@ -25,3 +25,6 @@ dev = ["pytest ~=7.4"]
 
 [project.urls]
 Repository = "https://github.com/NLCaceres/mlb-team-schedule.git"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib", "-W=ignore::DeprecationWarning"]
