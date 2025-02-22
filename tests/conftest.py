@@ -2,7 +2,7 @@ import pytest
 import requests
 from dotenv import load_dotenv, find_dotenv
 from flask_migrate import upgrade, downgrade
-from .. import create_app
+from mlb_team_schedule import create_app
 from .MockHttpResponse import MockHttpResponse
 
 #? `Conftest.py` is used by `Pytest` to create fixtures that can be easily reused across all tests
