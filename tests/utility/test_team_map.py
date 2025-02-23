@@ -1,4 +1,4 @@
-from ...utility.team_map import TEAM_TO_ID_MAP, getTeamIdFromName, getTeamID
+from mlb_team_schedule.utility.team_map import TEAM_TO_ID_MAP, getTeamIdFromName, getTeamID
 from ..common_assertions import assertHasLengthOf, assertIsNone, assertIsNotNone
 
 

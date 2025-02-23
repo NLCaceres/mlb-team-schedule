@@ -1,8 +1,9 @@
-from ...utility.utc_to_pt_converters import (utcStrToPacificTimeStr, utcStrToPacificDatetime, utcDatetimeToPacificDatetime,
+from mlb_team_schedule.utility.utc_to_pt_converters import (utcStrToPacificTimeStr,
+                                             utcStrToPacificDatetime, utcDatetimeToPacificDatetime,
                                              utcDatetimeToPacificTimeStr, utcDatetimeToReadablePacificTimeStr)
 import pytest
 from datetime import datetime, timedelta, UTC
-from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
+from mlb_team_schedule.utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
 
 #! UTC String to PT Converters

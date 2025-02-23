@@ -1,4 +1,4 @@
-from ...utility.endpoint_constants import SCHEDULE_ENDPOINT, LATEST_GAME_URL, BASE_MLB_LOGO_URL
+from mlb_team_schedule.utility.endpoint_constants import SCHEDULE_ENDPOINT, LATEST_GAME_URL, BASE_MLB_LOGO_URL
 import pytest
 
 
