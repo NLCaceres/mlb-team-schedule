@@ -1,7 +1,7 @@
-from ...utility.mlb_api import (fetchThisYearsSchedule, fetchRemainingSchedule,
+from mlb_team_schedule.utility.mlb_api import (fetchThisYearsSchedule, fetchRemainingSchedule,
                                 getScheduleTotals, scheduleDates, createEndpoint)
 from ..common_assertions import assertIsNone
-from ...utility.datetime_helpers import dateToday, dateToStr, YMD_FORMAT
+from mlb_team_schedule.utility.datetime_helpers import dateToday, dateToStr, YMD_FORMAT
 
 
 def test_fetchThisYearsSchedule(app, monkeypatch):
@@ -9,7 +9,7 @@ def test_fetchThisYearsSchedule(app, monkeypatch):
     def mock_JSON(*args, **kwargs):
         return mockResponse
     #? Need to monkeypatch the imported fetch() func, NOT the api_helper module's original export
-    monkeypatch.setattr("DodgersPromo.utility.mlb_api.fetch", mock_JSON)
+    monkeypatch.setattr("mlb_team_schedule.utility.mlb_api.fetch", mock_JSON)
     with app.app_context():
         #* WHEN the response is empty
         totalGames, teamGameDates, seasonStart = fetchThisYearsSchedule()
@@ -33,7 +33,7 @@ def test_fetchThisYearsSchedule(app, monkeypatch):
 def test_fetchRemainingSchedule(app, monkeypatch):
     mockResponse = { } #? Can use a lambda to inject this value via monkeypatch!
     #? Python Lambda's are just 1-line expressions, so placing a var in a lambda acts as an implicit return
-    monkeypatch.setattr("DodgersPromo.utility.mlb_api.fetch", lambda x: mockResponse) #? `x` is required even though unused
+    monkeypatch.setattr("mlb_team_schedule.utility.mlb_api.fetch", lambda x: mockResponse) #? `x` required even if unused
     with app.app_context():
         #* WHEN the response is empty
         totalGames, teamGameDates, scheduleStartPoint = fetchRemainingSchedule()
