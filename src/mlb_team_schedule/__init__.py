@@ -10,7 +10,7 @@ class Base(DeclarativeBase):
 
 #? Setting db and migrate here makes exporting them into other pkgs/dirs & modules/files easier
 db = SQLAlchemy(model_class = Base)
-migrate = Migrate()
+migrate = Migrate(directory = 'src/mlb_team_schedule/migrations')
 scheduler = APScheduler()
 
 def create_app(test_config = None):
