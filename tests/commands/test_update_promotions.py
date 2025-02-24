@@ -1,15 +1,15 @@
-from ...commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
+from mlb_team_schedule.commands.update_promotions import updateAllPromotions, updateEachGamesPromotions
 import pytest
 import requests
 #? An alt option w/ built-in collections like lists, dicts and sets is their constructor BUT they return shallow copies
 import copy #? So deep copy is super useful to avoid changes propagating in nested values across new copies
 from ..common_assertions import assertIsEmpty, assertHasLengthOf
 from ..MockHttpResponse import MockHttpResponse
-from ... import db
-from ...models import BaseballGame, BaseballTeam
-from ...utility.api_helpers import ClientErrorStatusCodeException
-from ...utility.database_helpers import saveToDb
-from ...utility.datetime_helpers import strToDatetime, ISO_FORMAT
+from mlb_team_schedule import db
+from mlb_team_schedule.models import BaseballGame, BaseballTeam
+from mlb_team_schedule.utility.api_helpers import ClientErrorStatusCodeException
+from mlb_team_schedule.utility.database_helpers import saveToDb
+from mlb_team_schedule.utility.datetime_helpers import strToDatetime, ISO_FORMAT
 
 
 #! Fixtures

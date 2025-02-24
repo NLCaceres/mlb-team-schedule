@@ -1,12 +1,12 @@
-from ...commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
+from mlb_team_schedule.commands.update_standings import updateAllTeamRecords, updateEachDivision, updateTeamRecord
 import pytest
 import copy
 import requests
 from ..MockHttpResponse import MockHttpResponse
-from ... import db
-from ...models import BaseballTeam
-from ...utility.api_helpers import ClientErrorStatusCodeException
-from ...utility.database_helpers import saveToDb
+from mlb_team_schedule import db
+from mlb_team_schedule.models import BaseballTeam
+from mlb_team_schedule.utility.api_helpers import ClientErrorStatusCodeException
+from mlb_team_schedule.utility.database_helpers import saveToDb
 
 
 #! Fixtures

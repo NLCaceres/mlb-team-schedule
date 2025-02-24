@@ -1,5 +1,5 @@
-from ...utility.api_helpers import (fetch, ClientErrorStatusCodeException,
-                                    ServerErrorStatusCodeException, UnexpectedHttpResponseStatusCodeException)
+from mlb_team_schedule.utility.api_helpers import (fetch, ClientErrorStatusCodeException,
+                                                   ServerErrorStatusCodeException, UnexpectedHttpResponseStatusCodeException)
 import pytest
 import requests
 from ..common_assertions import assertIsNotNone
