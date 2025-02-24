@@ -1,8 +1,7 @@
-from ...utility.database_helpers import saveToDb, finalizeDbUpdate
+from mlb_team_schedule.utility.database_helpers import saveToDb, finalizeDbUpdate
 from datetime import date
-from ... import db
-from ...models import BaseballGame, BaseballTeam
-
+from mlb_team_schedule import db
+from mlb_team_schedule.models import BaseballGame, BaseballTeam
 
 def test_saveToDb(app):
     team1 = BaseballTeam(team_name='Foobar', city_name='Barfoo', team_logo='Foo', abbreviation='BF', wins=2, losses=1)
