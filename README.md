@@ -146,6 +146,8 @@ use, making it super easy to create your own CLI commands for all kinds of thing
   - `flask db upgrade` - Run any new migrations on your DB
     - `flask db downgrade` - Rollback the last migration you've run
   - WORKFLOW: Run `db init` once! Run `db migrate` + `db upgrade` every new migration
+  - If using "src-layout", MUST set `Migrate(directory='src/<project-name>/migrations')`
+  for any commands to work. Can use `flask db check` to be sure everything is correct
 
 ### Notes on Seeding & the MLB-Stats API
 
@@ -187,10 +189,16 @@ adding a game with `gameNumber: 1` at index 0, and `gameNumber: 2` at index 1
 
 ### Pytest
 
-- To run tests, run `pytest` from the root directory!
-  - Including `-W ignore::DeprecationWarning` silences warnings
-    - Can also add a list of `ignore::someWarning` strings `filterwarnings` to `tool.pytest.ini_options`
+- To run tests, run `python -m pytest` from the root directory!
+  - Append `tests/<sub-pkg>` to run only specific test files
+    - Appending `<file_name.py>` runs a specific file
+    - Appending `<file_name.py::test_func_name>` runs a specific test in a file
+  - Include `-W ignore::DeprecationWarning` to silence warnings
+    - OR add a list of `ignore::someWarning` strings `filterwarnings` to `tool.pytest.ini_options`
     in `pyproject.toml` to add filters for any warning types
+  - MUST run in `-m` module mode to properly test with the new "src-layout" & "importlib"
+    - Also MUST have main pkg installed editably, i.e. `pip install -e .`
+      - ONLY need to be re-installed if metadata changes, i.e. versioning or generated-scrips
   - DOESN'T load env files, so MUST add a fixture before all others to get env vars
     - Should put into `conftest.py` so all tests load env by default
   - For extra debug help, use the `-rP` flag to capture output of all passing tests
