@@ -1,0 +1,43 @@
+exclude = [ # Exclude commonly ignored directories
+    ".bzr", ".direnv", ".eggs", ".git", ".git-rewrite", ".hg", ".ipynb_checkpoints",
+    ".mypy_cache", ".nox", ".pants.d", ".pyenv", ".pytest_cache", ".pytype", ".ruff_cache",
+    ".svn", ".tox", ".venv", ".vscode", "__pypackages__", "_build", "buck-out", "build",
+    "dist", "node_modules", "site-packages", "venv",
+]
+per-file-ignores = {}
+
+line-length = 90
+indent-width = 4
+
+target-version = "py312" # Assume Python 3.12
+
+[lint] # See more at: "docs.astral.sh/ruff/rules/"
+# preview = true # Helpful for finding extra potential issues
+# Default = pycodestyle `E4` imports, `E7` statements, `E9` runtime, & pyflake `F`
+select = ["E", "F", "Q"] # Missing `W` pycodestyle warnings & McCabeComplexity `C901`
+ignore = ["E261", "E262", "E265", 'E402']
+
+fixable = ["ALL"] # Allow fixes for all enabled/selected rules
+unfixable = ["E261", "E262", "E265"] # Spaces around comments
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.isort] # Handles import organization
+section-order = ["local-folder", "first-party", "third-party", "standard-library", "future"]
+relative-imports-order = "closest-to-furthest"
+no-lines-before = ["local-folder", "first-party"]
+
+[lint.mccabe] # Default to complexity of 10, unlike Flake8
+max-complexity = 10
+
+[format] # Disabled Ruff formatter since not quite perfect alongside linter
+# Black style formatting
+quote-style = "double" # Strings use double quotes
+indent-style = "space" # Use spaces, not tabs
+skip-magic-trailing-comma = false # Magic trailing commas are okay
+line-ending = "auto" # Detect appropriate line ending for OS
+
+docstring-code-format = false # Planned to be default enabled in the future
+# Line limit for docstrings IF `docstring-code-format` set to true
+docstring-code-line-length = "dynamic"
