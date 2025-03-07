@@ -20,6 +20,4 @@ build/
 /node_modules/
 /public/build/
 
-ruff.toml
-
 .DS_Store
