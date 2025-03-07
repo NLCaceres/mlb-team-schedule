@@ -27,6 +27,9 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 section-order = ["local-folder", "first-party", "third-party", "standard-library", "future"]
 relative-imports-order = "closest-to-furthest"
 no-lines-before = ["local-folder", "first-party"]
+force-single-line = false
+split-on-trailing-comma = false
+# Ideally "github.com/astral-sh/ruff/issues/2600" fixes import line-wrapping due to line-length
 
 [lint.mccabe] # Default to complexity of 10, unlike Flake8
 max-complexity = 10
@@ -35,7 +38,7 @@ max-complexity = 10
 # Black style formatting
 quote-style = "double" # Strings use double quotes
 indent-style = "space" # Use spaces, not tabs
-skip-magic-trailing-comma = false # Magic trailing commas are okay
+skip-magic-trailing-comma = true # Magic trailing commas are okay
 line-ending = "auto" # Detect appropriate line ending for OS
 
 docstring-code-format = false # Planned to be default enabled in the future
