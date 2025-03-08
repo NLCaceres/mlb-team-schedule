@@ -26,7 +26,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [lint.isort] # Handles import organization
 section-order = ["local-folder", "first-party", "third-party", "standard-library", "future"]
 relative-imports-order = "closest-to-furthest"
-no-lines-before = ["local-folder", "first-party"]
+no-lines-before = ["local-folder", "first-party", "standard-library"]
 force-single-line = false
 split-on-trailing-comma = false
 # Ideally "github.com/astral-sh/ruff/issues/2600" fixes import line-wrapping due to line-length
