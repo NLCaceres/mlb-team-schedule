@@ -1,10 +1,8 @@
 from ..common_assertions import assertIsNotNone
 from ..MockHttpResponse import MockHttpResponse
 from mlb_team_schedule.utility.api_helpers import (
-    ClientErrorStatusCodeException,
-    ServerErrorStatusCodeException,
-    UnexpectedHttpResponseStatusCodeException,
-    fetch,
+    ClientErrorStatusCodeException, ServerErrorStatusCodeException,
+    UnexpectedHttpResponseStatusCodeException, fetch,
 )
 
 import pytest
