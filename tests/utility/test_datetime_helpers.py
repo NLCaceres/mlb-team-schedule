@@ -21,7 +21,7 @@ def test_isDatetime():
     todays_datetime = datetime.now(UTC)
     #* THEN isDatetime, of course, returns True
     assert isDatetime(todays_datetime) is True
-    
+
     #* WHEN using my dateToday() alias to request the current datetime
     todays_date = dateToday()
     #* THEN isDatetime returns False since a date is NOT a datetime, just similar
@@ -32,7 +32,7 @@ def test_isDatetime():
     assert isDatetime("not a date") is False
     #* THEN isDatetime returns False EVEN IF a string that could be formatted into a date
     assert isDatetime("2021-03-01") is False
-    
+
     #* WHEN using an int
     #* THEN isDatetime returns False
     assert isDatetime(123) is False
