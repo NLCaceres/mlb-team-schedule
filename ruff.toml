@@ -14,7 +14,7 @@ target-version = "py312" # Assume Python 3.12
 [lint] # See more at: "docs.astral.sh/ruff/rules/"
 # preview = true # Helpful for finding extra potential issues
 # Default = pycodestyle `E4` imports, `E7` statements, `E9` runtime, & pyflake `F`
-select = ["E", "F", "Q"] # Missing `W` pycodestyle warnings & McCabeComplexity `C901`
+select = ["E", "F", "Q", "W"] # Missing McCabeComplexity `C901`
 ignore = ["E261", "E262", "E265", 'E402']
 
 fixable = ["ALL"] # Allow fixes for all enabled/selected rules
