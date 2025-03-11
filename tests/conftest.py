@@ -1,20 +1,21 @@
+from .MockHttpResponse import MockHttpResponse
+from mlb_team_schedule import create_app
+
 import pytest
 import requests
-from dotenv import load_dotenv, find_dotenv
-from flask_migrate import upgrade, downgrade
-from mlb_team_schedule import create_app
-from .MockHttpResponse import MockHttpResponse
+from dotenv import find_dotenv, load_dotenv
+from flask_migrate import downgrade, upgrade
 
-#? `Conftest.py` is used by `Pytest` to create fixtures that can be easily reused across all tests
-#? Unfortunately, there isn't any other way to share fixtures across tests, so MUST be careful w/ 'autouse'
+#? `Conftest.py` is used by `pytest` to add reusable test fixtures
+#? There isn't any way to share fixtures without `conftest` so beware `autouse` arg
 
 #? Using basic `python-dotenv` rather than `pytest-dotenv` requires the following
 #? 'session' scope ensures this test-wide fixture is the highest priority
-#? 'autouse' tells `pytest` to run this fixture first (configuring an order based on a dependency tree of fixtures)
-@pytest.fixture(scope='session', autouse=True)
-def load_env():
-    env_file = find_dotenv('.env.tests') #? Finds the correct path to this 'tests' directory and its specific env file
-    load_dotenv(env_file) #? Returns a boolean indicating it successfully loaded the env file
+#? `autouse` sets up the order of how fixtures run by setting up a dependency tree
+@pytest.fixture(scope="session", autouse=True)
+def load_env(): #? Find the right path to `/tests` & the env file
+    env_file = find_dotenv(".env.tests")
+    load_dotenv(env_file) #? Returns a bool indicating it successfully loaded the env file
 
 @pytest.fixture
 def app():
@@ -23,8 +24,7 @@ def app():
     app = create_app({ }) #* Passing an empty Dictionary ensures the TestConfig is used
 
     with app.app_context():
-        upgrade() #? Setup the test DB by running migrations so tables are created for tests to fill with mocks
-
+        upgrade() #? Setup test DB via migrations so can fill tables during tests
     # with app.test_client() as client:
         # yield client
 
@@ -33,7 +33,7 @@ def app():
     # os.close(db_fd) #? Only purpose of db_fd is to close file/db
     # os.unlink(db_path)
     with app.app_context():
-        downgrade(revision='base') #? FULLY reset the DB by removing all migrations via 'base', so ALL tables are dropped
+        downgrade(revision="base") #? FULL reset DB, dropping migrations/tables to 'base'
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def client(app):
 def runner(app):
     return app.test_cli_runner()
 
-#? The following fixture comes at the cost of failing ALL tests that try to run HTTP requests making it kinda useless
+#? This fixtures fails ALL tests that try to run HTTP requests, so kinda useless
 # @pytest.fixture(autouse=True)
 # def no_requests(monkeypatch):
 #     monkeypatch.delattr("requests.sessions.Session.request")
