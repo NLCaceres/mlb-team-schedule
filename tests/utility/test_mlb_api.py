@@ -1,14 +1,16 @@
-from mlb_team_schedule.utility.mlb_api import (fetchThisYearsSchedule, fetchRemainingSchedule,
-                                getScheduleTotals, scheduleDates, createEndpoint)
 from ..common_assertions import assertIsNone
-from mlb_team_schedule.utility.datetime_helpers import dateToday, dateToStr, YMD_FORMAT
+from mlb_team_schedule.utility.datetime_helpers import YMD_FORMAT, dateToday, dateToStr
+from mlb_team_schedule.utility.mlb_api import (
+    createEndpoint, fetchRemainingSchedule, fetchThisYearsSchedule,
+    getScheduleTotals, scheduleDates,
+)
 
 
 def test_fetchThisYearsSchedule(app, monkeypatch):
     mockResponse = { }
     def mock_JSON(*args, **kwargs):
         return mockResponse
-    #? Need to monkeypatch the imported fetch() func, NOT the api_helper module's original export
+    #? MUST monkeypatch imported `fetch()`, NOT the api_helper module's original export
     monkeypatch.setattr("mlb_team_schedule.utility.mlb_api.fetch", mock_JSON)
     with app.app_context():
         #* WHEN the response is empty
@@ -17,41 +19,42 @@ def test_fetchThisYearsSchedule(app, monkeypatch):
         assertIsNone(totalGames)
         assertIsNone(teamGameDates)
         #* BUT the start date will still be set to March 1st of THIS year
-        expectedDate = f'{dateToday().year}-03-01'
+        expectedDate = f"{dateToday().year}-03-01"
         assert seasonStart == expectedDate
 
     with app.app_context():
         #* WHEN the response is filled
-        mockResponse = { 'totalGames': 123, 'dates': [] }
-        filledTotalGames, filledTeamGameDates, newSeasonStart = fetchThisYearsSchedule()
+        mockResponse = { "totalGames": 123, "dates": [] }
+        totalGames, teamGameDates, seasonStart = fetchThisYearsSchedule()
         #* THEN all values are properly assigned in a tuple
-        assert filledTotalGames == 123
-        assert filledTeamGameDates == []
-        assert newSeasonStart == expectedDate #* This date won't change
+        assert totalGames == 123
+        assert teamGameDates == []
+        assert seasonStart == expectedDate #* This date won't change
 
 
 def test_fetchRemainingSchedule(app, monkeypatch):
     mockResponse = { } #? Can use a lambda to inject this value via monkeypatch!
-    #? Python Lambda's are just 1-line expressions, so placing a var in a lambda acts as an implicit return
-    monkeypatch.setattr("mlb_team_schedule.utility.mlb_api.fetch", lambda x: mockResponse) #? `x` required even if unused
+    #? Python Lambdas are 1-line expressions that can implicitly return referenced vars
+    #? Lambdas also typically accepts args, and the following one NEEDS it to pass test
+    monkeypatch.setattr("mlb_team_schedule.utility.mlb_api.fetch", lambda _: mockResponse)
     with app.app_context():
         #* WHEN the response is empty
         totalGames, teamGameDates, scheduleStartPoint = fetchRemainingSchedule()
         #* THEN the totalGames and teamGameDates will be None
         assertIsNone(totalGames)
         assertIsNone(teamGameDates)
-        #* BUT the scheduleStartPoint will still be filled properly to today's date, i.e. YYYY-MM-DD
+        #* BUT scheduleStartPoint still is filled correctly to today's date as YYYY-MM-DD
         expectedDate = dateToStr(dateToday(), YMD_FORMAT)
         assert scheduleStartPoint == expectedDate
 
     with app.app_context():
         #* WHEN the response is filled
-        mockResponse = { 'totalGames': 123, 'dates': [] }
-        filledTotalGames, filledTeamGameDates, newScheduleStartPoint = fetchRemainingSchedule()
+        mockResponse = { "totalGames": 123, "dates": [] }
+        totalGames, teamGameDates, scheduleStartPoint = fetchRemainingSchedule()
         #* THEN all values are properly assigned in a tuple
-        assert filledTotalGames == 123
-        assert filledTeamGameDates == []
-        assert newScheduleStartPoint == expectedDate #* This date won't change
+        assert totalGames == 123
+        assert teamGameDates == []
+        assert scheduleStartPoint == expectedDate #* This date won't change
 
 
 def test_getScheduleTotals():
@@ -61,19 +64,19 @@ def test_getScheduleTotals():
     assertIsNone(teamGameDates)
 
     #* WHEN the schedule JSON is missing the game dates
-    nextTotalGames, nextTeamGameDates = getScheduleTotals({ 'totalGames': 123 })
+    nextTotalGames, nextTeamGameDates = getScheduleTotals({ "totalGames": 123 })
     assertIsNone(nextTotalGames) #* THEN the tuple returned is filled with 2 None values
-    assertIsNone(nextTeamGameDates) #* It needs both the game dates and total game count to be filled
+    assertIsNone(nextTeamGameDates) #* MUST fill both game dates & total game count
 
     #* WHEN the schedule JSON is missing the total game count
-    thirdTotalGames, thirdTeamGameDates = getScheduleTotals({ 'dates': [] })
+    thirdTotalGames, thirdTeamGameDates = getScheduleTotals({ "dates": [] })
     assertIsNone(thirdTotalGames) #* THEN the tuple returned is filled with 2 None values
-    assertIsNone(thirdTeamGameDates) #* It needs both the game dates and total game count to be filled
+    assertIsNone(thirdTeamGameDates) #* MUST fill both game dates & total game count
 
-    #* WHEN the schedule JSON has both the total game count and list of game dates (even if empty)
-    filledTotalGames, filledTeamGameDates = getScheduleTotals({ 'totalGames': 123, 'dates': [] })
-    assert filledTotalGames == 123 #* THEN the tuple returned is filled with their respective key's values
-    assert filledTeamGameDates == []
+    #* WHEN the schedule JSON has BOTH total game count & game date list (even if empty)
+    totalGames, teamGameDates = getScheduleTotals({ "totalGames": 123, "dates": [] })
+    assert totalGames == 123 #* THEN fills returned tuple with respective k-v pairs
+    assert teamGameDates == []
 
 
 def test_scheduleDates():
@@ -81,39 +84,43 @@ def test_scheduleDates():
     defaultStartDate, defaultEndDate, defaultThisYear = scheduleDates()
     todaysDate = dateToday()
     expectedYear = todaysDate.year
-    expectedStart = f'{expectedYear}-03-01'
-    expectedEnd = f'{expectedYear}-11-30'
-    #* THEN the start date is March 1st of THIS year and end date is November 30 of the same year
+    expectedStart = f"{expectedYear}-03-01"
+    expectedEnd = f"{expectedYear}-11-30"
+    #* THEN start date is March 1st THIS year & end date is Nov 30 THIS year
     assert defaultStartDate == expectedStart
     assert defaultEndDate == expectedEnd
     assert defaultThisYear == expectedYear
-    
-    #* WHEN requesting this year's schedule dates by explicitly setting startingToday to False
+
+    #* WHEN requesting this year's dates by setting startingToday to False
     startDate, endDate, thisYear = scheduleDates(startingToday = False)
-    #* THEN the start date is STILL March 1st of THIS year and end date is November 30 of the same year
+    #* THEN start date is STILL March 1st THIS year & end date is Nov 30 THIS year
     assert startDate == expectedStart
     assert endDate == expectedEnd
     assert thisYear == expectedYear
 
     #* WHEN requesting this year's schedule dates setting startingToday to True
-    startingTodayDate, updatedEndDate, updatedThisYear = scheduleDates(startingToday = True)
-    #* THEN the start date is today's date in YYYY-MM-DD format AND the end date is STILL November 30th of this year
+    startingTodayDate, setEndDate, setThisYear = scheduleDates(startingToday = True)
+    #* THEN start date is today's date as YYYY-MM-DD & end date is STILL Nov 30 THIS year
     assert startingTodayDate == dateToStr(dateToday(), YMD_FORMAT)
-    assert updatedEndDate == expectedEnd
-    assert updatedThisYear == expectedYear
+    assert setEndDate == expectedEnd
+    assert setThisYear == expectedYear
 
 
 def test_createEndpoint(app):
     with app.app_context():
         #* WHEN any of the date values are missing
-        endpointMissingAllValues = createEndpoint(startDate = None, endDate = None, seasonYear = None, teamId = None)
+        endpointMissingAllValues = createEndpoint(startDate = None, endDate = None,
+                                                  seasonYear = None, teamId = None)
         #* THEN None is returned
         assertIsNone(endpointMissingAllValues)
-        endpointFromStartDate = createEndpoint(startDate = '2021-03-01', endDate = None, seasonYear = None, teamId = None)
+        endpointFromStartDate = createEndpoint(startDate = "2021-03-01", endDate = None,
+                                               seasonYear = None, teamId = None)
         assertIsNone(endpointFromStartDate)
-        endpointFromEndDate = createEndpoint(startDate = None, endDate = '2021-11-01', seasonYear = None, teamId = None)
+        endpointFromEndDate = createEndpoint(startDate = None, endDate = "2021-11-01",
+                                             seasonYear = None, teamId = None)
         assertIsNone(endpointFromEndDate)
-        endpointFromYear = createEndpoint(startDate = None, endDate = None, seasonYear = '2021', teamId = None)
+        endpointFromYear = createEndpoint(startDate = None, endDate = None,
+                                          seasonYear = "2021", teamId = None)
         assertIsNone(endpointFromYear)
 
         #* WHEN no date values are provided
@@ -122,54 +129,63 @@ def test_createEndpoint(app):
         assertIsNone(endpointMissingDateValues)
 
         #* WHEN the date values are filled
-        endpointWithDefaultTeam = createEndpoint('2021-03-01', '2021-11-30', '2021')
+        endpointWithDefaultTeam = createEndpoint("2021-03-01", "2021-11-30", "2021")
         #* THEN the endpoint will be filled with those values AND a default team ID of 119
-        expectedEndpointWithDefaultTeam = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                           ',game(promotions)&season=2021&startDate=2021-03-01&endDate=2021-11-30'
-                                           '&teamId=119&gameType=R&scheduleTypes=games')
+        expectedEndpointWithDefaultTeam = ("https://statsapi.mlb.com/api/v1/schedule?lang=en"
+                                           "&sportId=1&hydrate=team,game(promotions)"
+                                           "&season=2021&startDate=2021-03-01&endDate=2021-11-30"
+                                           "&teamId=119&gameType=R&scheduleTypes=games")
         assert endpointWithDefaultTeam == expectedEndpointWithDefaultTeam
 
         #* WHEN the teamID env var is filled incorrectly
-        app.config['TEAM_FULL_NAME'] = 'chiicagoo Cubs'
-        endpointWithMisspelledTeam = createEndpoint('2021-03-01', '2021-11-30', '2021')
+        app.config["TEAM_FULL_NAME"] = "chiicagoo Cubs"
+        endpointWithMisspelledTeam = createEndpoint("2021-03-01", "2021-11-30", "2021")
         #* THEN the endpoint will be filled with those values AND a default team ID of 119
-        expectedEndpointStillWithDefaultTeam = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                                ',game(promotions)&season=2021&startDate=2021-03-01&endDate=2021-11-30'
-                                                '&teamId=119&gameType=R&scheduleTypes=games')
+        expectedEndpointStillWithDefaultTeam = ("https://statsapi.mlb.com/api/v1/schedule"
+                                                "?lang=en&sportId=1&hydrate=team"
+                                                ",game(promotions)&season=2021"
+                                                "&startDate=2021-03-01&endDate=2021-11-30"
+                                                "&teamId=119&gameType=R&scheduleTypes=games")
         assert endpointWithMisspelledTeam == expectedEndpointStillWithDefaultTeam
 
         #* WHEN the teamID env var is filled properly
-        app.config['TEAM_FULL_NAME'] = 'Chicago Cubs'
-        endpointWithOtherTeam = createEndpoint('2021-03-01', '2021-11-30', '2021')
+        app.config["TEAM_FULL_NAME"] = "Chicago Cubs"
+        endpointWithOtherTeam = createEndpoint("2021-03-01", "2021-11-30", "2021")
         #* THEN the endpoint will be filled with those values AND the team's expected ID
-        expectedEndpointWithOtherTeam = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                         ',game(promotions)&season=2021&startDate=2021-03-01&endDate=2021-11-30'
-                                         '&teamId=112&gameType=R&scheduleTypes=games')
+        expectedEndpointWithOtherTeam = ("https://statsapi.mlb.com/api/v1/schedule?lang=en"
+                                         "&sportId=1&hydrate=team,game(promotions)&season=2021"
+                                         "&startDate=2021-03-01&endDate=2021-11-30"
+                                         "&teamId=112&gameType=R&scheduleTypes=games")
         assert endpointWithOtherTeam == expectedEndpointWithOtherTeam
 
         #* WHEN all args are filled
-        normalEndpointWithID = createEndpoint('2021-03-01', '2021-11-30', '2021', 123)
-        #* THEN the endpoint will be filled using ALL input arg values, even if team ID env var is filled
-        normalExpectedEndpointWithID = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                        ',game(promotions)&season=2021&startDate=2021-03-01&endDate=2021-11-30'
-                                        '&teamId=123&gameType=R&scheduleTypes=games')
+        normalEndpointWithID = createEndpoint("2021-03-01", "2021-11-30", "2021", 123)
+        #* THEN endpoint filled using ALL arg values, even if TEAM_ID env var filled
+        normalExpectedEndpointWithID = ("https://statsapi.mlb.com/api/v1/schedule?lang=en"
+                                        "&sportId=1&hydrate=team,game(promotions)&season=2021"
+                                        "&startDate=2021-03-01&endDate=2021-11-30"
+                                        "&teamId=123&gameType=R&scheduleTypes=games")
         assert normalEndpointWithID == normalExpectedEndpointWithID
 
         #* WHEN the dates are input BUT poorly formatted
-        app.config['TEAM_FULL_NAME'] = 'Los Angeles Dodgers' #* Reset to default for simplicity sake
-        endpointWithUnformattedDateVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020',
-                                                        seasonYear = 1234, teamId = None)
+        app.config["TEAM_FULL_NAME"] = "Los Angeles Dodgers" #* Reset to default
+        endpointWithUnformattedDateVals = createEndpoint(startDate = "03-01-2021",
+                                                         endDate = "11-30-2020",
+                                                         seasonYear = 1234, teamId = None)
         #* THEN the poorly formatted values will be injected regardless
-        poorlyFormattedEndpoint = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                ',game(promotions)&season=1234&startDate=03-01-2021&endDate=11-30-2020'
-                                '&teamId=119&gameType=R&scheduleTypes=games')
+        poorlyFormattedEndpoint = ("https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1"
+                                   "&hydrate=team,game(promotions)&season=1234"
+                                   "&startDate=03-01-2021&endDate=11-30-2020"
+                                   "&teamId=119&gameType=R&scheduleTypes=games")
         assert endpointWithUnformattedDateVals == poorlyFormattedEndpoint
 
         #* WHEN all values are input BUT poorly formatted
-        endpointWithUnformattedVals = createEndpoint(startDate = '03-01-2021', endDate = '11-30-2020',
-                                                    seasonYear = 1234, teamId = 'some_id')
+        endpointWithUnformattedVals = createEndpoint(startDate = "03-01-2021",
+                                                     endDate = "11-30-2020",
+                                                     seasonYear = 1234, teamId = "someId")
         #* THEN the poorly formatted values will be injected regardless
-        completelyPoorlyFormattedEndpoint = ('https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=1&hydrate=team'
-                                            ',game(promotions)&season=1234&startDate=03-01-2021&endDate=11-30-2020'
-                                            '&teamId=some_id&gameType=R&scheduleTypes=games')
+        completelyPoorlyFormattedEndpoint = ("https://statsapi.mlb.com/api/v1/schedule?lang=en"
+                                             "&sportId=1&hydrate=team,game(promotions)"
+                                             "&season=1234&startDate=03-01-2021&endDate=11-30-2020"
+                                             "&teamId=someId&gameType=R&scheduleTypes=games")
         assert endpointWithUnformattedVals == completelyPoorlyFormattedEndpoint
