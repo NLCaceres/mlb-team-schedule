@@ -23,6 +23,9 @@ unfixable = ["E261", "E262", "E265"] # Spaces around comments
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
+[lint.per-file-ignores]
+"__init__.py" = ["F401"] # "preview" should eventually fix this
+
 [lint.isort] # Handles import organization
 section-order = ["local-folder", "first-party", "third-party", "standard-library", "future"]
 relative-imports-order = "closest-to-furthest"
