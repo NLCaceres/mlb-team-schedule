@@ -1,48 +1,51 @@
+from .. import db
+
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
-from .. import db
 
 
 class BaseballTeam(db.Model):
-    __tablename__ = 'baseball_teams'
+    __tablename__ = "baseball_teams"
 
 
-    #* MLB API Json Parent Key = dates.games.teams.home.
+    # MLB API Json Parent Key = dates.games.teams.home.
     id: Mapped[int] = mapped_column(primary_key=True)
-    #* MLB API Json Key = team.id -> f"https://www.mlbstatic.com/team-logos/{espnID}.svg" -> DIFFERENT THAN above DB ID
-    team_logo: Mapped[str] = mapped_column(unique=True)
-    #* MLB API Json Key = team.clubName -> Dodgers which grabs the official name, not nicknames like D-Backs
+    # MLB API Json Key = team.id -> f"https://www.mlbstatic.com/team-logos/{espnID}.svg"
+    team_logo: Mapped[str] = mapped_column(unique=True) # Uses different ID than above ID
+    # MLB API Json Key = team.clubName -> Dodgers - Grabs official name, not nicknames
     team_name: Mapped[str] = mapped_column(unique=True)
-    #* MLB API Json Key = team.franchiseName -> Los Angeles which grabs official location, not necessarily city or state
-    city_name: Mapped[str] #* i.e. Colorado Rockies vs Denver Rockies
-    #* MLB API Json Key = team.abbreviation -> LAD
-    abbreviation: Mapped[str] = mapped_column(unique=True) #? Need mapped_column since unique must be set to true here
-    #* MLB API Json Key = leagueRecord.wins
-    wins: Mapped[int] #? Don't need mapped_column since nullable will be set to false based on the type!
-    #* MLB API Json Key = leagueRecord.losses
-    losses: Mapped[int] #? Alternatively, if nullable needed to be true, we could set the type to Mapped[Optional[int]]
+    # MLB API Json Key = team.franchiseName -> Los Angeles - Grabs official location
+    city_name: Mapped[str] # Might not be city or state i.e. Colorado Rockies vs Denver
+    # MLB API Json Key = team.abbreviation -> LAD
+    abbreviation: Mapped[str] = mapped_column(unique=True) #? Need unique in mapped_column
+    # MLB API Json Key = leagueRecord.wins
+    wins: Mapped[int] #? Don't need mapped_column since nullable = false based on type!
+    # MLB API Json Key = leagueRecord.losses
+    losses: Mapped[int] #? IF nullable must be true, set the type to Mapped[Optional[int]]
 
 
-    #? Being on the Many-side, BaseballGame uses foreign_keys to pair ITS OWN foreign keys' w/ their relationships
-    #? BUT on the 1-side, BaseballTeam uses foreign_keys to help SQLAlchemy find those ForeignKeys in BASEBALL_GAMES table
-    baseballGameMapName = 'BaseballGame'
-    homeGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='home_team',
-                                                                foreign_keys='BaseballGame.home_team_id')
-    #? Put home+away games in 1 column THEN filter via hybrid_prop?.. FOR NOW, these 2 relationships provide easy table joins
-    awayGames: Mapped[List[baseballGameMapName]] = relationship(back_populates='away_team',
-                                                                foreign_keys='BaseballGame.away_team_id')
+    #? BaseballGame sets `foreign_keys` from ITS OWN table to pair the BaseballTeam FK
+    #? BaseballTeam as parent sets `foreign_keys` to help SQLAlchemy find those FKs
+    baseballGameMapName = "BaseballGame"
+    homeGames: Mapped[List[baseballGameMapName]] = relationship(
+        back_populates="home_team", foreign_keys="BaseballGame.home_team_id"
+    )
+    #TODO: Home+Away games in 1 column THEN filter as hybrid_prop? Delim "Ws-Ls" by "-"
+    awayGames: Mapped[List[baseballGameMapName]] = relationship(
+        back_populates="away_team", foreign_keys="BaseballGame.away_team_id"
+    )
 
 
-    @hybrid_property #? Hybrid props are SQLAlchemy's equivalent of computed properties (or virtuals from mongo!)
-    def fullName(self): #? MUST concatenate here, since f-strings are misinterpreted by SQLAlchemy
+    @hybrid_property #? SQLAlchemy hybrid props act like computed props or Mongo virtuals
+    def fullName(self): #? MUST concat here, since SQLAlchemy misinterprets f-strings
         return self.city_name + " " + self.team_name
 
 
     @hybrid_property
-    def espnID(self): #* team_logo starts as 'https://mlbstat.com/team-logos/123.svg'
-        splitLogoUrl = self.team_logo.split('/')[4] #* so 4th index always grabs '123.svg'
-        return splitLogoUrl.split('.')[0] #* Once split on the dot, take the 0-index from [123, svg] so '123'
+    def espnID(self): # team_logo starts as 'https://mlbstat.com/team-logos/123.svg'
+        splitLogoUrl = self.team_logo.split("/")[4] # so 4th index SHOULD grab '123.svg'
+        return splitLogoUrl.split(".")[0] # Split on "." to get '123' from [123, svg]
 
 
     @hybrid_property
@@ -51,21 +54,23 @@ class BaseballTeam(db.Model):
 
 
     @hybrid_property
-    def asDict(self): #* No need to include homeGames/awayGames (which would just cause a large recursive reference mess)
+    def asDict(self): # Don't need homeGames/awayGames, and cause a big recursive mess
         return {
-            'id': self.id, 'teamLogo': self.team_logo,
-            'teamName': self.team_name, 'cityName': self.city_name,
-            'abbreviation': self.abbreviation, 'wins': self.wins, 'losses': self.losses
+            "id": self.id, "teamLogo": self.team_logo,
+            "teamName": self.team_name, "cityName": self.city_name,
+            "abbreviation": self.abbreviation, "wins": self.wins, "losses": self.losses
         }
 
 
     def __repr__(self): #? String representation on queries
-        return f'<BaseballTeam {self.id} - The {self.city_name} {self.team_name}>'
+        return f"<BaseballTeam {self.id} - The {self.city_name} {self.team_name}>"
 
 
-    def __eq__(self, other): #? Could also override __hash__ but only needed if expected to use sets
+    def __eq__(self, other): #? CAN override `__hash__` but only needed if using sets
         if isinstance(other, BaseballTeam):
             idCheck = self.id == other.id
-            teamCheck = self.city_name == other.city_name and self.team_name == other.team_name
-            return idCheck or teamCheck
+            sameCity = self.city_name == other.city_name
+            sameTeamName = self.team_name and other.team_name
+            return idCheck or (sameCity and sameTeamName)
         return False
+
