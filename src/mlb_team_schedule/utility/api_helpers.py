@@ -3,7 +3,7 @@ import requests
 
 def fetch(url):
     print(f"Fetching a response from {url}")
-    
+
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -11,24 +11,24 @@ def fetch(url):
         return response.json()
     elif 400 <= response.status_code <= 499:
         raise ClientErrorStatusCodeException(
-            f"While Fetching from {url}: Found a {response.status_code} Client Error Status Code"
+            f"When Fetching from {url}: Got a {response.status_code} Client Error Code"
         )
     elif 500 <= response.status_code <= 599:
         raise ServerErrorStatusCodeException(
-            f"While Fetching from {url}: Found a {response.status_code} Server Error Status Code"
+            f"When Fetching from {url}: Got a {response.status_code} Server Error Code"
         )
     else:
         raise UnexpectedHttpResponseStatusCodeException(
-            f"While Fetching from {url}: Found an unexpected {response.status_code} Status Code"
+            f"When Fetching from {url}: Got a {response.status_code} Status Code"
         )
 
 
 #! Status Code Exceptions
 class UnexpectedHttpResponseStatusCodeException(Exception):
-    """Raise when encountering an unexpected status code
+    """Raise when encountering an unexpected status code that is not between 400 and 599
 
-    Use the ClientError and ServerError Exception subclasses for 400-499 and 500-599 status codes, respectively
-
+    If the status code is 400-499, use the ClientError Exception subclass.
+    If the status code is 500-599, use the ServerError Exception subclass.
     """
 
 class ClientErrorStatusCodeException(UnexpectedHttpResponseStatusCodeException):
@@ -36,3 +36,4 @@ class ClientErrorStatusCodeException(UnexpectedHttpResponseStatusCodeException):
 
 class ServerErrorStatusCodeException(UnexpectedHttpResponseStatusCodeException):
     """Raise when receiving HTTP Responses that have a 500-599 status code"""
+
