@@ -1,4 +1,4 @@
-name: Run Golang Tests
+name: Run Python Tests
 
 on:
   push:
