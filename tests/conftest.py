@@ -1,6 +1,7 @@
 from .MockHttpResponse import MockHttpResponse
 from mlb_team_schedule import create_app
 
+import os
 import pytest
 import requests
 from dotenv import find_dotenv, load_dotenv
@@ -21,7 +22,9 @@ def load_env(): #? Find the right path to `/tests` & the env file
 def app():
     # db_fd, db_path = tempfile.mkstemp() #? db_path links to temp db file
 
+    os.environ["SECRET_KEY"] = f"{os.urandom(24)}"
     app = create_app({ }) #* Passing an empty Dictionary ensures the TestConfig is used
+    app.config.from_mapping({"SECRET_KEY": os.environ["SECRET_KEY"]})
 
     with app.app_context():
         upgrade() #? Setup test DB via migrations so can fill tables during tests
