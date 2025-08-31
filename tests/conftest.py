@@ -1,11 +1,14 @@
 from .MockHttpResponse import MockHttpResponse
 from mlb_team_schedule import create_app
 
-import os
 import pytest
 import requests
 from dotenv import find_dotenv, load_dotenv
-from flask_migrate import downgrade, upgrade
+from flask_migrate import upgrade
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine.url import make_url
+from sqlalchemy.exc import OperationalError
+import os
 
 #? `Conftest.py` is used by `pytest` to add reusable test fixtures
 #? There isn't any way to share fixtures without `conftest` so beware `autouse` arg
@@ -26,6 +29,21 @@ def app():
     app = create_app({ }) #* Passing an empty Dictionary ensures the TestConfig is used
     app.config.from_mapping({"SECRET_KEY": os.environ["SECRET_KEY"]})
 
+    config: dict[str, str] = app.config.get_namespace("SQLALCHEMY_")
+    url = make_url(config["database_uri"])
+    engine = create_engine(url, isolation_level="AUTOCOMMIT")
+    rootURL = url._replace(database="postgres")
+    rootEngine = create_engine(rootURL, isolation_level="AUTOCOMMIT")
+    try:
+        print(f"Trying to connect to database called = {url.database}")
+        with engine.connect() as db:
+            print(f"Found database called = {url.database}")
+    except OperationalError:
+        print(f"Creating new database called {url.database}")
+        with rootEngine.begin() as db:
+            statement = text(f"CREATE DATABASE {url.database} ENCODING 'utf8'")
+            db.execute(statement)
+
     with app.app_context():
         upgrade() #? Setup test DB via migrations so can fill tables during tests
     # with app.test_client() as client:
@@ -36,7 +54,10 @@ def app():
     # os.close(db_fd) #? Only purpose of db_fd is to close file/db
     # os.unlink(db_path)
     with app.app_context():
-        downgrade(revision="base") #? FULL reset DB, dropping migrations/tables to 'base'
+        # downgrade(revision="base") #? FULL reset DB, dropping migrations/tables to 'base'
+        with rootEngine.begin() as db:
+            statement = text(f"DROP DATABASE {url.database} WITH (FORCE)")
+            db.execute(statement)
 
 
 @pytest.fixture
