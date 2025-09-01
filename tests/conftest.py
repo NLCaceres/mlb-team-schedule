@@ -1,5 +1,5 @@
 from .MockHttpResponse import MockHttpResponse
-from mlb_team_schedule import create_app
+from mlb_team_schedule import create_app, db as sa
 
 import pytest
 import requests
@@ -55,8 +55,10 @@ def app():
     # os.unlink(db_path)
     with app.app_context():
         # downgrade(revision="base") #? FULL reset DB, dropping migrations/tables to 'base'
+        sa.engine.dispose()
         with rootEngine.begin() as db:
-            statement = text(f"DROP DATABASE {url.database} WITH (FORCE)")
+            print(f"Dropping database = {url.database}")
+            statement = text(f"DROP DATABASE {url.database}")
             db.execute(statement)
 
 
