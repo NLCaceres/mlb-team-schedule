@@ -8,7 +8,8 @@ from flask_migrate import downgrade, upgrade
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError
-import os
+from os import environ
+from secrets import token_hex
 
 #? `Conftest.py` is used by `pytest` to add reusable test fixtures
 #? There isn't any way to share fixtures without `conftest` so beware `autouse` arg
@@ -23,7 +24,7 @@ def load_env(): #? Find the right path to `/tests` & the env file
 
 @pytest.fixture(scope="session")
 def database():
-    url = make_url(os.environ["TEST_DATABASE_URL"])
+    url = make_url(environ["TEST_DATABASE_URL"])
     engine = create_engine(url, isolation_level="AUTOCOMMIT")
     rootURL = url._replace(database="postgres")
     rootEngine = create_engine(rootURL, isolation_level="AUTOCOMMIT")
@@ -48,9 +49,9 @@ def database():
 def app(database):
     # db_fd, db_path = tempfile.mkstemp() #? db_path links to temp db file
 
-    os.environ["SECRET_KEY"] = f"{os.urandom(24)}"
+    environ["SECRET_KEY"] = token_hex(16) # Defaults to 32, a good default in prod
     app = create_app({ }) #* Passing an empty Dictionary ensures the TestConfig is used
-    app.config.from_mapping({"SECRET_KEY": os.environ["SECRET_KEY"]})
+    app.config.from_mapping({"SECRET_KEY": environ["SECRET_KEY"]})
 
     with app.app_context():
         upgrade() #? Setup test DB via migrations so can fill tables during tests
@@ -88,3 +89,4 @@ def mock_404_response(monkeypatch):
         return MockHttpResponse(404)
 
     monkeypatch.setattr(requests, "get", mock_get)
+
